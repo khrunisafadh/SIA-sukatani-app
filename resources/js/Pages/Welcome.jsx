@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Head, Link } from '@inertiajs/react';
 import { 
   Building2, 
@@ -7,19 +7,21 @@ import {
   FileText, 
   Home, 
   CheckCircle2, 
-  FileCheck, 
-  Download, 
-  Stamp, 
   Info, 
   ShieldCheck, 
-  ExternalLink,
-  ChevronRight,
+  ChevronRight, 
+  ChevronDown,
   Sparkles,
+  HelpCircle,
+  UserCheck,
   ClipboardCheck,
-  UserCheck
+  Download,
+  Stamp
 } from 'lucide-react';
 
 export default function Welcome({ canLogin = true }) {
+  const [openFaq, setOpenFaq] = useState(null);
+
   const scrollToSection = (id) => {
     const el = document.getElementById(id);
     if (el) {
@@ -27,26 +29,48 @@ export default function Welcome({ canLogin = true }) {
     }
   };
 
+  const toggleFaq = (index) => {
+    setOpenFaq(openFaq === index ? null : index);
+  };
+
+  const faqs = [
+    {
+      q: 'Bagaimana cara mendapatkan akun warga untuk masuk ke sistem?',
+      a: 'Akun warga didaftarkan langsung oleh Pengurus RT 01/08 Sukatani berdasarkan data kependudukan (Kartu Keluarga). Anda dapat menghubungi ketua RT atau sekretaris RT untuk verifikasi dan aktivasi akun Anda.'
+    },
+    {
+      q: 'Berapa lama proses verifikasi pengajuan surat?',
+      a: 'Pemeriksaan surat secara digital biasanya diproses oleh pengurus RT dalam waktu 1x24 jam pada hari kerja setelah formulir diajukan melalui portal warga.'
+    },
+    {
+      q: 'Apakah surat yang diunduh langsung sah tanpa tanda tangan fisik?',
+      a: 'Tidak. Surat yang diunduh dari sistem merupakan draf resmi yang telah diverifikasi. Anda tetap wajib membawa dokumen fisik tersebut ke Pengurus RT untuk mendapatkan tanda tangan basah dan cap stempel resmi RT 01/08.'
+    },
+    {
+      q: 'Dokumen apa saja yang perlu disiapkan saat mengajukan surat?',
+      a: 'Secara umum Anda memerlukan file identitas (KTP) dan Kartu Keluarga (KK). Untuk keperluan surat domisili warga kontrak, pengurus mungkin meminta bukti perjanjian sewa atau surat pengantar pemilik rumah.'
+    },
+    {
+      q: 'Apakah warga non-permanen / pengontrak bisa mengajukan surat domisili?',
+      a: 'Bisa. Warga yang berdomisili atau bertempat tinggal di wilayah RT 01/08 Sukatani (baik tetap maupun kontrak) dapat mengajukan Surat Keterangan Domisili setelah data huniannya diverifikasi oleh pengurus.'
+    }
+  ];
+
   return (
     <>
       <Head title="SIA Sukatani - Layanan Administrasi RT 01/08" />
 
       <div className="min-h-screen bg-white font-sans text-[#10264F] antialiased selection:bg-[#2764D8] selection:text-white">
-        {/* ================= HEADER / NAVBAR ================= */}
+        {/* ================= HEADER / NAVBAR (Tanpa Logo Kotak) ================= */}
         <header className="sticky top-0 z-50 w-full bg-white/95 backdrop-blur-md border-b border-[#E4E9F0]">
           <div className="max-w-[1280px] mx-auto px-6 h-[78px] flex items-center justify-between">
-            {/* Left: Brand & Location Badge */}
+            {/* Left: Brand Text & Location Badge (Tanpa Icon Logo Kotak) */}
             <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-[#2764D8] flex items-center justify-center text-white font-bold shadow-md shadow-[#2764D8]/20">
-                  <Building2 className="w-5 h-5 text-white" />
-                </div>
-                <div className="flex flex-col">
-                  <span className="font-extrabold text-[17px] tracking-tight text-[#022448] font-heading leading-tight">
-                    SIA Sukatani
-                  </span>
-                  <span className="text-[11px] text-[#68748A]">Administrasi RT</span>
-                </div>
+              <div className="flex flex-col">
+                <span className="font-extrabold text-xl tracking-tight text-[#022448] font-heading leading-tight">
+                  SIA Sukatani
+                </span>
+                <span className="text-[11px] text-[#68748A]">Administrasi Rukun Tetangga</span>
               </div>
 
               <div className="hidden sm:inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#E7F6EF] border border-[#0F8F83]/20 text-xs font-semibold">
@@ -83,6 +107,12 @@ export default function Welcome({ canLogin = true }) {
                   className="hover:text-[#2764D8] transition-colors cursor-pointer"
                 >
                   Panduan
+                </button>
+                <button 
+                  onClick={() => scrollToSection('faq')}
+                  className="hover:text-[#2764D8] transition-colors cursor-pointer"
+                >
+                  FAQ
                 </button>
               </div>
 
@@ -159,58 +189,46 @@ export default function Welcome({ canLogin = true }) {
                 </div>
               </div>
 
-              {/* Right Column: Visual Graphic Banner */}
+              {/* Right Column: Visual Graphic Banner Sesuai Figma (Isometric Neighborhood RT 01/08) */}
               <div className="lg:col-span-5 relative flex justify-center">
-                <div className="relative w-full max-w-[460px] p-8 rounded-3xl bg-gradient-to-br from-[#F5F8FF] to-[#E7EEFB] border border-[#D7E2F2] shadow-xl shadow-blue-900/5">
-                  <div className="space-y-6">
-                    <div className="flex items-center justify-between border-b border-[#D7E2F2] pb-4">
-                      <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 rounded-full bg-[#EF4444]" />
-                        <div className="w-3 h-3 rounded-full bg-[#F59E0B]" />
-                        <div className="w-3 h-3 rounded-full bg-[#10B981]" />
-                      </div>
-                      <span className="text-xs font-semibold text-[#68748A]">Portal Warga Sukatani</span>
-                    </div>
+                <div className="relative w-full max-w-[480px] h-[380px] rounded-3xl bg-gradient-to-br from-[#EAF6F4] via-[#F2F8F7] to-[#E3EFEA] border border-[#C2D8D1] shadow-2xl shadow-teal-900/10 overflow-hidden flex items-center justify-center">
+                  
+                  {/* Concentric Ambient Ring (dari figma #8:834) */}
+                  <div className="absolute w-72 h-72 rounded-full border border-[#0F8F83]/20 shadow-[0_0_0_40px_rgba(15,143,131,0.03),0_0_0_80px_rgba(15,143,131,0.02)] pointer-events-none" />
 
-                    {/* Preview Cards */}
-                    <div className="space-y-3.5">
-                      <div className="p-4 rounded-xl bg-white border border-[#E4E9F0] shadow-sm flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-lg bg-[#EEF4FF] flex items-center justify-center text-[#2764D8]">
-                            <FileText className="w-5 h-5" />
+                  {/* Isometric House & Landmark Illustration Graphic */}
+                  <div className="relative z-10 flex flex-col items-center">
+                    {/* Isometric Building Representation */}
+                    <div className="relative w-52 h-44 flex items-center justify-center">
+                      {/* Ground Base Polygon */}
+                      <div className="absolute bottom-2 w-48 h-20 bg-[#DCEEE7] rounded-[40px] transform -rotate-3 border-4 border-[#C2D8D1]/80 shadow-sm" />
+                      
+                      {/* Center Home Building Card */}
+                      <div className="relative z-10 w-40 p-4 bg-[#F9FBFB] border-2 border-[#10264F] rounded-2xl shadow-lg transform -rotate-1">
+                        <div className="h-3 w-16 bg-[#C88A5E] rounded mb-2 border border-[#10264F]" />
+                        <div className="flex items-center justify-between">
+                          <div className="space-y-1">
+                            <div className="h-2 w-12 bg-[#DCECF0] rounded border border-[#10264F]" />
+                            <div className="h-2 w-16 bg-[#DCECF0] rounded border border-[#10264F]" />
                           </div>
-                          <div>
-                            <p className="text-xs font-bold text-[#10264F]">Surat Pengantar</p>
-                            <p className="text-[11px] text-[#68748A]">Pengajuan aktif</p>
+                          <div className="w-8 h-8 rounded-lg bg-[#0F8F83] text-white flex items-center justify-center font-bold text-xs shadow-md">
+                            01
                           </div>
                         </div>
-                        <span className="text-[11px] font-bold text-[#0F8F83] bg-[#E7F6EF] px-2.5 py-1 rounded-md">
-                          Tersedia
-                        </span>
                       </div>
 
-                      <div className="p-4 rounded-xl bg-white border border-[#E4E9F0] shadow-sm flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-lg bg-[#E7F6EF] flex items-center justify-center text-[#0F8F83]">
-                            <Home className="w-5 h-5" />
-                          </div>
-                          <div>
-                            <p className="text-xs font-bold text-[#10264F]">Keterangan Domisili</p>
-                            <p className="text-[11px] text-[#68748A]">Kebutuhan warga</p>
-                          </div>
-                        </div>
-                        <span className="text-[11px] font-bold text-[#0F8F83] bg-[#E7F6EF] px-2.5 py-1 rounded-md">
-                          Tersedia
-                        </span>
+                      {/* Right Secondary Badge Pin */}
+                      <div className="absolute top-2 right-2 z-20 px-2.5 py-1 rounded-lg bg-[#0F8F83] text-white text-[10px] font-bold shadow-md flex items-center gap-1 border border-white">
+                        <span>RW 08</span>
                       </div>
                     </div>
 
-                    <div className="pt-2 flex items-center justify-between text-xs text-[#68748A]">
-                      <div className="flex items-center gap-1.5">
-                        <ShieldCheck className="w-4 h-4 text-[#2764D8]" />
-                        <span className="font-medium">Lingkungan RT 01 / RW 08</span>
-                      </div>
-                      <span className="font-bold text-[#10264F]">Depok</span>
+                    {/* Badge Floating: Lingkungan RT 01 / RW 08 (dari Figma #8:868) */}
+                    <div className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/95 border border-[#C2D8D1] shadow-md backdrop-blur-md">
+                      <div className="w-2.5 h-2.5 rounded-full bg-[#0F8F83] animate-pulse" />
+                      <span className="text-xs font-bold text-[#10264F] font-heading">
+                        Lingkungan RT 01 / RW 08
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -305,90 +323,100 @@ export default function Welcome({ canLogin = true }) {
           </div>
         </section>
 
-        {/* ================= SECTION: ALUR PENGAJUAN (Dark Section) ================= */}
+        {/* ================= SECTION: ALUR PENGAJUAN (Sesuai Presisi Figma #8:929) ================= */}
         <section id="alur" className="py-24 bg-[#00655C] text-white">
           <div className="max-w-[1280px] mx-auto px-6">
+            {/* Header Alur Pengajuan (Figma: #8:934) */}
             <div className="text-center max-w-2xl mx-auto space-y-3 mb-16">
-              <span className="text-[11px] font-bold tracking-widest uppercase text-[#65D1C4] font-heading">
+              <span className="text-[10px] font-bold tracking-[0.16em] uppercase text-[#65D1C4] font-heading">
                 ALUR PENGAJUAN
               </span>
-              <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight font-heading">
+              <h2 className="text-3xl sm:text-4xl font-normal text-white tracking-tight font-heading">
                 Pengajuan Surat dalam Beberapa Langkah
               </h2>
-              <p className="text-sm sm:text-base text-white/80 leading-relaxed">
+              <p className="text-sm sm:text-base text-white/80 leading-relaxed font-sans">
                 Alur sederhana dari portal warga hingga proses tanda tangan fisik.
               </p>
             </div>
 
-            {/* 4 Steps Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {/* Step 1 */}
-              <div className="p-7 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/15 space-y-4">
-                <span className="text-2xl font-black text-[#65D1C4] font-heading">
-                  01
-                </span>
-                <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-[#65D1C4]">
-                  <UserCheck className="w-5 h-5" />
-                </div>
-                <h3 className="text-lg font-bold text-white font-heading">
-                  Login Warga
-                </h3>
-                <p className="text-xs text-white/80 leading-relaxed">
-                  Masuk menggunakan akun warga yang telah terdaftar.
-                </p>
-              </div>
+            {/* Step Grid dengan Garis Penghubung (Figma layout: #8:942) */}
+            <div className="relative">
+              {/* Garis Horizontal Penghubung (Figma: #8:943) */}
+              <div className="hidden lg:block absolute top-4 left-[10%] right-[10%] h-[1px] bg-white/20 z-0" />
 
-              {/* Step 2 */}
-              <div className="p-7 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/15 space-y-4">
-                <span className="text-2xl font-black text-[#65D1C4] font-heading">
-                  02
-                </span>
-                <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-[#65D1C4]">
-                  <ClipboardCheck className="w-5 h-5" />
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 relative z-10">
+                {/* Step 1: Login Warga */}
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-bold text-[#65D1C4] font-heading">
+                      01
+                    </span>
+                    <span className="w-2 h-2 rounded-full bg-[#65D1C4]" />
+                  </div>
+                  <h3 className="text-base font-bold text-white font-heading">
+                    Login Warga
+                  </h3>
+                  <p className="text-xs text-[#E4E9F0]/80 leading-relaxed">
+                    Masuk menggunakan akun warga yang telah terdaftar.
+                  </p>
                 </div>
-                <h3 className="text-lg font-bold text-white font-heading">
-                  Isi Formulir
-                </h3>
-                <p className="text-xs text-white/80 leading-relaxed">
-                  Pilih jenis surat dan lengkapi informasi yang diperlukan.
-                </p>
-              </div>
 
-              {/* Step 3 */}
-              <div className="p-7 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/15 space-y-4">
-                <span className="text-2xl font-black text-[#65D1C4] font-heading">
-                  03
-                </span>
-                <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-[#65D1C4]">
-                  <Download className="w-5 h-5" />
+                {/* Step 2: Isi Formulir */}
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-bold text-[#65D1C4] font-heading">
+                      02
+                    </span>
+                    <span className="w-2 h-2 rounded-full bg-[#65D1C4]" />
+                  </div>
+                  <h3 className="text-base font-bold text-white font-heading">
+                    Isi Formulir
+                  </h3>
+                  <p className="text-xs text-[#E4E9F0]/80 leading-relaxed">
+                    Pilih jenis surat dan lengkapi informasi yang diperlukan.
+                  </p>
                 </div>
-                <h3 className="text-lg font-bold text-white font-heading">
-                  Unduh dan Cetak
-                </h3>
-                <p className="text-xs text-white/80 leading-relaxed">
-                  Unduh PDF surat setelah dokumen diterbitkan.
-                </p>
-              </div>
 
-              {/* Step 4 */}
-              <div className="p-7 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/15 space-y-4">
-                <span className="text-2xl font-black text-[#65D1C4] font-heading">
-                  04
-                </span>
-                <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-[#65D1C4]">
-                  <Stamp className="w-5 h-5" />
+                {/* Step 3: Unduh dan Cetak */}
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-bold text-[#65D1C4] font-heading">
+                      03
+                    </span>
+                    <span className="w-2 h-2 rounded-full bg-[#65D1C4]" />
+                  </div>
+                  <h3 className="text-base font-bold text-white font-heading">
+                    Unduh dan Cetak
+                  </h3>
+                  <p className="text-xs text-[#E4E9F0]/80 leading-relaxed">
+                    Unduh PDF surat setelah dokumen diterbitkan.
+                  </p>
                 </div>
-                <h3 className="text-lg font-bold text-white font-heading">
-                  Tanda Tangan Fisik
-                </h3>
-                <p className="text-xs text-white/80 leading-relaxed">
-                  Bawa surat untuk mendapatkan tanda tangan dan cap sesuai prosedur RT.
-                </p>
+
+                {/* Step 4: Tanda Tangan Fisik */}
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-bold text-[#65D1C4] font-heading">
+                      04
+                    </span>
+                    <span className="w-2 h-2 rounded-full bg-[#65D1C4]" />
+                  </div>
+                  <h3 className="text-base font-bold text-white font-heading">
+                    Tanda Tangan Fisik
+                  </h3>
+                  <p className="text-xs text-[#E4E9F0]/80 leading-relaxed">
+                    Bawa surat untuk mendapatkan tanda tangan dan cap sesuai prosedur RT.
+                  </p>
+                </div>
               </div>
             </div>
 
-            <div className="mt-12 text-center text-xs text-[#BDC9DA]">
-              Penandatanganan dan cap tetap dilakukan secara fisik sesuai prosedur pengurus RT.
+            {/* Note Box Bawah (Figma: #8:990) */}
+            <div className="mt-14 max-w-lg mx-auto flex items-center justify-center gap-2.5 px-4 py-2.5 rounded-xl bg-white/[0.06] border border-white/10 text-center">
+              <Info className="w-4 h-4 text-[#65D1C4] flex-shrink-0" />
+              <p className="text-xs text-[#BDC9DA]">
+                Penandatanganan dan cap tetap dilakukan secara fisik sesuai prosedur pengurus RT.
+              </p>
             </div>
           </div>
         </section>
@@ -482,40 +510,73 @@ export default function Welcome({ canLogin = true }) {
           </div>
         </section>
 
-        {/* ================= SECTION: CTA PORTAL WARGA ================= */}
-        <section className="py-12 bg-white">
-          <div className="max-w-[1280px] mx-auto px-6">
-            <div className="relative overflow-hidden rounded-3xl bg-[#0F8F83] p-10 sm:p-14 text-white shadow-2xl shadow-[#0F8F83]/20 flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
-              {/* Background Geometric Accent */}
-              <div className="absolute right-0 bottom-0 translate-x-12 translate-y-12 w-80 h-80 rounded-full bg-white/5 pointer-events-none" />
+        {/* ================= SECTION: FAQ (MENGGANTIKAN CTA PORTAL WARGA) ================= */}
+        <section id="faq" className="py-24 bg-[#F8FAFC] border-t border-[#E4E9F0]">
+          <div className="max-w-[960px] mx-auto px-6">
+            <div className="text-center space-y-3 mb-14">
+              <span className="text-[11px] font-bold tracking-widest uppercase text-[#2764D8] font-heading">
+                PERTANYAAN UMUM
+              </span>
+              <h2 className="text-3xl sm:text-4xl font-extrabold text-[#10264F] tracking-tight font-heading">
+                Frequently Asked Questions (FAQ)
+              </h2>
+              <p className="text-sm sm:text-base text-[#68748A] leading-relaxed">
+                Jawaban seputar layanan administrasi, akun warga, dan proses pengajuan surat di RT 01/08 Sukatani.
+              </p>
+            </div>
 
-              <div className="space-y-3 max-w-xl z-10">
-                <span className="text-[11px] font-bold tracking-widest uppercase text-[#65D1C4] font-heading">
-                  PORTAL WARGA
-                </span>
-                <h2 className="text-3xl sm:text-4xl font-extrabold text-white font-heading tracking-tight">
-                  Butuh Layanan Administrasi?
-                </h2>
-                <p className="text-sm sm:text-base text-[#B7C3D4] leading-relaxed">
-                  Masuk ke portal warga untuk memulai pengajuan surat dan memantau statusnya.
-                </p>
-              </div>
-
-              <div className="z-10 flex-shrink-0">
-                <Link
-                  href={route('login')}
-                  className="inline-flex items-center gap-2 px-7 py-4 rounded-xl bg-white hover:bg-slate-100 text-[#10264F] text-sm font-bold shadow-xl transition-all active:scale-[0.98]"
+            {/* Accordion List */}
+            <div className="space-y-4">
+              {faqs.map((faq, idx) => (
+                <div 
+                  key={idx}
+                  className="rounded-2xl border border-[#E4E9F0] bg-white shadow-sm overflow-hidden transition-all duration-200"
                 >
-                  <span>Login Warga</span>
-                  <ArrowRight className="w-4 h-4 text-[#2764D8]" />
-                </Link>
+                  <button
+                    onClick={() => toggleFaq(idx)}
+                    className="w-full p-6 text-left flex items-center justify-between gap-4 hover:bg-slate-50/60 transition-colors cursor-pointer"
+                  >
+                    <span className="text-sm sm:text-base font-bold text-[#10264F] font-heading">
+                      {faq.q}
+                    </span>
+                    <span className={`w-8 h-8 rounded-full bg-[#F1F5F9] flex items-center justify-center flex-shrink-0 text-[#68748A] transition-transform duration-200 ${openFaq === idx ? 'rotate-180 text-[#2764D8] bg-[#EEF4FF]' : ''}`}>
+                      <ChevronDown className="w-4 h-4" />
+                    </span>
+                  </button>
+
+                  {openFaq === idx && (
+                    <div className="px-6 pb-6 pt-1 text-sm text-[#43474E] leading-relaxed border-t border-[#F1F5F9] bg-[#FCFDFE]">
+                      {faq.a}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* Help Callout */}
+            <div className="mt-12 p-6 rounded-2xl bg-gradient-to-r from-[#EEF4FF] to-[#E7EEFB] border border-[#2764D8]/20 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-3.5">
+                <div className="w-10 h-10 rounded-xl bg-[#2764D8] text-white flex items-center justify-center flex-shrink-0">
+                  <HelpCircle className="w-5 h-5" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-[#022448]">Masih memiliki pertanyaan lain?</h4>
+                  <p className="text-xs text-[#43474E]">Silakan hubungi Pengurus RT melalui sekretariat atau pos ronda RT 01/08.</p>
+                </div>
               </div>
+              <Link
+                href={route('login')}
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[#2764D8] hover:bg-[#1d4ed8] text-white text-xs font-semibold shadow-md transition-all flex-shrink-0"
+              >
+                <span>Masuk ke Akun</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
             </div>
           </div>
         </section>
 
         {/* ================= FOOTER ================= */}
-        <footer className="mt-16 bg-[#00655C] text-white pt-16 pb-12 border-t border-white/10">
+        <footer className="bg-[#00655C] text-white pt-16 pb-12 border-t border-white/10">
           <div className="max-w-[1280px] mx-auto px-6 space-y-12">
             <div className="grid grid-cols-1 md:grid-cols-12 gap-10">
               {/* Left Brand */}
@@ -571,6 +632,12 @@ export default function Welcome({ canLogin = true }) {
                     className="text-left hover:text-white transition-colors cursor-pointer"
                   >
                     Panduan
+                  </button>
+                  <button 
+                    onClick={() => scrollToSection('faq')}
+                    className="text-left hover:text-white transition-colors cursor-pointer"
+                  >
+                    FAQ
                   </button>
                 </div>
               </div>
