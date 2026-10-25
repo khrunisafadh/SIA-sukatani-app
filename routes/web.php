@@ -66,8 +66,14 @@ Route::middleware(['auth', 'role:warga'])->prefix('portal')->name('portal.')->gr
     // Tempat rute Pengajuan Surat & PDF (Anggota 2: Aliya)
     // Route::resource('surat', SuratController::class);
 
-    // Tempat rute Lapor Mandiri Mutasi (Anggota 3: Ghita)
-    // Route::post('lapor-mutasi', [MutasiController::class, 'store'])->name('mutasi.store');
+    // Lapor Mandiri Mutasi (Anggota 3: Ghita) — frontend pelaporan pindah/datang
+    Route::get('pindah-datang', function () {
+        return Inertia::render('Portal/PindahDatang/Create');
+    })->name('pindah-datang.create');
+
+    Route::get('pindah-datang/status', function () {
+        return Inertia::render('Portal/PindahDatang/Tracking');
+    })->name('pindah-datang.tracking');
 });
 
 /*
