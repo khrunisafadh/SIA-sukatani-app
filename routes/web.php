@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Admin\WargaController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -23,9 +24,6 @@ Route::get('/', function () {
 |--------------------------------------------------------------------------
 | Redirect Universal /dashboard
 |--------------------------------------------------------------------------
-| Mengarahkan pengguna ke ranah masing-masing berdasarkan rolenya:
-| - Pengurus (ketua_rt / sekretaris) -> /admin/dashboard
-| - Warga -> /portal
 */
 Route::get('/dashboard', function () {
     $user = auth()->user();
@@ -45,12 +43,11 @@ Route::middleware(['auth', 'role:ketua_rt,sekretaris'])->prefix('admin')->name('
         return Inertia::render('Admin/Dashboard');
     })->name('dashboard');
 
-    // Tempat rute CRUD Warga (Anggota 1: Khoirunnisa)
-    // Route::resource('warga', WargaController::class);
-
-    // Tempat rute Verifikasi Mutasi & Audit Log (Anggota 3: Ghita)
-    // Route::get('laporan-mutasi', [MutasiController::class, 'index'])->name('mutasi.index');
-    // Route::get('audit-logs', [AuditLogController::class, 'index'])->name('audit.index');
+    // Modul Data Warga
+    Route::get('/warga', [WargaController::class, 'index'])->name('warga.index');
+    Route::get('/warga/create', [WargaController::class, 'create'])->name('warga.create');
+    Route::post('/warga', [WargaController::class, 'store'])->name('warga.store');
+    Route::get('/warga/check-nik', [WargaController::class, 'checkNik'])->name('warga.check-nik');
 });
 
 /*
@@ -62,12 +59,6 @@ Route::middleware(['auth', 'role:warga'])->prefix('portal')->name('portal.')->gr
     Route::get('/', function () {
         return Inertia::render('Portal/Dashboard');
     })->name('dashboard');
-
-    // Tempat rute Pengajuan Surat & PDF (Anggota 2: Aliya)
-    // Route::resource('surat', SuratController::class);
-
-    // Tempat rute Lapor Mandiri Mutasi (Anggota 3: Ghita)
-    // Route::post('lapor-mutasi', [MutasiController::class, 'store'])->name('mutasi.store');
 });
 
 /*
