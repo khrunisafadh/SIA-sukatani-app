@@ -10,8 +10,8 @@ use App\Support\AuditLogger;
 use App\Support\Roles;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Password;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -56,20 +56,17 @@ class UserRoleController extends Controller
 
     public function store(StoreUserAccountRequest $request): RedirectResponse
     {
-        $plainPassword = Str::password(20);
-
         $user = User::query()->create([
             'name' => $request->string('name'),
             'username' => $request->string('username'),
             'email' => $request->string('email'),
             'role' => $request->string('role'),
-            'password' => $plainPassword,
+            'password' => Hash::make($request->string('password')),
             'is_active' => true,
-            'email_verified_at' => null,
+            'must_change_password' => true,
+            'email_verified_at' => now(),
             'last_activity_at' => now(),
         ]);
-
-        Password::sendResetLink(['email' => $user->email]);
 
         AuditLogger::record($request->user(), 'user.created', User::class, $user->id, [
             'role' => $user->role,
@@ -77,7 +74,7 @@ class UserRoleController extends Controller
 
         return redirect()
             ->route('admin.users.index')
-            ->with('success', 'Akun berhasil ditambahkan. Tautan aktivasi dikirim ke email terdaftar.');
+            ->with('success', 'Akun berhasil ditambahkan. Pengguna dapat login dengan password sementara dan wajib menggantinya saat pertama kali masuk.');
     }
 
     public function updateRole(UpdateUserRoleRequest $request, User $user): RedirectResponse
@@ -105,21 +102,26 @@ class UserRoleController extends Controller
     {
         $this->assertAdmin($request);
 
-        $status = Password::sendResetLink(['email' => $user->email]);
+        $validated = $request->validate([
+            'password' => ['required', 'string', 'confirmed', Password::defaults()],
+        ], [
+            'password.required' => 'Password sementara baru wajib diisi.',
+            'password.confirmed' => 'Konfirmasi password sementara baru tidak cocok.',
+            'password.min' => 'Password sementara minimal :min karakter.',
+        ]);
 
-        if ($status !== Password::RESET_LINK_SENT) {
-            throw ValidationException::withMessages([
-                'email' => 'Gagal mengirim tautan reset akses. Pastikan email akun valid.',
-            ]);
-        }
-
-        $user->markActivity();
+        $user->forceFill([
+            'password' => Hash::make($validated['password']),
+            'must_change_password' => true,
+            'email_verified_at' => $user->email_verified_at ?? now(),
+            'last_activity_at' => now(),
+        ])->save();
 
         AuditLogger::record($request->user(), 'user.reset_access', User::class, $user->id);
 
         return redirect()
             ->route('admin.users.index')
-            ->with('success', 'Tautan reset akses telah dikirim ke email akun. Kata sandi tidak ditampilkan.');
+            ->with('success', 'Akses akun berhasil direset. Password sementara baru telah ditetapkan dan wajib diganti saat pengguna login.');
     }
 
     /**
@@ -136,6 +138,7 @@ class UserRoleController extends Controller
             'role_label' => $user->roleLabel(),
             'status' => $user->statusLabel(),
             'is_active' => $user->is_active,
+            'must_change_password' => (bool) $user->must_change_password,
             'last_activity_at' => $user->last_activity_at?->timezone(config('app.timezone'))->format('d/m/Y H:i'),
             'is_self' => $user->id === auth()->id(),
         ];
@@ -150,11 +153,14 @@ class UserRoleController extends Controller
         }
 
         if ($target->role === Roles::KETUA_RT && $newRole !== Roles::KETUA_RT) {
-            $adminCount = User::query()->where('role', Roles::KETUA_RT)->count();
+            $adminCount = User::query()
+                ->where('role', Roles::KETUA_RT)
+                ->where('is_active', true)
+                ->count();
 
             if ($adminCount <= 1) {
                 throw ValidationException::withMessages([
-                    'role' => 'Tidak dapat mengubah role admin terakhir.',
+                    'role' => 'Tidak dapat mengubah role admin aktif terakhir.',
                 ]);
             }
         }

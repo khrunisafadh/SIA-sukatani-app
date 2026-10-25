@@ -3,7 +3,7 @@ import Modal from '@/Components/Modal';
 import Pagination from '@/Components/Pagination';
 import AdminLayout from '@/Layouts/AdminLayout';
 import { Head, router, useForm } from '@inertiajs/react';
-import { KeyRound, Pencil, Plus, RotateCcw, Search, X } from 'lucide-react';
+import { Eye, EyeOff, KeyRound, Pencil, Plus, RotateCcw, Search, X } from 'lucide-react';
 import { useState } from 'react';
 
 export default function UsersIndex({ users, filters, roleOptions, total }) {
@@ -12,16 +12,27 @@ export default function UsersIndex({ users, filters, roleOptions, total }) {
     const [createOpen, setCreateOpen] = useState(false);
     const [roleUser, setRoleUser] = useState(null);
     const [resetUser, setResetUser] = useState(null);
+    const [createShowPassword, setCreateShowPassword] = useState(false);
+    const [createShowConfirm, setCreateShowConfirm] = useState(false);
+    const [resetShowPassword, setResetShowPassword] = useState(false);
+    const [resetShowConfirm, setResetShowConfirm] = useState(false);
 
     const createForm = useForm({
         name: '',
         username: '',
         email: '',
         role: '',
+        password: '',
+        password_confirmation: '',
     });
 
     const roleForm = useForm({
         role: '',
+    });
+
+    const resetForm = useForm({
+        password: '',
+        password_confirmation: '',
     });
 
     const applyFilters = (next = {}) => {
@@ -48,6 +59,8 @@ export default function UsersIndex({ users, filters, roleOptions, total }) {
         setCreateOpen(false);
         createForm.reset();
         createForm.clearErrors();
+        setCreateShowPassword(false);
+        setCreateShowConfirm(false);
     };
 
     const submitCreate = (event) => {
@@ -57,6 +70,8 @@ export default function UsersIndex({ users, filters, roleOptions, total }) {
             onSuccess: () => {
                 setCreateOpen(false);
                 createForm.reset();
+                setCreateShowPassword(false);
+                setCreateShowConfirm(false);
             },
         });
     };
@@ -78,14 +93,34 @@ export default function UsersIndex({ users, filters, roleOptions, total }) {
         });
     };
 
-    const submitReset = () => {
+    const openReset = (user) => {
+        setResetUser(user);
+        resetForm.reset();
+        resetForm.clearErrors();
+        setResetShowPassword(false);
+        setResetShowConfirm(false);
+    };
+
+    const closeReset = () => {
+        if (resetForm.processing) {
+            return;
+        }
+        setResetUser(null);
+        resetForm.reset();
+        resetForm.clearErrors();
+        setResetShowPassword(false);
+        setResetShowConfirm(false);
+    };
+
+    const submitReset = (event) => {
+        event.preventDefault();
         if (!resetUser) {
             return;
         }
 
-        router.post(route('admin.users.reset-access', resetUser.id), {}, {
+        resetForm.post(route('admin.users.reset-access', resetUser.id), {
             preserveScroll: true,
-            onFinish: () => setResetUser(null),
+            onSuccess: () => closeReset(),
         });
     };
 
@@ -94,6 +129,7 @@ export default function UsersIndex({ users, filters, roleOptions, total }) {
             title="Pengguna & Role"
             description="Kelola akun dan tetapkan salah satu dari empat role resmi. Perubahan role berlaku pada izin akses berikutnya."
             breadcrumbs={[
+                { label: 'Layanan Administrasi', href: route('admin.dashboard') },
                 { label: 'Pengguna & Role' },
             ]}
             actions={
@@ -193,9 +229,9 @@ export default function UsersIndex({ users, filters, roleOptions, total }) {
                                                 </button>
                                                 <button
                                                     type="button"
-                                                    onClick={() => setResetUser(user)}
+                                                    onClick={() => openReset(user)}
                                                     className="rounded-md border border-[#E3E8EC] p-1.5 text-[#267F83] hover:bg-slate-50"
-                                                    title="Kirim tautan reset akses"
+                                                    title="Reset akses akun"
                                                 >
                                                     <KeyRound className="h-4 w-4" />
                                                 </button>
@@ -208,7 +244,7 @@ export default function UsersIndex({ users, filters, roleOptions, total }) {
                     </table>
                 </div>
                 <div className="border-t border-[#E3E8EC] px-4 py-3">
-                    <Pagination meta={users.meta ?? { total, last_page: 1 }} links={users.links} />
+                    <Pagination meta={users} links={users.links} />
                 </div>
             </div>
 
@@ -218,7 +254,7 @@ export default function UsersIndex({ users, filters, roleOptions, total }) {
                         <div>
                             <h3 className="text-base font-semibold">Tambah Akun Pengguna</h3>
                             <p className="mt-1 text-sm text-[#667085]">
-                                Kredensial awal tidak ditampilkan. Tautan aktivasi dikirim ke email.
+                                Masukkan data akun dan tetapkan password sementara. Pengguna wajib mengganti password saat login pertama kali.
                             </p>
                         </div>
                         <button type="button" onClick={closeCreate} aria-label="Tutup">
@@ -251,6 +287,50 @@ export default function UsersIndex({ users, filters, roleOptions, total }) {
                             </select>
                             {createForm.errors.role && <p className="mt-1 text-xs text-red-600">{createForm.errors.role}</p>}
                         </div>
+                        <div>
+                            <label className="text-sm font-medium" htmlFor="password">Password sementara</label>
+                            <div className="relative mt-1">
+                                <input
+                                    id="password"
+                                    type={createShowPassword ? 'text' : 'password'}
+                                    value={createForm.data.password}
+                                    placeholder="Minimal 8 karakter"
+                                    onChange={(e) => createForm.setData('password', e.target.value)}
+                                    className={`h-10 w-full rounded-lg border pl-3 pr-10 text-sm ${createForm.errors.password ? 'border-red-500' : 'border-[#E3E8EC]'}`}
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setCreateShowPassword(!createShowPassword)}
+                                    className="absolute right-3 top-2.5 text-[#68748A] hover:text-[#17233C]"
+                                    aria-label={createShowPassword ? 'Sembunyikan password' : 'Tampilkan password'}
+                                >
+                                    {createShowPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                </button>
+                            </div>
+                            {createForm.errors.password && <p className="mt-1 text-xs text-red-600">{createForm.errors.password}</p>}
+                        </div>
+                        <div>
+                            <label className="text-sm font-medium" htmlFor="password_confirmation">Konfirmasi password sementara</label>
+                            <div className="relative mt-1">
+                                <input
+                                    id="password_confirmation"
+                                    type={createShowConfirm ? 'text' : 'password'}
+                                    value={createForm.data.password_confirmation}
+                                    placeholder="Ulangi password sementara"
+                                    onChange={(e) => createForm.setData('password_confirmation', e.target.value)}
+                                    className={`h-10 w-full rounded-lg border pl-3 pr-10 text-sm ${createForm.errors.password_confirmation ? 'border-red-500' : 'border-[#E3E8EC]'}`}
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setCreateShowConfirm(!createShowConfirm)}
+                                    className="absolute right-3 top-2.5 text-[#68748A] hover:text-[#17233C]"
+                                    aria-label={createShowConfirm ? 'Sembunyikan password' : 'Tampilkan password'}
+                                >
+                                    {createShowConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                </button>
+                            </div>
+                            {createForm.errors.password_confirmation && <p className="mt-1 text-xs text-red-600">{createForm.errors.password_confirmation}</p>}
+                        </div>
                     </div>
                     <div className="mt-6 flex justify-end gap-2">
                         <button type="button" onClick={closeCreate} className="rounded-lg border border-[#E3E8EC] px-4 py-2 text-sm">Batal</button>
@@ -282,16 +362,73 @@ export default function UsersIndex({ users, filters, roleOptions, total }) {
                 {roleForm.errors.role && <p className="mt-1 text-xs text-red-600">{roleForm.errors.role}</p>}
             </ConfirmModal>
 
-            <ConfirmModal
-                show={Boolean(resetUser)}
-                title="Reset akses akun"
-                description={resetUser
-                    ? `Sistem akan mengirim tautan reset kata sandi ke ${resetUser.email}. Kata sandi tidak ditampilkan dan tidak diubah menjadi nilai default.`
-                    : ''}
-                confirmLabel="Kirim tautan reset"
-                onClose={() => setResetUser(null)}
-                onConfirm={submitReset}
-            />
+            <Modal show={Boolean(resetUser)} onClose={closeReset} maxWidth="md">
+                <form onSubmit={submitReset} className="p-6">
+                    <div className="mb-4 flex items-start justify-between">
+                        <div>
+                            <h3 className="text-base font-semibold">Reset Akses Pengguna</h3>
+                            <p className="mt-1 text-sm text-[#667085]">
+                                {resetUser ? `Tetapkan password sementara baru untuk akun ${resetUser.name} (${resetUser.username}). Pengguna wajib mengganti password saat login berikutnya.` : ''}
+                            </p>
+                        </div>
+                        <button type="button" onClick={closeReset} aria-label="Tutup">
+                            <X className="h-4 w-4" />
+                        </button>
+                    </div>
+                    <div className="space-y-4">
+                        <div>
+                            <label className="text-sm font-medium" htmlFor="reset_password">Password sementara baru</label>
+                            <div className="relative mt-1">
+                                <input
+                                    id="reset_password"
+                                    type={resetShowPassword ? 'text' : 'password'}
+                                    value={resetForm.data.password}
+                                    placeholder="Minimal 8 karakter"
+                                    onChange={(e) => resetForm.setData('password', e.target.value)}
+                                    className={`h-10 w-full rounded-lg border pl-3 pr-10 text-sm ${resetForm.errors.password ? 'border-red-500' : 'border-[#E3E8EC]'}`}
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setResetShowPassword(!resetShowPassword)}
+                                    className="absolute right-3 top-2.5 text-[#68748A] hover:text-[#17233C]"
+                                    aria-label={resetShowPassword ? 'Sembunyikan password' : 'Tampilkan password'}
+                                >
+                                    {resetShowPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                </button>
+                            </div>
+                            {resetForm.errors.password && <p className="mt-1 text-xs text-red-600">{resetForm.errors.password}</p>}
+                        </div>
+                        <div>
+                            <label className="text-sm font-medium" htmlFor="reset_password_confirmation">Konfirmasi password sementara</label>
+                            <div className="relative mt-1">
+                                <input
+                                    id="reset_password_confirmation"
+                                    type={resetShowConfirm ? 'text' : 'password'}
+                                    value={resetForm.data.password_confirmation}
+                                    placeholder="Ulangi password sementara baru"
+                                    onChange={(e) => resetForm.setData('password_confirmation', e.target.value)}
+                                    className={`h-10 w-full rounded-lg border pl-3 pr-10 text-sm ${resetForm.errors.password_confirmation ? 'border-red-500' : 'border-[#E3E8EC]'}`}
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setResetShowConfirm(!resetShowConfirm)}
+                                    className="absolute right-3 top-2.5 text-[#68748A] hover:text-[#17233C]"
+                                    aria-label={resetShowConfirm ? 'Sembunyikan password' : 'Tampilkan password'}
+                                >
+                                    {resetShowConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                </button>
+                            </div>
+                            {resetForm.errors.password_confirmation && <p className="mt-1 text-xs text-red-600">{resetForm.errors.password_confirmation}</p>}
+                        </div>
+                    </div>
+                    <div className="mt-6 flex justify-end gap-2">
+                        <button type="button" onClick={closeReset} className="rounded-lg border border-[#E3E8EC] px-4 py-2 text-sm">Batal</button>
+                        <button type="submit" disabled={resetForm.processing} className="rounded-lg bg-[#267F83] px-4 py-2 text-sm font-semibold text-white disabled:opacity-60">
+                            {resetForm.processing ? 'Menyimpan...' : 'Simpan Password Baru'}
+                        </button>
+                    </div>
+                </form>
+            </Modal>
         </AdminLayout>
     );
 }

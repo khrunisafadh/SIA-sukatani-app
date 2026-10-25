@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'username', 'email', 'role', 'password', 'is_active', 'last_activity_at'])]
+#[Fillable(['name', 'username', 'email', 'role', 'password', 'is_active', 'must_change_password', 'last_activity_at'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -24,6 +24,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_active' => 'boolean',
+            'must_change_password' => 'boolean',
             'last_activity_at' => 'datetime',
         ];
     }
@@ -64,7 +65,11 @@ class User extends Authenticatable
             return 'Nonaktif';
         }
 
-        return $this->email_verified_at ? 'Aktif' : 'Menunggu aktivasi';
+        if ($this->must_change_password) {
+            return 'Perlu ganti password';
+        }
+
+        return 'Aktif';
     }
 
     public function markActivity(): void

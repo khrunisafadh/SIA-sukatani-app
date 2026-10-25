@@ -104,10 +104,18 @@ class SuratAdminController extends Controller
 
         $letter = DB::transaction(function () use ($request, $actor) {
             $year = now()->year;
-            $sequence = PengajuanSurat::query()
+            $latest = PengajuanSurat::query()
                 ->whereYear('created_at', $year)
                 ->lockForUpdate()
-                ->count() + 1;
+                ->orderByDesc('id')
+                ->first();
+
+            $sequence = 1;
+            if ($latest && preg_match('/SRT-\d{4}-(\d+)/', (string) $latest->nomor, $matches)) {
+                $sequence = ((int) $matches[1]) + 1;
+            } else {
+                $sequence = PengajuanSurat::query()->whereYear('created_at', $year)->count() + 1;
+            }
 
             $letter = PengajuanSurat::query()->create([
                 'nomor' => sprintf('SRT-%d-%03d', $year, $sequence),
@@ -203,17 +211,17 @@ class SuratAdminController extends Controller
             ->with('success', 'Pengesahan fisik berhasil dicatat.');
     }
 
-    public function preview(Request $request, PengajuanSurat $pengajuanSurat): BinaryFileResponse
+    public function preview(Request $request, PengajuanSurat $pengajuanSurat): HttpResponse
     {
         return $this->pdfResponse($request, $pengajuanSurat, false);
     }
 
-    public function download(Request $request, PengajuanSurat $pengajuanSurat): BinaryFileResponse
+    public function download(Request $request, PengajuanSurat $pengajuanSurat): HttpResponse
     {
         return $this->pdfResponse($request, $pengajuanSurat, true);
     }
 
-    private function pdfResponse(Request $request, PengajuanSurat $pengajuanSurat, bool $download): BinaryFileResponse
+    private function pdfResponse(Request $request, PengajuanSurat $pengajuanSurat, bool $download): HttpResponse
     {
         $this->assertCanManageLetters($request);
 
@@ -232,15 +240,19 @@ class SuratAdminController extends Controller
         }
 
         $filename = $pengajuanSurat->downloadFilename();
+        $disposition = ($download ? 'attachment' : 'inline').'; filename="'.$filename.'"';
         $headers = [
             'Content-Type' => 'application/pdf',
+            'Content-Disposition' => $disposition,
         ];
 
-        return $download
-            ? response()->download($path, $filename, $headers)
-            : response()->file($path, $headers + [
-                'Content-Disposition' => 'inline; filename="'.$filename.'"',
-            ]);
+        return response()->stream(function () use ($path) {
+            $stream = fopen($path, 'rb');
+            if ($stream) {
+                fpassthru($stream);
+                fclose($stream);
+            }
+        }, HttpResponse::HTTP_OK, $headers);
     }
 
     /**

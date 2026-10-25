@@ -33,7 +33,12 @@ export default function SuratIndex({ letters, filters, summary, jenisOptions, st
 
     const downloadRow = async (letter) => {
         if (!letter.can_download) {
-            notify('error', 'Dokumen PDF belum tersedia.');
+            notify(
+                'error',
+                letter.status === 'selesai'
+                    ? 'Draf elektronik tidak dapat diunduh setelah pengesahan fisik.'
+                    : 'Dokumen PDF belum tersedia.',
+            );
             return;
         }
 
@@ -46,9 +51,11 @@ export default function SuratIndex({ letters, filters, summary, jenisOptions, st
             if (!response.ok) {
                 notify(
                     'error',
-                    response.status === 404
-                        ? 'Dokumen PDF belum tersedia.'
-                        : 'Gagal mengunduh dokumen. Coba lagi.',
+                    response.status === 403
+                        ? 'Draf elektronik tidak dapat diunduh setelah pengesahan fisik.'
+                        : response.status === 404
+                          ? 'Dokumen PDF belum tersedia.'
+                          : 'Gagal mengunduh dokumen. Coba lagi.',
                 );
                 return;
             }
@@ -62,7 +69,7 @@ export default function SuratIndex({ letters, filters, summary, jenisOptions, st
             const url = window.URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
-            link.download = `Surat_${letter.nomor}.pdf`;
+            link.download = `${letter.jenis_label ? letter.jenis_label.replaceAll(' ', '_') : 'Surat'}_${letter.nomor}.pdf`;
             document.body.appendChild(link);
             link.click();
             link.remove();
@@ -247,7 +254,7 @@ export default function SuratIndex({ letters, filters, summary, jenisOptions, st
                 </div>
 
                 <div className="border-t border-[#E3E8EC] px-4 py-3">
-                    <Pagination meta={letters.meta} links={letters.links} />
+                    <Pagination meta={letters} links={letters.links} />
                 </div>
             </div>
         </AdminLayout>

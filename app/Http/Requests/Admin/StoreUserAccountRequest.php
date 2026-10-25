@@ -5,6 +5,7 @@ namespace App\Http\Requests\Admin;
 use App\Support\Roles;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Password;
 
 class StoreUserAccountRequest extends FormRequest
 {
@@ -20,9 +21,10 @@ class StoreUserAccountRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'username' => ['required', 'string', 'max:50', 'alpha_dash', 'unique:users,username'],
+            'username' => ['required', 'string', 'max:50', 'regex:/^[a-zA-Z0-9._-]+$/', 'unique:users,username'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
             'role' => ['required', 'string', Rule::in(Roles::all())],
+            'password' => ['required', 'string', 'confirmed', Password::defaults()],
         ];
     }
 
@@ -35,11 +37,14 @@ class StoreUserAccountRequest extends FormRequest
             'name.required' => 'Nama lengkap wajib diisi.',
             'username.required' => 'Username wajib diisi.',
             'username.unique' => 'Username sudah digunakan.',
-            'username.alpha_dash' => 'Username hanya boleh berisi huruf, angka, strip, dan garis bawah.',
-            'email.required' => 'Email wajib diisi untuk tautan aktivasi akun.',
+            'username.regex' => 'Username hanya boleh berisi huruf, angka, titik, strip, dan garis bawah.',
+            'email.required' => 'Email wajib diisi.',
             'email.unique' => 'Email sudah digunakan.',
             'role.required' => 'Pilih role akun.',
             'role.in' => 'Role tidak termasuk daftar resmi.',
+            'password.required' => 'Password sementara wajib diisi.',
+            'password.confirmed' => 'Konfirmasi password sementara tidak cocok.',
+            'password.min' => 'Password sementara minimal :min karakter.',
         ];
     }
 }

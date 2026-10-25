@@ -1,10 +1,17 @@
 import { Link } from '@inertiajs/react';
 
 export default function Pagination({ meta, links }) {
-    if (!meta || meta.last_page <= 1) {
+    const p = meta?.last_page !== undefined ? meta : (meta?.meta || {});
+    const total = p.total ?? meta?.total ?? 0;
+    const lastPage = p.last_page ?? meta?.last_page ?? 1;
+    const from = p.from ?? (total > 0 ? 1 : 0);
+    const to = p.to ?? total;
+    const paginationLinks = links || p.links || [];
+
+    if (lastPage <= 1) {
         return (
             <p className="text-sm text-[#667085]">
-                Menampilkan {meta?.total ?? 0} data
+                Menampilkan {total} data
             </p>
         );
     }
@@ -12,10 +19,10 @@ export default function Pagination({ meta, links }) {
     return (
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-sm text-[#667085]">
-                Menampilkan {meta.from}-{meta.to} dari {meta.total} data
+                Menampilkan {from}-{to} dari {total} data
             </p>
             <div className="flex flex-wrap gap-1">
-                {links
+                {paginationLinks
                     .filter((link) => link.url !== null || link.active)
                     .map((link, index) => (
                         <Link

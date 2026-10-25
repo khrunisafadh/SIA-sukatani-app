@@ -23,7 +23,7 @@ class StoreLetterRequest extends FormRequest
             'pemohon_id' => [
                 'required',
                 'integer',
-                Rule::exists('users', 'id')->where(fn ($query) => $query->where('role', Roles::WARGA)),
+                Rule::exists('users', 'id')->where(fn ($query) => $query->where('role', Roles::WARGA)->where('is_active', true)),
             ],
             'jenis_surat' => ['required', 'string', Rule::in(LetterType::all())],
             'keperluan' => ['required', 'string', 'max:255'],
@@ -38,7 +38,7 @@ class StoreLetterRequest extends FormRequest
     {
         return [
             'pemohon_id.required' => 'Pilih warga pemohon yang terdaftar.',
-            'pemohon_id.exists' => 'Pemohon harus warga terdaftar.',
+            'pemohon_id.exists' => 'Pemohon harus warga terdaftar yang aktif.',
             'jenis_surat.required' => 'Pilih jenis surat.',
             'jenis_surat.in' => 'Jenis surat tidak valid.',
             'keperluan.required' => 'Keperluan wajib diisi.',
