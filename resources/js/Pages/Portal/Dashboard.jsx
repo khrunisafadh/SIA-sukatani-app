@@ -74,7 +74,10 @@ export default function PortalDashboard({ auth }) {
                         </div>
 
                         {/* Layanan 2: Lapor Pindah / Datang (Tugas Ghita) */}
-                        <div className="p-6 rounded-2xl bg-white border border-[#E4E9F0] shadow-sm space-y-4">
+                        <Link
+                            href={route('portal.pindah-datang.create')}
+                            className="p-6 rounded-2xl bg-white border border-[#E4E9F0] shadow-sm space-y-4 hover:border-[#11704E]/30 transition"
+                        >
                             <div className="flex items-center justify-between">
                                 <div className="w-10 h-10 rounded-xl bg-[#E7F6EF] flex items-center justify-center text-[#11704E]">
                                     <Clock className="w-5 h-5" />
@@ -92,10 +95,10 @@ export default function PortalDashboard({ auth }) {
                                 </p>
                             </div>
                             <div className="pt-2 border-t border-[#E4E9F0] flex items-center justify-between text-xs text-[#11704E] font-semibold">
-                                <span>Modul Mutasi (Ghita)</span>
+                                <span>Buka Formulir Pelaporan</span>
                                 <ArrowRight className="w-4 h-4" />
                             </div>
-                        </div>
+                        </Link>
                     </div>
                 </div>
             </div>
