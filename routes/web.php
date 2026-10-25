@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Admin\SuratAdminController;
+use App\Http\Controllers\Admin\UserRoleController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -45,12 +47,31 @@ Route::middleware(['auth', 'role:ketua_rt,sekretaris'])->prefix('admin')->name('
         return Inertia::render('Admin/Dashboard');
     })->name('dashboard');
 
+    Route::get('pengajuan-surat', [SuratAdminController::class, 'index'])->name('surat.index');
+    Route::get('pengajuan-surat/buat', [SuratAdminController::class, 'create'])
+        ->middleware('role:ketua_rt')
+        ->name('surat.create');
+    Route::post('pengajuan-surat', [SuratAdminController::class, 'store'])
+        ->middleware('role:ketua_rt')
+        ->name('surat.store');
+    Route::get('pengajuan-surat/{pengajuanSurat}', [SuratAdminController::class, 'show'])->name('surat.show');
+    Route::post('pengajuan-surat/{pengajuanSurat}/pengesahan', [SuratAdminController::class, 'confirmEndorsement'])->name('surat.confirm');
+    Route::get('pengajuan-surat/{pengajuanSurat}/pdf', [SuratAdminController::class, 'preview'])->name('surat.pdf.preview');
+    Route::get('pengajuan-surat/{pengajuanSurat}/pdf/unduh', [SuratAdminController::class, 'download'])->name('surat.pdf.download');
+
     // Tempat rute CRUD Warga (Anggota 1: Khoirunnisa)
     // Route::resource('warga', WargaController::class);
 
     // Tempat rute Verifikasi Mutasi & Audit Log (Anggota 3: Ghita)
     // Route::get('laporan-mutasi', [MutasiController::class, 'index'])->name('mutasi.index');
     // Route::get('audit-logs', [AuditLogController::class, 'index'])->name('audit.index');
+});
+
+Route::middleware(['auth', 'role:ketua_rt'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('pengguna', [UserRoleController::class, 'index'])->name('users.index');
+    Route::post('pengguna', [UserRoleController::class, 'store'])->name('users.store');
+    Route::patch('pengguna/{user}/role', [UserRoleController::class, 'updateRole'])->name('users.update-role');
+    Route::post('pengguna/{user}/reset-akses', [UserRoleController::class, 'resetAccess'])->name('users.reset-access');
 });
 
 /*

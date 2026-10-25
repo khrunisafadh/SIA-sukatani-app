@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { 
-  Building2, 
   MapPin, 
   FileText, 
   Users, 
@@ -10,11 +9,15 @@ import {
   Lock, 
   Eye, 
   EyeOff, 
-  ArrowRight 
+  ArrowRight,
+  MessageCircle
 } from 'lucide-react';
 
 export default function Login({ status, canResetPassword }) {
   const [showPassword, setShowPassword] = useState(false);
+
+  // Link WhatsApp Ketua RT (ganti nomor dan teks pesan sesuai kebutuhan)
+  const whatsappUrl = "https://wa.me/6281234567890?text=Halo%20Ketua%20RT%2001/08%20Sukatani,%20saya%20butuh%20bantuan%20terkait%20akses%20akun%20SIA%20Sukatani.";
 
   const { data, setData, post, processing, errors, reset } = useForm({
     login: 'ketua.rt01',
@@ -40,20 +43,8 @@ export default function Login({ status, canResetPassword }) {
           <div className="absolute -top-24 -left-24 w-80 h-80 rounded-full bg-[#89F5E7]/25 blur-3xl pointer-events-none" />
           <div className="absolute -bottom-20 -right-20 w-80 h-80 rounded-full bg-[#D5E3FF]/50 blur-3xl pointer-events-none" />
 
-          {/* Top: Brand Logo & Title */}
+          {/* Top: Header Identity (Logo & Teks SIA Sukatani Dihapus Sesuai Permintaan) */}
           <div className="relative z-10 space-y-8">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-[#2764D8] flex items-center justify-center text-white font-bold shadow-md shadow-[#2764D8]/20">
-                <Building2 className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <span className="font-extrabold text-lg tracking-tight text-[#022448] font-heading">
-                  SIA Sukatani
-                </span>
-                <p className="text-xs text-[#43474E]">Administrasi Rukun Tetangga</p>
-              </div>
-            </div>
-
             {/* Badge Lokasi */}
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/90 border border-[#C4C6CF]/60 shadow-sm text-xs font-semibold backdrop-blur-sm">
               <MapPin className="w-3.5 h-3.5 text-[#006A61]" />
@@ -253,15 +244,18 @@ export default function Login({ status, canResetPassword }) {
               </button>
             </form>
 
-            {/* Footer Tambahan */}
+            {/* Footer Tambahan - Link WA Ketua RT */}
             <div className="pt-4 text-center">
               <p className="text-xs text-[#68748A]">
                 Butuh bantuan akses akun?{' '}
-                <a 
-                  href="#" 
-                  className="text-[#2764D8] font-semibold hover:underline"
+                <a
+                href={whatsappUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#2764D8] font-semibold hover:underline"
                 >
-                  Hubungi Pengurus RT
+                  <MessageCircle className="w-3.5 h-3.5 text-[#25D366]" />
+                  <span>Hubungi Ketua RT</span>
                 </a>
               </p>
             </div>
