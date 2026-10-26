@@ -1,0 +1,339 @@
+import WargaLayout from '@/Layouts/WargaLayout';
+import { Head, Link } from '@inertiajs/react';
+import {
+    CheckCircle2,
+    Clock3,
+    Download,
+    Eye,
+    FileText,
+    HelpCircle,
+    Info,
+    Lock,
+    MapPin,
+    MessageCircle,
+    Phone,
+    Plus,
+    RefreshCw,
+    Search,
+    ShieldCheck,
+} from 'lucide-react';
+import { useMemo } from 'react';
+
+const DEFAULT_REPORT = {
+    jenis: 'datang',
+    nama: 'Budi Santoso',
+    unit: 'Blok B3 No. 12',
+    statusTinggal: 'Kontrak / Sewa Tahunan',
+    files: [
+        { id: 'ktp', name: 'eKTP_BudiSantoso.jpg', sizeLabel: '1.8 MB', kind: 'Terenkripsi' },
+        { id: 'kk', name: 'KartuKeluarga_Terbaru.pdf', sizeLabel: '2.4 MB', kind: 'Disetujui Dukcapil' },
+    ],
+    submittedAt: '2025-06-16T09:30:00',
+};
+
+function formatSubmittedAt(value) {
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) {
+        return '16 Jun 2025, 09:30 WIB';
+    }
+    return `${date.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })}, ${date.toLocaleTimeString(
+        'id-ID',
+        { hour: '2-digit', minute: '2-digit' },
+    )} WIB`;
+}
+
+export default function PindahDatangTracking() {
+    const report = useMemo(() => {
+        try {
+            const raw = window.sessionStorage.getItem('sia.pindahDatang.latest');
+            return raw ? { ...DEFAULT_REPORT, ...JSON.parse(raw) } : DEFAULT_REPORT;
+        } catch {
+            return DEFAULT_REPORT;
+        }
+    }, []);
+
+    const ticket = report.ticket?.replace('#MUT-', '#PD-') ?? '#PD-2025-0616-01';
+    const displayTicket = ticket.startsWith('#PD-') ? ticket : '#PD-2025-0616-01';
+
+    const steps = [
+        {
+            n: 1,
+            title: 'Tahap 1: Laporan Terkirim',
+            desc: `${formatSubmittedAt(report.submittedAt)}`,
+            note: 'Selesai Diverifikasi Sistem',
+            state: 'done',
+        },
+        {
+            n: 2,
+            title: 'Tahap 2: Diperiksa Ketua RT',
+            desc: 'Sedang Berlangsung',
+            note: 'Penelitian kelengkapan domisili',
+            state: 'current',
+        },
+        {
+            n: 3,
+            title: 'Tahap 3: Verifikasi Berkas',
+            desc: 'Menunggu Tahap 2',
+            note: 'Pencocokan e-KTP & Kartu Keluarga',
+            state: 'todo',
+        },
+        {
+            n: 4,
+            title: 'Tahap 4: Penerbitan Surat',
+            desc: 'Tahap Akhir',
+            note: 'Update Buku Induk RT & TTE Surat',
+            state: 'todo',
+        },
+    ];
+
+    return (
+        <WargaLayout>
+            <Head title="Tracking Status Laporan" />
+
+            <div className="mb-5 flex items-start justify-between gap-3 rounded-2xl border border-[#BFE8D8] bg-[#E7F8F0] px-4 py-4">
+                <div className="flex items-start gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-[#11704E] shadow-sm">
+                        <CheckCircle2 className="h-6 w-6" />
+                    </div>
+                    <div>
+                        <div className="flex flex-wrap items-center gap-2">
+                            <p className="font-heading text-[15px] font-extrabold text-[#0F5A45]">
+                                Laporan Berhasil Terkirim ke Ketua RT 01/RW 08!
+                            </p>
+                            <span className="rounded-full bg-[#11704E] px-2 py-0.5 text-[10px] font-semibold text-white">
+                                Baru Saja Diajukan
+                            </span>
+                        </div>
+                        <p className="mt-1 text-[12px] leading-relaxed text-[#0F5A45]/90">
+                            Permohonan datang warga Anda telah masuk dalam antrean verifikasi{' '}
+                            <strong>Pak Budi Santoso (Ketua RT 01)</strong>. No. Tiket Pelaporan:{' '}
+                            <span className="font-semibold">{displayTicket}</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div className="mb-5 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                <div>
+                    <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#2F6BFF]">
+                        Perubahan Data Hunian • RT 01 / RW 08
+                    </p>
+                    <h1 className="mt-1 font-heading text-[26px] font-extrabold tracking-tight">
+                        Tracking Status &amp; Riwayat Laporan
+                    </h1>
+                    <p className="mt-1 text-[13px] text-[#68748A]">
+                        Pantau progres verifikasi permohonan kepindahan dan kedatangan secara transparan.
+                    </p>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                    <button
+                        type="button"
+                        onClick={() => window.location.reload()}
+                        className="inline-flex items-center gap-2 rounded-xl border border-[#E6EAF2] bg-white px-4 py-2.5 text-[13px] font-semibold text-[#4B5568]"
+                    >
+                        <RefreshCw className="h-4 w-4" />
+                        Perbarui Status
+                    </button>
+                    <Link
+                        href={route('portal.pindah-datang.create')}
+                        className="inline-flex items-center gap-2 rounded-xl bg-[#147A72] px-4 py-2.5 text-[13px] font-semibold text-white"
+                    >
+                        <Plus className="h-4 w-4" />
+                        Buat Laporan Baru
+                    </Link>
+                </div>
+            </div>
+
+            <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_300px]">
+                <section className="rounded-2xl border border-[#E6EAF2] bg-white p-5 shadow-sm sm:p-6">
+                    <div className="flex flex-col gap-3 rounded-2xl bg-[#F4F7FB] p-4 sm:flex-row sm:items-center sm:justify-between">
+                        <div className="flex items-center gap-3">
+                            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-[#147A72] shadow-sm">
+                                <FileText className="h-5 w-5" />
+                            </div>
+                            <div>
+                                <p className="text-[10px] font-semibold uppercase tracking-wide text-[#98A2B3]">
+                                    Nomor Pelaporan Aktif
+                                </p>
+                                <p className="font-heading text-[18px] font-extrabold">{displayTicket}</p>
+                            </div>
+                        </div>
+                        <span className="inline-flex items-center gap-2 self-start rounded-full bg-[#E8F0FF] px-3 py-1 text-[12px] font-semibold text-[#2F6BFF]">
+                            <span className="h-2 w-2 rounded-full bg-[#2F6BFF]" />
+                            Menunggu Pemeriksaan
+                        </span>
+                    </div>
+
+                    <div className="mt-5 grid gap-4 border-b border-[#EEF1F6] pb-5 sm:grid-cols-3">
+                        <div>
+                            <p className="text-[11px] text-[#68748A]">Jenis Pelaporan</p>
+                            <p className="mt-1 text-[13px] font-bold text-[#147A72]">
+                                {report.jenis === 'pindah' ? 'Lapor Warga Pindah' : 'Lapor Warga Datang'}
+                            </p>
+                            <p className="text-[11px] text-[#68748A]">{report.unit}</p>
+                        </div>
+                        <div>
+                            <p className="text-[11px] text-[#68748A]">Pemohon / Kepala Keluarga</p>
+                            <p className="mt-1 text-[13px] font-bold">{report.nama} &amp; Keluarga</p>
+                            <p className="text-[11px] text-[#68748A]">Total 3 Anggota Keluarga</p>
+                        </div>
+                        <div>
+                            <p className="text-[11px] text-[#68748A]">Waktu Pengajuan</p>
+                            <p className="mt-1 text-[13px] font-bold">{formatSubmittedAt(report.submittedAt)}</p>
+                            <p className="inline-flex items-center gap-1 text-[11px] text-[#147A72]">
+                                <Clock3 className="h-3.5 w-3.5" />
+                                15 Menit yang lalu
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="mt-6">
+                        <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#68748A]">
+                            Progres Verifikasi Rukun Tetangga
+                        </p>
+                        <div className="mt-5 grid grid-cols-4 gap-2">
+                            {steps.map((step, index) => (
+                                <div key={step.n} className="relative text-center">
+                                    {index < steps.length - 1 && (
+                                        <span
+                                            className={`absolute left-[calc(50%+18px)] right-[-50%] top-4 h-[3px] ${
+                                                step.state === 'done' ? 'bg-[#147A72]' : 'bg-[#E6EAF2]'
+                                            }`}
+                                        />
+                                    )}
+                                    <div
+                                        className={`relative z-10 mx-auto flex h-8 w-8 items-center justify-center rounded-full text-[12px] font-bold ${
+                                            step.state === 'done'
+                                                ? 'bg-[#147A72] text-white'
+                                                : step.state === 'current'
+                                                  ? 'bg-[#2F6BFF] text-white'
+                                                  : 'bg-[#EEF1F6] text-[#98A2B3]'
+                                        }`}
+                                    >
+                                        {step.state === 'done' ? <CheckCircle2 className="h-4 w-4" /> : step.state === 'current' ? <Search className="h-4 w-4" /> : step.n}
+                                    </div>
+                                    <p className={`mt-3 text-[12px] font-bold ${step.state === 'todo' ? 'text-[#98A2B3]' : 'text-[#12233F]'}`}>
+                                        {step.title}
+                                    </p>
+                                    <p className="mt-1 text-[11px] text-[#68748A]">{step.desc}</p>
+                                    <p className={`mt-1 text-[11px] ${step.state === 'done' ? 'font-semibold text-[#147A72]' : 'text-[#98A2B3]'}`}>
+                                        {step.note}
+                                    </p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="mt-6 flex gap-3 rounded-2xl border border-[#D7E4FF] bg-[#F3F7FF] px-4 py-4">
+                        <Info className="mt-0.5 h-5 w-5 shrink-0 text-[#2F6BFF]" />
+                        <div>
+                            <p className="text-[13px] font-bold text-[#1D4ED8]">Estimasi Waktu Pelayanan (SLA)</p>
+                            <p className="mt-1 text-[12px] leading-relaxed text-[#3B5B9A]">
+                                Estimasi verifikasi oleh Ketua RT adalah <strong>1×24 jam kerja</strong>. Anda akan
+                                menerima notifikasi otomatis WhatsApp/Sistem bila diperlukan revisi berkas atau saat
+                                surat pengantar siap diunduh.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="mt-5 flex flex-col gap-3 border-t border-[#EEF1F6] pt-5 sm:flex-row sm:items-center sm:justify-between">
+                        
+                        <div className="flex flex-wrap gap-2">
+                            <button
+                                type="button"
+                                className="inline-flex items-center gap-2 rounded-xl border border-[#E6EAF2] bg-[#F4F7FB] px-4 py-2.5 text-[13px] font-semibold text-[#4B5568]"
+                            >
+                                <Download className="h-4 w-4" />
+                                Unduh Bukti Pengajuan (PDF)
+                            </button>
+                            <a
+                                href="https://wa.me/6281298765432"
+                                target="_blank"
+                                rel="noreferrer"
+                                className="inline-flex items-center gap-2 rounded-xl bg-[#147A72] px-4 py-2.5 text-[13px] font-semibold text-white"
+                            >
+                                <MessageCircle className="h-4 w-4" />
+                                WhatsApp Pengurus RT
+                            </a>
+                        </div>
+                    </div>
+                </section>
+
+                <aside className="space-y-4">
+                    <div className="rounded-2xl border border-[#E6EAF2] bg-white p-4 shadow-sm">
+                        <div className="flex items-center justify-between">
+                            <p className="text-[12px] font-bold uppercase tracking-wide text-[#68748A]">Berkas Dilampirkan</p>
+                            <p className="text-[11px] font-semibold text-[#147A72]">{report.files?.length ?? 2} Dokumen Lengkap</p>
+                        </div>
+                        <div className="mt-3 space-y-2">
+                            {(report.files ?? DEFAULT_REPORT.files).map((file) => (
+                                <div key={file.id || file.name} className="flex items-center gap-3 rounded-xl bg-[#F7F9FC] px-3 py-3">
+                                    <FileText className="h-4 w-4 text-[#147A72]" />
+                                    <div className="min-w-0 flex-1">
+                                        <p className="truncate text-[12px] font-semibold">{file.name}</p>
+                                        <p className="text-[10px] text-[#68748A]">
+                                            {file.sizeLabel} • {file.kind}
+                                        </p>
+                                    </div>
+                                    <Eye className="h-4 w-4 text-[#98A2B3]" />
+                                </div>
+                            ))}
+                        </div>
+                        <p className="mt-3 flex items-center gap-2 rounded-xl bg-[#F4F7FB] px-3 py-2 text-[11px] text-[#68748A]">
+                            <ShieldCheck className="h-4 w-4 text-[#147A72]" />
+                            Privasi dilindungi UU Perlindungan Data Pribadi (PDP)
+                        </p>
+                    </div>
+
+                    <div className="rounded-2xl border border-[#E6EAF2] bg-white p-4 shadow-sm">
+                        <div className="mb-3 flex items-center gap-2">
+                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#E7F6EF] text-[#147A72]">
+                                <Clock3 className="h-4 w-4" />
+                            </div>
+                            <div>
+                                <p className="text-[13px] font-bold">Jadwal Sekretariat RT 01</p>
+                                <p className="text-[11px] text-[#68748A]">Pelayanan Tatap Muka &amp; Legalitas</p>
+                            </div>
+                        </div>
+                        <div className="space-y-2 text-[12px]">
+                            <div className="flex justify-between">
+                                <span>Senin – Jumat</span>
+                                <span className="font-semibold">19:30 – 21:00 WIB</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span>Sabtu &amp; Minggu</span>
+                                <span className="font-semibold">Dengan Perjanjian</span>
+                            </div>
+                            <p className="flex items-start gap-2 pt-1 text-[#68748A]">
+                                <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                                Pos Balai Warga RT 01 (Samping Lapangan)
+                            </p>
+                            <div className="flex items-center justify-between pt-1">
+                                <p className="inline-flex items-center gap-2">
+                                    <Phone className="h-3.5 w-3.5" />
+                                    Kontak Sekretaris RT 0812-9876-5432
+                                </p>
+                                <span className="rounded-full bg-[#E7F6EF] px-2 py-0.5 text-[10px] font-semibold text-[#11704E]">
+                                    Aktif
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="rounded-2xl border border-[#E6EAF2] bg-white p-4 shadow-sm">
+                        <div className="flex items-start gap-2">
+                            <HelpCircle className="mt-0.5 h-4 w-4 text-[#68748A]" />
+                            <div>
+                                <p className="text-[13px] font-bold">Butuh Surat Pengantar Cepat?</p>
+                                <p className="mt-1 text-[12px] leading-relaxed text-[#68748A]">
+                                    Untuk keperluan darurat rumah sakit atau kepolisian, gunakan fitur prioritas di pos
+                                    ronda atau kontak langsung nomor darurat RT.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </WargaLayout>
+    );
+}
