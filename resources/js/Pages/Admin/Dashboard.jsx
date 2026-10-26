@@ -1,6 +1,6 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link } from '@inertiajs/react';
-import { Users, FileText, ArrowLeftRight, ShieldCheck, MapPin } from 'lucide-react';
+import { Users, FileText, ArrowLeftRight, ShieldCheck, MapPin, ArrowRight } from 'lucide-react';
 
 export default function AdminDashboard({ auth }) {
     return (
@@ -86,7 +86,10 @@ export default function AdminDashboard({ auth }) {
                         </div>
 
                         {/* Modul 3: Lapor Mutasi & Audit (Tugas Ghita) */}
-                        <div className="p-6 rounded-2xl bg-white border border-[#E4E9F0] shadow-sm space-y-4">
+                        <Link
+                            href={route('admin.mutasi.index')}
+                            className="p-6 rounded-2xl bg-white border border-[#E4E9F0] shadow-sm space-y-4 hover:border-[#97620D]/40 hover:shadow-md transition cursor-pointer block group"
+                        >
                             <div className="w-10 h-10 rounded-xl bg-[#FFF2D9] flex items-center justify-center text-[#97620D]">
                                 <ArrowLeftRight className="w-5 h-5" />
                             </div>
@@ -98,10 +101,11 @@ export default function AdminDashboard({ auth }) {
                                     Pemeriksaan pelaporan warga pindah/datang dan rekaman jejak aktivitas sistem.
                                 </p>
                             </div>
-                            <div className="pt-2 border-t border-[#E4E9F0] text-xs text-[#97620D] font-semibold">
-                                Modul P0 • Siap Dikembangkan
+                            <div className="pt-2 border-t border-[#E4E9F0] flex items-center justify-between text-xs text-[#97620D] font-semibold">
+                                <span>Verifikasi Pindah / Datang</span>
+                                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                             </div>
-                        </div>
+                        </Link>
                     </div>
                 </div>
             </div>

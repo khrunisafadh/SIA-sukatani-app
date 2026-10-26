@@ -1,7 +1,9 @@
 <?php
 
+use App\Http\Controllers\Admin\MutasiAdminController;
 use App\Http\Controllers\Admin\SuratAdminController;
 use App\Http\Controllers\Admin\UserRoleController;
+use App\Http\Controllers\Portal\PindahDatangController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -59,6 +61,16 @@ Route::middleware(['auth', 'role:ketua_rt,sekretaris'])->prefix('admin')->name('
     Route::get('pengajuan-surat/{pengajuanSurat}/pdf', [SuratAdminController::class, 'preview'])->name('surat.pdf.preview');
     Route::get('pengajuan-surat/{pengajuanSurat}/pdf/unduh', [SuratAdminController::class, 'download'])->name('surat.pdf.download');
 
+    // Rute Verifikasi Laporan Pindah / Datang (POV Admin/Ketua RT)
+    Route::get('pindah-datang', [MutasiAdminController::class, 'index'])->name('mutasi.index');
+    Route::get('pindah-datang/ekspor', [MutasiAdminController::class, 'export'])->name('mutasi.export');
+    Route::get('pindah-datang/{permohonanMutasi}', [MutasiAdminController::class, 'show'])->name('mutasi.show');
+    Route::post('pindah-datang/{permohonanMutasi}/draft', [MutasiAdminController::class, 'saveDraft'])->name('mutasi.save-draft');
+    Route::post('pindah-datang/{permohonanMutasi}/revisi', [MutasiAdminController::class, 'requestRevision'])->name('mutasi.request-revision');
+    Route::post('pindah-datang/{permohonanMutasi}/setujui', [MutasiAdminController::class, 'approve'])->name('mutasi.approve');
+    Route::get('pindah-datang/{permohonanMutasi}/dokumen/{dokumenMutasi}/unduh', [MutasiAdminController::class, 'downloadDocument'])->name('mutasi.document.download');
+    Route::get('pindah-datang/{permohonanMutasi}/dokumen/{dokumenMutasi}/pratinjau', [MutasiAdminController::class, 'previewDocument'])->name('mutasi.document.preview');
+
     // Tempat rute CRUD Warga (Anggota 1: Khoirunnisa)
     // Route::resource('warga', WargaController::class);
 
@@ -87,14 +99,10 @@ Route::middleware(['auth', 'role:warga'])->prefix('portal')->name('portal.')->gr
     // Tempat rute Pengajuan Surat & PDF (Anggota 2: Aliya)
     // Route::resource('surat', SuratController::class);
 
-    // Lapor Mandiri Mutasi (Anggota 3: Ghita) — frontend pelaporan pindah/datang
-    Route::get('pindah-datang', function () {
-        return Inertia::render('Portal/PindahDatang/Create');
-    })->name('pindah-datang.create');
-
-    Route::get('pindah-datang/status', function () {
-        return Inertia::render('Portal/PindahDatang/Tracking');
-    })->name('pindah-datang.tracking');
+    // Lapor Mandiri Mutasi (Anggota 3: Ghita) — frontend & backend pelaporan pindah/datang
+    Route::get('pindah-datang', [PindahDatangController::class, 'create'])->name('pindah-datang.create');
+    Route::post('pindah-datang', [PindahDatangController::class, 'store'])->name('pindah-datang.store');
+    Route::get('pindah-datang/status', [PindahDatangController::class, 'tracking'])->name('pindah-datang.tracking');
 });
 
 /*
