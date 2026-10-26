@@ -196,17 +196,17 @@ export default function WargaCreate({ auth }) {
                 </Link>
 
                 {/* Pindah / Datang */}
-                <a
-                  href="#pindah-datang"
+                <Link
+                  href={route('admin.pindah-datang.index')}
                   className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[#D0EBE7] hover:bg-[#206760] hover:text-white text-xs font-medium transition-colors"
                 >
                   <ArrowLeftRight className="w-4 h-4 text-[#A7D7D0]" />
                   <span>Pindah / Datang</span>
-                </a>
+                </Link>
 
                 {/* Pengajuan Surat dengan Badge Oranye 2 */}
-                <a
-                  href="#pengajuan-surat"
+                <Link
+                  href={route('admin.surat.index')}
                   className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-[#D0EBE7] hover:bg-[#206760] hover:text-white text-xs font-medium transition-colors"
                 >
                   <div className="flex items-center gap-3">
@@ -216,7 +216,7 @@ export default function WargaCreate({ auth }) {
                   <span className="w-5 h-5 rounded-full bg-[#E58917] text-white flex items-center justify-center font-bold text-[10px]">
                     2
                   </span>
-                </a>
+                </Link>
 
                 {/* Audit Trail */}
                 <a
@@ -228,13 +228,13 @@ export default function WargaCreate({ auth }) {
                 </a>
 
                 {/* Pengguna & Role */}
-                <a
-                  href="#pengguna-role"
+                <Link
+                  href={route('admin.users.index')}
                   className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[#D0EBE7] hover:bg-[#206760] hover:text-white text-xs font-medium transition-colors"
                 >
                   <UserCog className="w-4 h-4 text-[#A7D7D0]" />
                   <span>Pengguna & Role</span>
-                </a>
+                </Link>
               </div>
             </div>
           </div>
@@ -264,46 +264,31 @@ export default function WargaCreate({ auth }) {
         </aside>
 
         {/* ================= AREA KONTEN DASHBOARD UTAMA ================= */}
-        <div className="flex-1 ml-[260px] flex flex-col min-w-0">
-          {/* Top Bar Header */}
-          <header className="h-16 bg-white border-b border-[#EAEFF5] px-8 flex items-center justify-between sticky top-0 z-20">
-            <div className="flex items-center gap-2.5 text-xs text-[#718096]">
-              <span className="font-bold text-[#0F685D] tracking-wider uppercase">
+        <div className="flex-1 pl-[260px] flex flex-col min-w-0">
+          {/* Header Bar */}
+          <header className="h-[72px] bg-white border-b border-[#EAEFF5] px-10 flex items-center justify-between sticky top-0 z-20">
+            <div className="flex items-center gap-3">
+              <span className="text-[11px] font-bold tracking-wider uppercase text-[#0E8F84]">
                 SIA RT 01/08 Sukatani
               </span>
-              <span>•</span>
-              <span>Kecamatan Tapos, Kota Depok</span>
+              <span className="text-[#A0AEC0]">•</span>
+              <span className="text-xs text-[#718096] font-medium">Kecamatan Tapos, Kota Depok</span>
             </div>
 
-            <div className="flex items-center gap-4">
-              <button 
-                type="button" 
-                className="w-8 h-8 rounded-full flex items-center justify-center text-[#718096] hover:text-[#0F685D] hover:bg-[#F0FDF4] transition-colors"
-                title="Bantuan Pengurus"
-              >
-                <HelpCircle className="w-4 h-4" />
-              </button>
-
-              <div className="h-5 w-[1px] bg-[#E2E8F0]" />
-
-              <div className="flex items-center gap-2.5 cursor-pointer">
-                <div className="w-8 h-8 rounded-full bg-[#E0F2FE] text-[#0369A1] font-bold text-xs flex items-center justify-center border border-[#BAE6FD]">
-                  BS
-                </div>
-                <div className="text-left hidden sm:block">
-                  <div className="text-xs font-bold text-[#1A253C] leading-tight">
-                    Budi Santoso
-                  </div>
-                  <div className="text-[10px] text-[#718096]">
-                    Ketua RT 01/08
-                  </div>
-                </div>
+            <div className="flex items-center gap-3 cursor-pointer py-1.5 px-2 rounded-xl hover:bg-slate-50 transition-colors">
+              <div className="w-9 h-9 rounded-full bg-[#EAF0FC] text-[#2F65CB] flex items-center justify-center font-bold text-xs">
+                BS
               </div>
+              <div className="text-left">
+                <h4 className="text-xs font-bold text-[#1A253C] leading-none">Budi Santoso</h4>
+                <p className="text-[10px] text-[#718096] mt-0.5">Ketua RT 01/08</p>
+              </div>
+              <ChevronRight className="w-3.5 h-3.5 text-[#A0AEC0] ml-1" />
             </div>
           </header>
 
           {/* Latar Belakang Dashboard (Dengan efek blur/backdrop context) */}
-          <main className="p-8 space-y-6 max-w-[1200px] w-full opacity-30 pointer-events-none filter blur-[1px]">
+          <main className="p-10 space-y-6 max-w-[1240px] w-full opacity-30 pointer-events-none filter blur-[1px]">
             <div className="flex items-end justify-between">
               <div>
                 <span className="text-[11px] font-bold tracking-wider uppercase text-[#0d9488]">

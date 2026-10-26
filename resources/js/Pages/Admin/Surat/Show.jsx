@@ -77,70 +77,70 @@ export default function SuratShow({ letter, canConfirm }) {
             actions={
                 <Link
                     href={route('admin.surat.index')}
-                    className="rounded-lg border border-[#E3E8EC] bg-white px-4 py-2 text-sm font-medium hover:bg-slate-50"
+                    className="btn-admin-secondary"
                 >
                     Kembali
                 </Link>
             }
         >
-            <Head title={`Detail ${letter.nomor}`} />
+            <Head title={`Detail ${letter.nomor} - SIA Sukatani`} />
 
             <div className="grid gap-6 lg:grid-cols-3">
-                <section className="space-y-4 rounded-xl border border-[#E3E8EC] bg-white p-5 lg:col-span-2">
+                <section className="card-admin p-6 space-y-4 lg:col-span-2">
                     <div className="flex items-start justify-between gap-3">
                         <div>
-                            <p className="text-xs uppercase tracking-wide text-[#667085]">Nomor pengajuan</p>
-                            <h2 className="text-lg font-semibold">{letter.nomor}</h2>
+                            <p className="text-[11px] font-bold uppercase tracking-wider text-[#718096]">Nomor pengajuan</p>
+                            <h2 className="text-xl font-bold text-[#1A253C] font-heading">{letter.nomor}</h2>
                         </div>
                         <StatusBadge status={letter.status} label={letter.status_label} />
                     </div>
 
-                    <dl className="grid gap-4 sm:grid-cols-2">
+                    <dl className="grid gap-4 sm:grid-cols-2 pt-2">
                         <div>
-                            <dt className="text-xs text-[#667085]">Pemohon</dt>
-                            <dd className="mt-1 text-sm font-medium">{letter.pemohon.name}</dd>
-                            <dd className="text-xs text-[#667085]">{letter.pemohon.username}</dd>
+                            <dt className="text-xs text-[#718096]">Pemohon</dt>
+                            <dd className="mt-1 text-sm font-semibold text-[#1A253C]">{letter.pemohon.name}</dd>
+                            <dd className="text-xs text-[#718096]">{letter.pemohon.username}</dd>
                         </div>
                         <div>
-                            <dt className="text-xs text-[#667085]">Dibuat oleh petugas</dt>
-                            <dd className="mt-1 text-sm font-medium">{letter.creator.name}</dd>
-                            <dd className="text-xs text-[#667085]">{letter.creator.role_label}</dd>
+                            <dt className="text-xs text-[#718096]">Dibuat oleh petugas</dt>
+                            <dd className="mt-1 text-sm font-semibold text-[#1A253C]">{letter.creator.name}</dd>
+                            <dd className="text-xs text-[#718096]">{letter.creator.role_label}</dd>
                         </div>
                         <div>
-                            <dt className="text-xs text-[#667085]">Jenis surat</dt>
-                            <dd className="mt-1 text-sm">{letter.jenis_label}</dd>
+                            <dt className="text-xs text-[#718096]">Jenis surat</dt>
+                            <dd className="mt-1 text-sm text-[#1A253C]">{letter.jenis_label}</dd>
                         </div>
                         <div>
-                            <dt className="text-xs text-[#667085]">Tanggal pengajuan</dt>
-                            <dd className="mt-1 text-sm">{letter.tanggal}</dd>
+                            <dt className="text-xs text-[#718096]">Tanggal pengajuan</dt>
+                            <dd className="mt-1 text-sm text-[#1A253C]">{letter.tanggal}</dd>
                         </div>
                         <div className="sm:col-span-2">
-                            <dt className="text-xs text-[#667085]">Keperluan</dt>
-                            <dd className="mt-1 text-sm">{letter.keperluan}</dd>
+                            <dt className="text-xs text-[#718096]">Keperluan</dt>
+                            <dd className="mt-1 text-sm text-[#1A253C]">{letter.keperluan}</dd>
                         </div>
                         {letter.keterangan && (
                             <div className="sm:col-span-2">
-                                <dt className="text-xs text-[#667085]">Keterangan</dt>
-                                <dd className="mt-1 text-sm">{letter.keterangan}</dd>
+                                <dt className="text-xs text-[#718096]">Keterangan</dt>
+                                <dd className="mt-1 text-sm text-[#1A253C]">{letter.keterangan}</dd>
                             </div>
                         )}
                         {letter.completed_by && (
-                            <div className="sm:col-span-2 rounded-lg bg-emerald-50 p-3 text-sm text-emerald-800">
+                            <div className="sm:col-span-2 rounded-xl bg-[#EAF7EE] border border-[#B6E6C5] p-3 text-xs text-[#14833B]">
                                 Diselesaikan {letter.completed_at} oleh {letter.completed_by.name} ({letter.completed_by.role_label}).
                             </div>
                         )}
                     </dl>
 
-                    <div className="flex flex-wrap gap-2 border-t border-[#E3E8EC] pt-4">
+                    <div className="flex flex-wrap gap-2.5 border-t border-[#EDF2F7] pt-5">
                         {letter.can_preview ? (
                             <a
                                 href={letter.preview_url}
                                 target="_blank"
                                 rel="noreferrer"
-                                className="inline-flex items-center gap-2 rounded-lg border border-[#E3E8EC] px-3 py-2 text-sm font-medium hover:bg-slate-50"
+                                className="btn-admin-secondary"
                             >
                                 <Eye className="h-4 w-4" />
-                                Preview PDF
+                                <span>Preview PDF</span>
                             </a>
                         ) : (
                             <button
@@ -149,10 +149,10 @@ export default function SuratShow({ letter, canConfirm }) {
                                 title={letter.pdf_locked
                                     ? 'Draf ditutup setelah pengesahan fisik'
                                     : 'Dokumen PDF belum tersedia'}
-                                className="inline-flex items-center gap-2 rounded-lg border border-[#E3E8EC] px-3 py-2 text-sm text-slate-400"
+                                className="inline-flex items-center gap-2 rounded-xl border border-[#E2E8F0] px-4 py-2.5 text-xs font-semibold text-slate-400 bg-slate-50 cursor-not-allowed"
                             >
                                 <Eye className="h-4 w-4" />
-                                Preview PDF
+                                <span>Preview PDF</span>
                             </button>
                         )}
 
@@ -161,43 +161,43 @@ export default function SuratShow({ letter, canConfirm }) {
                             onClick={downloadPdf}
                             disabled={!letter.can_download}
                             title={letter.can_download ? 'Unduh PDF' : (letter.pdf_locked ? 'Draf ditutup setelah pengesahan fisik' : 'Dokumen PDF belum tersedia')}
-                            className="inline-flex items-center gap-2 rounded-lg border border-[#E3E8EC] px-3 py-2 text-sm font-medium hover:bg-slate-50 disabled:cursor-not-allowed disabled:text-slate-400"
+                            className="btn-admin-secondary"
                         >
                             <Download className="h-4 w-4" />
-                            Unduh PDF
+                            <span>Unduh PDF</span>
                         </button>
 
                         {canConfirm ? (
                             <button
                                 type="button"
                                 onClick={() => setConfirming(true)}
-                                className="inline-flex items-center rounded-lg bg-[#267F83] px-3 py-2 text-sm font-semibold text-white hover:bg-[#1F686C]"
+                                className="btn-admin-primary"
                             >
                                 Konfirmasi Pengesahan Fisik
                             </button>
                         ) : letter.status === 'selesai' ? (
-                            <span className="self-center text-xs text-[#667085]">Pengesahan fisik sudah dicatat. Hanya detail administratif yang tersedia.</span>
+                            <span className="self-center text-xs text-[#718096]">Pengesahan fisik sudah dicatat. Hanya detail administratif yang tersedia.</span>
                         ) : null}
                     </div>
 
                     {letter.pdf_unavailable && (
-                        <p className="text-sm text-amber-700">Dokumen PDF belum tersedia.</p>
+                        <p className="text-xs text-amber-700 font-medium">Dokumen PDF belum tersedia.</p>
                     )}
                     {letter.pdf_locked && (
-                        <p className="text-sm text-[#667085]">
+                        <p className="text-xs text-[#718096]">
                             Preview dan unduh draf elektronik ditutup karena surat telah disahkan secara fisik.
                         </p>
                     )}
                 </section>
 
-                <section className="rounded-xl border border-[#E3E8EC] bg-white p-5">
-                    <h3 className="text-sm font-semibold">Riwayat status</h3>
+                <section className="card-admin p-6 space-y-3">
+                    <h3 className="text-sm font-bold text-[#1A253C] font-heading">Riwayat status</h3>
                     <ol className="mt-4 space-y-4">
                         {letter.histories.map((item) => (
-                            <li key={item.id} className="border-l-2 border-[#267F83] pl-3">
-                                <p className="text-sm font-medium">{item.status_label}</p>
-                                <p className="text-xs text-[#667085]">{item.at} · {item.actor || 'Sistem'}</p>
-                                {item.keterangan && <p className="mt-1 text-xs">{item.keterangan}</p>}
+                            <li key={item.id} className="border-l-2 border-[#0F685D] pl-3.5 space-y-0.5">
+                                <p className="text-xs font-bold text-[#1A253C]">{item.status_label}</p>
+                                <p className="text-[11px] text-[#718096]">{item.at} · {item.actor || 'Sistem'}</p>
+                                {item.keterangan && <p className="mt-1 text-xs text-[#4A5568]">{item.keterangan}</p>}
                             </li>
                         ))}
                     </ol>
@@ -205,8 +205,8 @@ export default function SuratShow({ letter, canConfirm }) {
             </div>
 
             {letter.can_preview && (
-                <section className="mt-6 overflow-hidden rounded-xl border border-[#E3E8EC] bg-white">
-                    <div className="border-b border-[#E3E8EC] px-5 py-3 text-sm font-semibold">Pratinjau dokumen</div>
+                <section className="mt-6 overflow-hidden card-admin">
+                    <div className="border-b border-[#EDF2F7] px-6 py-4 text-xs font-bold text-[#1A253C] uppercase tracking-wider bg-[#FAFCFD]">Pratinjau dokumen</div>
                     <iframe title="Preview PDF" src={letter.preview_url} className="h-[640px] w-full" />
                 </section>
             )}

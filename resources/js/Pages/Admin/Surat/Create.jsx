@@ -24,8 +24,8 @@ export default function SuratCreate({ wargaOptions, jenisOptions }) {
     };
 
     const fieldClass = (name) =>
-        `mt-1 h-10 w-full rounded-lg border px-3 text-sm focus:border-[#267F83] focus:ring-[#267F83]/20 ${
-            errors[name] ? 'border-red-500' : 'border-[#E3E8EC]'
+        `mt-1.5 h-10 w-full rounded-xl border px-3.5 text-xs text-[#1A253C] bg-white transition-colors focus:outline-none focus:ring-2 focus:ring-[#0F685D]/20 focus:border-[#0F685D] ${
+            errors[name] ? 'border-red-500' : 'border-[#E2E8F0]'
         }`;
 
     return (
@@ -38,11 +38,11 @@ export default function SuratCreate({ wargaOptions, jenisOptions }) {
                 { label: 'Buat Pengajuan' },
             ]}
         >
-            <Head title="Buat Pengajuan" />
+            <Head title="Buat Pengajuan - SIA Sukatani" />
 
-            <form onSubmit={submit} className="max-w-3xl space-y-5 rounded-xl border border-[#E3E8EC] bg-white p-6">
+            <form onSubmit={submit} className="card-admin max-w-3xl space-y-5 p-6 sm:p-8">
                 <div>
-                    <label htmlFor="pemohon_id" className="text-sm font-medium">
+                    <label htmlFor="pemohon_id" className="text-xs font-semibold text-[#1A253C]">
                         Warga pemohon
                     </label>
                     <select
@@ -62,7 +62,7 @@ export default function SuratCreate({ wargaOptions, jenisOptions }) {
                 </div>
 
                 <div>
-                    <label htmlFor="jenis_surat" className="text-sm font-medium">
+                    <label htmlFor="jenis_surat" className="text-xs font-semibold text-[#1A253C]">
                         Jenis surat
                     </label>
                     <select
@@ -82,7 +82,7 @@ export default function SuratCreate({ wargaOptions, jenisOptions }) {
                 </div>
 
                 <div>
-                    <label htmlFor="keperluan" className="text-sm font-medium">
+                    <label htmlFor="keperluan" className="text-xs font-semibold text-[#1A253C]">
                         Keperluan
                     </label>
                     <input
@@ -96,7 +96,7 @@ export default function SuratCreate({ wargaOptions, jenisOptions }) {
                 </div>
 
                 <div>
-                    <label htmlFor="keterangan" className="text-sm font-medium">
+                    <label htmlFor="keterangan" className="text-xs font-semibold text-[#1A253C]">
                         Keterangan tambahan
                     </label>
                     <textarea
@@ -104,24 +104,25 @@ export default function SuratCreate({ wargaOptions, jenisOptions }) {
                         value={data.keterangan}
                         onChange={(event) => setData('keterangan', event.target.value)}
                         rows={4}
-                        className={`mt-1 w-full rounded-lg border px-3 py-2 text-sm focus:border-[#267F83] focus:ring-[#267F83]/20 ${
-                            errors.keterangan ? 'border-red-500' : 'border-[#E3E8EC]'
+                        className={`mt-1.5 w-full rounded-xl border p-3 text-xs text-[#1A253C] bg-white transition-colors focus:outline-none focus:ring-2 focus:ring-[#0F685D]/20 focus:border-[#0F685D] ${
+                            errors.keterangan ? 'border-red-500' : 'border-[#E2E8F0]'
                         }`}
+                        placeholder="Catatan atau keterangan pendukung pengajuan..."
                     />
                     {errors.keterangan && <p className="mt-1 text-xs text-red-600">{errors.keterangan}</p>}
                 </div>
 
-                <div className="flex justify-end gap-2 border-t border-[#E3E8EC] pt-4">
+                <div className="flex justify-end gap-2.5 border-t border-[#EDF2F7] pt-5">
                     <Link
                         href={route('admin.surat.index')}
-                        className="rounded-lg border border-[#E3E8EC] px-4 py-2 text-sm font-medium hover:bg-slate-50"
+                        className="btn-admin-secondary"
                     >
                         Batal
                     </Link>
                     <button
                         type="submit"
                         disabled={processing}
-                        className="rounded-lg bg-[#267F83] px-4 py-2 text-sm font-semibold text-white hover:bg-[#1F686C] disabled:opacity-60"
+                        className="btn-admin-primary"
                     >
                         Simpan Pengajuan
                     </button>

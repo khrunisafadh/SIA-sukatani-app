@@ -1,3 +1,91 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+    /* ==========================================================================
+       SIA SUKATANI UNIFIED ADMIN DESIGN SYSTEM (Satu Berkas CSS Terpadu)
+       Mengacu pada Master UI Admin: Dark Teal #287971 / #0F685D, Clean Slate, Rounded Cards
+       ========================================================================== */
+
+    /* Card & Container Standar Admin */
+    .card-admin {
+        @apply bg-white rounded-2xl border border-[#E9EFF6] shadow-sm;
+    }
+
+    .card-admin-header {
+        @apply px-6 py-4 border-b border-[#EDF2F7] flex items-center justify-between;
+    }
+
+    /* Tombol Standar Admin */
+    .btn-admin-primary {
+        @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#0F685D] hover:bg-[#0B5249] text-white text-xs font-semibold shadow-sm transition-all duration-150 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed;
+    }
+
+    .btn-admin-secondary {
+        @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-[#CBD5E1] bg-white hover:bg-slate-50 text-[#4A5568] text-xs font-semibold shadow-sm transition-all duration-150 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed;
+    }
+
+    .btn-admin-danger {
+        @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-semibold shadow-sm transition-all duration-150 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed;
+    }
+
+    .btn-admin-icon {
+        @apply rounded-xl border border-[#E2E8F0] p-2 text-[#0F685D] hover:bg-[#E6F6F4]/60 transition-colors cursor-pointer disabled:cursor-not-allowed disabled:text-slate-300;
+    }
+
+    /* Input & Form Standar Admin */
+    .input-admin {
+        @apply h-10 w-full rounded-xl border border-[#E2E8F0] px-3.5 text-xs text-[#1A253C] bg-white placeholder-[#94A3B8] focus:outline-none focus:ring-2 focus:ring-[#0F685D]/20 focus:border-[#0F685D] transition-colors;
+    }
+
+    .select-admin {
+        @apply h-10 rounded-xl border border-[#E2E8F0] px-3.5 text-xs text-[#1A253C] bg-white focus:outline-none focus:ring-2 focus:ring-[#0F685D]/20 focus:border-[#0F685D] transition-colors;
+    }
+
+    .textarea-admin {
+        @apply w-full rounded-xl border border-[#E2E8F0] p-3 text-xs text-[#1A253C] bg-white placeholder-[#94A3B8] focus:outline-none focus:ring-2 focus:ring-[#0F685D]/20 focus:border-[#0F685D] transition-colors;
+    }
+
+    /* Tabel Standar Admin */
+    .table-admin {
+        @apply min-w-full text-left text-xs;
+    }
+
+    .table-admin thead {
+        @apply bg-[#FAFCFD] border-b border-[#EDF2F7] text-[11px] font-bold text-[#718096] uppercase tracking-wider;
+    }
+
+    .table-admin th {
+        @apply px-4 py-3.5 font-semibold;
+    }
+
+    .table-admin td {
+        @apply px-4 py-3.5 text-[#1A253C];
+    }
+
+    .table-admin tbody tr {
+        @apply border-b border-[#F0F4F8] hover:bg-[#F9FBFC] transition-colors;
+    }
+
+    /* Status Badge Standar Admin */
+    .badge-admin-teal {
+        @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#E6F6F4] text-[#0F685D] text-[11px] font-semibold border border-[#BDE8E2];
+    }
+
+    .badge-admin-blue {
+        @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#EBF2FF] text-[#2F65CB] text-[11px] font-semibold border border-[#CDE0FD];
+    }
+
+    .badge-admin-amber {
+        @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#FFF3DA] text-[#A66700] text-[11px] font-semibold border border-[#FDE6B8];
+    }
+
+    .badge-admin-green {
+        @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#EAF7EE] text-[#14833B] text-[11px] font-semibold border border-[#B6E6C5];
+    }
+
+    .badge-admin-gray {
+        @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#F1F5F9] text-[#475569] text-[11px] font-semibold border border-[#E2E8F0];
+    }
+}

@@ -98,17 +98,17 @@ export default function WargaIndex({ wargas, filters, totalWarga, totalTetap, to
                 </Link>
 
                 {/* Pindah / Datang */}
-                <a
-                  href="#pindah-datang"
+                <Link
+                  href={route('admin.pindah-datang.index')}
                   className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[#D0EBE7] hover:bg-[#206760] hover:text-white text-xs font-medium transition-colors"
                 >
                   <ArrowLeftRight className="w-4 h-4 text-[#A7D7D0]" />
                   <span>Pindah / Datang</span>
-                </a>
+                </Link>
 
                 {/* Pengajuan Surat dengan Badge 2 */}
-                <a
-                  href="#pengajuan-surat"
+                <Link
+                  href={route('admin.surat.index')}
                   className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-[#D0EBE7] hover:bg-[#206760] hover:text-white text-xs font-medium transition-colors"
                 >
                   <div className="flex items-center gap-3">
@@ -118,7 +118,7 @@ export default function WargaIndex({ wargas, filters, totalWarga, totalTetap, to
                   <span className="w-5 h-5 rounded-full bg-[#E58917] text-white flex items-center justify-center font-bold text-[10px]">
                     2
                   </span>
-                </a>
+                </Link>
 
                 {/* Audit Trail */}
                 <a
@@ -130,13 +130,13 @@ export default function WargaIndex({ wargas, filters, totalWarga, totalTetap, to
                 </a>
 
                 {/* Pengguna & Role */}
-                <a
-                  href="#pengguna-role"
+                <Link
+                  href={route('admin.users.index')}
                   className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[#D0EBE7] hover:bg-[#206760] hover:text-white text-xs font-medium transition-colors"
                 >
                   <UserCog className="w-4 h-4 text-[#A7D7D0]" />
                   <span>Pengguna & Role</span>
-                </a>
+                </Link>
               </div>
             </div>
           </div>

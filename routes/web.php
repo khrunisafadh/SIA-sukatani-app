@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\SuratAdminController;
 use App\Http\Controllers\Admin\UserRoleController;
 use App\Http\Controllers\ProfileController;
@@ -41,9 +42,7 @@ Route::get('/dashboard', function () {
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth', 'role:ketua_rt,sekretaris'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/dashboard', function () {
-        return Inertia::render('Admin/Dashboard');
-    })->name('dashboard');
+    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
 
     Route::get('pengajuan-surat', [SuratAdminController::class, 'index'])->name('surat.index');
     Route::get('pengajuan-surat/buat', [SuratAdminController::class, 'create'])
@@ -62,6 +61,11 @@ Route::middleware(['auth', 'role:ketua_rt,sekretaris'])->prefix('admin')->name('
     Route::get('/warga/create', [WargaController::class, 'create'])->name('warga.create');
     Route::post('/warga', [WargaController::class, 'store'])->name('warga.store');
     Route::get('/warga/check-nik', [WargaController::class, 'checkNik'])->name('warga.check-nik');
+
+    // Modul Laporan Pindah / Datang (Fitur Masih Dalam Pengembangan)
+    Route::get('/pindah-datang', function () {
+        return Inertia::render('Admin/PindahDatang/Index');
+    })->name('pindah-datang.index');
 });
 
 Route::middleware(['auth', 'role:ketua_rt'])->prefix('admin')->name('admin.')->group(function () {
@@ -84,8 +88,14 @@ Route::middleware(['auth', 'role:warga'])->prefix('portal')->name('portal.')->gr
     // Tempat rute Pengajuan Surat & PDF (Anggota 2: Aliya)
     // Route::resource('surat', SuratController::class);
 
-    // Tempat rute Lapor Mandiri Mutasi (Anggota 3: Ghita)
-    // Route::post('lapor-mutasi', [MutasiController::class, 'store'])->name('mutasi.store');
+    // Lapor Mandiri Mutasi (Anggota 3: Ghita) — frontend pelaporan pindah/datang
+    Route::get('pindah-datang', function () {
+        return Inertia::render('Portal/PindahDatang/Create');
+    })->name('pindah-datang.create');
+
+    Route::get('pindah-datang/status', function () {
+        return Inertia::render('Portal/PindahDatang/Tracking');
+    })->name('pindah-datang.tracking');
 });
 
 /*

@@ -91,45 +91,45 @@ export default function SuratIndex({ letters, filters, summary, jenisOptions, st
                 canCreate ? (
                     <Link
                         href={route('admin.surat.create')}
-                        className="inline-flex items-center gap-2 rounded-lg bg-[#267F83] px-4 py-2 text-sm font-semibold text-white hover:bg-[#1F686C]"
+                        className="btn-admin-primary"
                     >
                         <Plus className="h-4 w-4" />
-                        Buat Pengajuan
+                        <span>Buat Pengajuan</span>
                     </Link>
                 ) : null
             }
         >
-            <Head title="Pengajuan Surat" />
+            <Head title="Pengajuan Surat - SIA Sukatani" />
 
-            <div className="mb-4 grid grid-cols-2 gap-3 md:grid-cols-4">
+            <div className="mb-6 grid grid-cols-2 gap-4 md:grid-cols-4">
                 {[
                     ['Total', summary.total],
                     ['Diajukan', summary.diajukan],
                     ['Terbit', summary.terbit],
                     ['Selesai', summary.selesai],
                 ].map(([label, value]) => (
-                    <div key={label} className="rounded-xl border border-[#E3E8EC] bg-white px-4 py-3">
-                        <p className="text-xs text-[#667085]">{label}</p>
-                        <p className="mt-1 text-lg font-semibold">{value}</p>
+                    <div key={label} className="card-admin p-4">
+                        <p className="text-xs text-[#718096] font-medium">{label}</p>
+                        <p className="mt-1 text-xl font-bold text-[#1A253C]">{value}</p>
                     </div>
                 ))}
             </div>
 
-            <div className="overflow-hidden rounded-xl border border-[#E3E8EC] bg-white">
+            <div className="card-admin overflow-hidden">
                 <form
-                    className="flex flex-col gap-3 border-b border-[#E3E8EC] p-4 lg:flex-row lg:items-center"
+                    className="flex flex-col gap-3 border-b border-[#EDF2F7] p-4 lg:flex-row lg:items-center bg-[#FCFDFE]"
                     onSubmit={(event) => {
                         event.preventDefault();
                         applyFilters();
                     }}
                 >
                     <div className="relative flex-1">
-                        <Search className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-[#97A0AF]" />
+                        <Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-[#94A3B8]" />
                         <input
                             value={q}
                             onChange={(event) => setQ(event.target.value)}
                             placeholder="Cari nomor atau pemohon..."
-                            className="h-10 w-full rounded-lg border border-[#E3E8EC] pl-9 pr-3 text-sm focus:border-[#267F83] focus:ring-[#267F83]/20"
+                            className="input-admin pl-9"
                         />
                     </div>
                     <select
@@ -138,7 +138,7 @@ export default function SuratIndex({ letters, filters, summary, jenisOptions, st
                             setJenis(event.target.value);
                             applyFilters({ jenis: event.target.value });
                         }}
-                        className="h-10 rounded-lg border border-[#E3E8EC] text-sm"
+                        className="select-admin"
                     >
                         <option value="">Semua jenis surat</option>
                         {Object.entries(jenisOptions).map(([value, label]) => (
@@ -153,7 +153,7 @@ export default function SuratIndex({ letters, filters, summary, jenisOptions, st
                             setStatus(event.target.value);
                             applyFilters({ status: event.target.value });
                         }}
-                        className="h-10 rounded-lg border border-[#E3E8EC] text-sm"
+                        className="select-admin"
                     >
                         <option value="">Semua status</option>
                         {Object.entries(statusOptions).map(([value, label]) => (
@@ -164,14 +164,14 @@ export default function SuratIndex({ letters, filters, summary, jenisOptions, st
                     </select>
                     <button
                         type="submit"
-                        className="h-10 rounded-lg bg-[#267F83] px-4 text-sm font-semibold text-white hover:bg-[#1F686C]"
+                        className="btn-admin-primary"
                     >
                         Cari
                     </button>
                     <button
                         type="button"
                         onClick={resetFilters}
-                        className="inline-flex h-10 items-center gap-1 rounded-lg border border-[#E3E8EC] px-3 text-sm text-[#667085] hover:bg-slate-50"
+                        className="btn-admin-secondary"
                     >
                         <RotateCcw className="h-3.5 w-3.5" />
                         Reset
@@ -179,27 +179,27 @@ export default function SuratIndex({ letters, filters, summary, jenisOptions, st
                 </form>
 
                 <div className="overflow-x-auto">
-                    <table className="min-w-full text-left text-sm">
-                        <thead className="bg-[#F8FAFB] text-xs uppercase tracking-wide text-[#667085]">
+                    <table className="table-admin">
+                        <thead>
                             <tr>
-                                <th className="px-4 py-3 font-semibold">Nomor</th>
-                                <th className="px-4 py-3 font-semibold">Pemohon</th>
-                                <th className="px-4 py-3 font-semibold">Jenis Surat</th>
-                                <th className="px-4 py-3 font-semibold">Tanggal</th>
-                                <th className="px-4 py-3 font-semibold">Status</th>
-                                <th className="px-4 py-3 text-right font-semibold">Aksi</th>
+                                <th>Nomor</th>
+                                <th>Pemohon</th>
+                                <th>Jenis Surat</th>
+                                <th>Tanggal</th>
+                                <th>Status</th>
+                                <th className="text-right">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
                             {letters.data.length === 0 ? (
                                 <tr>
-                                    <td colSpan={6} className="px-4 py-12 text-center text-sm text-[#667085]">
+                                    <td colSpan={6} className="px-4 py-12 text-center text-xs text-[#718096]">
                                         Belum ada pengajuan yang sesuai filter.
                                         <div className="mt-3">
                                             <button
                                                 type="button"
                                                 onClick={resetFilters}
-                                                className="text-[#267F83] underline"
+                                                className="text-[#0F685D] hover:underline font-semibold"
                                             >
                                                 Reset filter
                                             </button>
@@ -208,23 +208,23 @@ export default function SuratIndex({ letters, filters, summary, jenisOptions, st
                                 </tr>
                             ) : (
                                 letters.data.map((letter) => (
-                                    <tr key={letter.id} className="border-t border-[#E3E8EC]">
-                                        <td className="px-4 py-3 font-medium">
+                                    <tr key={letter.id}>
+                                        <td className="font-semibold text-[#0F685D]">
                                             <Link href={route('admin.surat.show', letter.id)} className="hover:underline">
                                                 {letter.nomor}
                                             </Link>
                                         </td>
-                                        <td className="px-4 py-3">{letter.pemohon}</td>
-                                        <td className="px-4 py-3">{letter.jenis_label}</td>
-                                        <td className="px-4 py-3">{letter.tanggal}</td>
-                                        <td className="px-4 py-3">
+                                        <td className="font-medium">{letter.pemohon}</td>
+                                        <td>{letter.jenis_label}</td>
+                                        <td>{letter.tanggal}</td>
+                                        <td>
                                             <StatusBadge status={letter.status} label={letter.status_label} />
                                         </td>
-                                        <td className="px-4 py-3">
-                                            <div className="flex justify-end gap-2">
+                                        <td>
+                                            <div className="flex justify-end gap-1.5">
                                                 <Link
                                                     href={route('admin.surat.show', letter.id)}
-                                                    className="rounded-md border border-[#E3E8EC] p-1.5 text-[#267F83] hover:bg-slate-50"
+                                                    className="btn-admin-icon"
                                                     title="Lihat detail"
                                                 >
                                                     <Eye className="h-4 w-4" />
@@ -240,7 +240,7 @@ export default function SuratIndex({ letters, filters, summary, jenisOptions, st
                                                               ? 'Draf PDF ditutup setelah pengesahan fisik'
                                                               : 'Dokumen PDF belum tersedia'
                                                     }
-                                                    className="rounded-md border border-[#E3E8EC] p-1.5 text-[#267F83] hover:bg-slate-50 disabled:cursor-not-allowed disabled:text-slate-300"
+                                                    className="btn-admin-icon"
                                                 >
                                                     <Download className="h-4 w-4" />
                                                 </button>
@@ -253,7 +253,7 @@ export default function SuratIndex({ letters, filters, summary, jenisOptions, st
                     </table>
                 </div>
 
-                <div className="border-t border-[#E3E8EC] px-4 py-3">
+                <div className="border-t border-[#EDF2F7] px-5 py-4">
                     <Pagination meta={letters} links={letters.links} />
                 </div>
             </div>

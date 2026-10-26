@@ -35,6 +35,11 @@ class RoleAccessTest extends TestCase
 
         $responsePage = $this->actingAs($admin)->get('/admin/dashboard');
         $responsePage->assertStatus(200);
+        $responsePage->assertInertia(fn ($page) => $page
+            ->component('Admin/Dashboard')
+            ->has('stats')
+            ->has('recentLetters')
+        );
     }
 
     public function test_warga_cannot_access_admin_dashboard(): void

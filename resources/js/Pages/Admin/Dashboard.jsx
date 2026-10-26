@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Head, Link } from '@inertiajs/react';
 import { 
   Home,
@@ -13,23 +13,40 @@ import {
   Check,
   CheckCircle2,
   Clock,
-  ArrowRight
+  ArrowRight,
+  X,
+  IdCard,
+  Contact,
+  HelpCircle
 } from 'lucide-react';
 
-export default function AdminDashboard({ auth }) {
-  // 4 Kartu Statistik sesuai Gambar
+export default function AdminDashboard({ auth, stats: propStats, recentLetters: propRecentLetters, recentHistories: propRecentHistories }) {
+  const [selectedLetter, setSelectedLetter] = useState(null);
+
+  // Close drawer on Escape key
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setSelectedLetter(null);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  // 4 Kartu Statistik Real-time
   const stats = [
     {
       title: 'Total warga',
-      value: '248',
-      desc: 'Contoh data aktif',
+      value: propStats?.total_warga || '248',
+      desc: 'Data warga aktif',
       icon: Users,
       bgIcon: 'bg-[#EDF3FF]',
       iconColor: 'text-[#2F65CB]',
     },
     {
       title: 'Surat diajukan',
-      value: '02',
+      value: propStats?.surat_diajukan || '02',
       desc: 'Perlu ditinjau hari ini',
       icon: FileText,
       bgIcon: 'bg-[#FFF6E5]',
@@ -37,7 +54,7 @@ export default function AdminDashboard({ auth }) {
     },
     {
       title: 'Laporan hunian',
-      value: '03',
+      value: propStats?.laporan_hunian || '03',
       desc: 'Menunggu pemeriksaan',
       icon: ArrowLeftRight,
       bgIcon: 'bg-[#E6F6F4]',
@@ -45,44 +62,67 @@ export default function AdminDashboard({ auth }) {
     },
     {
       title: 'Surat selesai',
-      value: '18',
-      desc: 'Contoh bulan Juni',
+      value: propStats?.surat_selesai || '18',
+      desc: 'Pengesahan fisik tercatat',
       icon: Check,
       bgIcon: 'bg-[#EBF7EE]',
       iconColor: 'text-[#188A42]',
     },
   ];
 
-  // Pengajuan surat terbaru (List Horizontal lebar sesuai gambar)
-  const recentLetters = [
+  // Data Pengajuan Surat Cadangan (Demo Fallback) jika DB kosong
+  const fallbackRecentLetters = [
     {
-      id: 'SRT-2025-014',
+      id: 1,
+      nomor: 'SRT-2025-014',
       date: '18 Jun 2025',
-      name: 'Siti Rahmawati',
-      type: 'Surat Keterangan Domisili',
-      status: 'Diajukan',
-      statusClass: 'bg-[#FFF3DA] text-[#A66700]',
+      pemohon_name: 'Siti Rahmawati',
+      pemohon_nik: '3276010022334455',
+      jenis_label: 'Surat Keterangan Domisili',
+      keperluan: 'Pengurusan administrasi perbankan',
+      status: 'diajukan',
+      status_label: 'Diajukan',
+      status_class: 'bg-[#FFF3DA] text-[#A66700] border border-[#FDE6B8]',
+      petugas_name: 'Budi Santoso',
+      updated_at_formatted: '18 Juni 2025, 10.24',
     },
     {
-      id: 'SRT-2025-013',
+      id: 2,
+      nomor: 'SRT-2025-013',
       date: '17 Jun 2025',
-      name: 'Dimas Saputra',
-      type: 'Surat Pengantar',
-      status: 'Terbit',
-      statusClass: 'bg-[#EBF2FF] text-[#2F65CB]',
+      pemohon_name: 'Dimas Saputra',
+      pemohon_nik: '3276010099887766',
+      jenis_label: 'Surat Pengantar',
+      keperluan: 'Pembuatan SKCK Polsek Tapos',
+      status: 'terbit',
+      status_label: 'Terbit',
+      status_class: 'bg-[#EBF2FF] text-[#2F65CB] border border-[#CDE0FD]',
+      petugas_name: 'Budi Santoso',
+      updated_at_formatted: '17 Juni 2025, 14.10',
     },
     {
-      id: 'SRT-2025-012',
+      id: 3,
+      nomor: 'SRT-2025-012',
       date: '16 Jun 2025',
-      name: 'Rizky Pratama',
-      type: 'Surat Pengantar',
-      status: 'Selesai / Ditandatangani',
-      statusClass: 'bg-[#EAF7EE] text-[#14833B]',
+      pemohon_name: 'Rizky Pratama',
+      pemohon_nik: '3276010011223344',
+      jenis_label: 'Surat Pengantar',
+      keperluan: 'Perpanjangan KTP Elektronik',
+      status: 'selesai',
+      status_label: 'Selesai / Ditandatangani',
+      status_class: 'bg-[#EAF7EE] text-[#14833B] border border-[#B6E6C5]',
+      petugas_name: 'Budi Santoso',
+      updated_at_formatted: '16 Juni 2025, 11.30',
     },
   ];
 
-  // Aktivitas terbaru (List vertikal berbaris)
-  const recentActivities = [
+  // Gunakan data real-time dari backend (fitur Zafi)
+  const lettersList = (propRecentLetters && propRecentLetters.length > 0)
+    ? propRecentLetters
+    : fallbackRecentLetters;
+
+  // Aktivitas terbaru real-time atau fallback
+  const fallbackActivities = [
     {
       title: 'Status surat diperbarui',
       desc: 'SRT-2025-012 ditandai selesai',
@@ -108,6 +148,17 @@ export default function AdminDashboard({ auth }) {
       iconColor: 'text-[#687588]',
     },
   ];
+
+  const activitiesList = (propRecentHistories && propRecentHistories.length > 0)
+    ? propRecentHistories.map((act) => ({
+        title: act.title,
+        desc: act.desc,
+        time: act.time,
+        icon: act.status === 'selesai' ? Check : FileText,
+        bgIcon: act.status === 'selesai' ? 'bg-[#EAF7EE]' : 'bg-[#EBF2FF]',
+        iconColor: act.status === 'selesai' ? 'text-[#14833B]' : 'text-[#2F65CB]',
+      }))
+    : fallbackActivities;
 
   return (
     <>
@@ -153,17 +204,17 @@ export default function AdminDashboard({ auth }) {
                 </Link>
 
                 {/* Pindah / Datang */}
-                <a
-                  href="#pindah-datang"
+                <Link
+                  href={route('admin.pindah-datang.index')}
                   className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[#D0EBE7] hover:bg-[#206760] hover:text-white text-xs font-medium transition-colors"
                 >
                   <ArrowLeftRight className="w-4 h-4 text-[#A7D7D0]" />
                   <span>Pindah / Datang</span>
-                </a>
+                </Link>
 
                 {/* Pengajuan Surat dengan Badge Oranye 2 */}
-                <a
-                  href="#pengajuan-surat"
+                <Link
+                  href={route('admin.surat.index')}
                   className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-[#D0EBE7] hover:bg-[#206760] hover:text-white text-xs font-medium transition-colors"
                 >
                   <div className="flex items-center gap-3">
@@ -173,7 +224,7 @@ export default function AdminDashboard({ auth }) {
                   <span className="w-5 h-5 rounded-full bg-[#E58917] text-white flex items-center justify-center font-bold text-[10px]">
                     2
                   </span>
-                </a>
+                </Link>
 
                 {/* Audit Trail */}
                 <a
@@ -185,18 +236,18 @@ export default function AdminDashboard({ auth }) {
                 </a>
 
                 {/* Pengguna & Role */}
-                <a
-                  href="#pengguna-role"
+                <Link
+                  href={route('admin.users.index')}
                   className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[#D0EBE7] hover:bg-[#206760] hover:text-white text-xs font-medium transition-colors"
                 >
                   <UserCog className="w-4 h-4 text-[#A7D7D0]" />
                   <span>Pengguna & Role</span>
-                </a>
+                </Link>
               </div>
             </div>
           </div>
 
-          {/* Bagian Bawah: Card Keamanan Data & Tombol Keluar */}
+          {/* Footer Sidebar: Keamanan data & Tombol Keluar */}
           <div className="p-5 space-y-4">
             {/* Card Keamanan Data Semi-Transparan (#1E665E) */}
             <div className="p-3.5 rounded-2xl bg-[#1E665E]/90 border border-[#358A81] flex items-start gap-2.5">
@@ -224,22 +275,30 @@ export default function AdminDashboard({ auth }) {
 
         {/* ================= MAIN CONTENT AREA ================= */}
         <div className="flex-1 pl-[260px] flex flex-col min-w-0">
-          {/* Header Bar Bersih (Hanya Profil di Kanan Atas) */}
-          <header className="h-[72px] bg-white border-b border-[#EAEFF5] px-10 flex items-center justify-end sticky top-0 z-20">
+          {/* Header Bar */}
+          <header className="h-[72px] bg-white border-b border-[#EAEFF5] px-10 flex items-center justify-between sticky top-0 z-20">
+            <div className="flex items-center gap-3">
+              <span className="text-[11px] font-bold tracking-wider uppercase text-[#0E8F84]">
+                SIA RT 01/08 Sukatani
+              </span>
+              <span className="text-[#A0AEC0]">•</span>
+              <span className="text-xs text-[#718096] font-medium">Kecamatan Tapos, Kota Depok</span>
+            </div>
+
             <div className="flex items-center gap-3 cursor-pointer py-1.5 px-2 rounded-xl hover:bg-slate-50 transition-colors">
               <div className="w-9 h-9 rounded-full bg-[#EAF0FC] text-[#2F65CB] flex items-center justify-center font-bold text-xs">
                 BS
               </div>
               <div className="text-left">
                 <h4 className="text-xs font-bold text-[#1A253C] leading-none">Budi Santoso</h4>
-                <p className="text-[10px] text-[#718096] mt-0.5">Ketua RT</p>
+                <p className="text-[10px] text-[#718096] mt-0.5">Ketua RT 01/08</p>
               </div>
               <ChevronRight className="w-3.5 h-3.5 text-[#A0AEC0] ml-1" />
             </div>
           </header>
 
           {/* Konten Halaman */}
-          <main className="p-10 space-y-6 max-w-[1200px] w-full">
+          <main className="p-10 space-y-6 max-w-[1240px] w-full">
             {/* Greeting Header & Tombol Tambah Data Warga */}
             <div className="flex items-end justify-between">
               <div className="space-y-1">
@@ -257,7 +316,7 @@ export default function AdminDashboard({ auth }) {
               {/* Tombol Hijau Gelap: + Tambah data warga */}
               <Link
                 href={route('admin.warga.create')}
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#0F685D] hover:bg-[#0B5249] text-white text-xs font-semibold shadow-sm transition-all cursor-pointer"
+                className="btn-admin-primary"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>Tambah data warga</span>
@@ -271,7 +330,7 @@ export default function AdminDashboard({ auth }) {
                 return (
                   <div
                     key={i}
-                    className="p-5 rounded-2xl bg-white border border-[#E9EFF6] shadow-[0px_2px_4px_0px_rgba(20,30,55,0.02)] flex items-center justify-between"
+                    className="p-5 rounded-2xl bg-white border border-[#E9EFF6] shadow-sm flex items-center justify-between"
                   >
                     <div className="flex items-center gap-3.5">
                       <div className={`w-11 h-11 rounded-xl ${stat.bgIcon} ${stat.iconColor} flex items-center justify-center flex-shrink-0`}>
@@ -291,7 +350,7 @@ export default function AdminDashboard({ auth }) {
             </div>
 
             {/* ================= CARD 1: PENGAJUAN SURAT TERBARU (LEBAR) ================= */}
-            <div className="p-6 rounded-2xl bg-white border border-[#E9EFF6] shadow-[0px_2px_4px_0px_rgba(20,30,55,0.02)] space-y-5">
+            <div className="p-6 rounded-2xl bg-white border border-[#E9EFF6] shadow-sm space-y-5">
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-sm font-bold text-[#1A253C] font-heading">
@@ -301,46 +360,51 @@ export default function AdminDashboard({ auth }) {
                     Pengajuan yang perlu dipantau pengurus.
                   </p>
                 </div>
-                <a
-                  href="#pengajuan-surat"
-                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#2F65CB] hover:underline"
+                {/* Link Lihat Semua -> Masuk ke Pengajuan Surat Zafi */}
+                <Link
+                  href={route('admin.surat.index')}
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#0F685D] hover:underline cursor-pointer"
                 >
                   <span>Lihat semua</span>
                   <ArrowRight className="w-3.5 h-3.5" />
-                </a>
+                </Link>
               </div>
 
-              {/* List Baris Surat */}
+              {/* List Baris Surat Real-time */}
               <div className="space-y-2.5">
-                {recentLetters.map((item, idx) => (
+                {lettersList.map((item, idx) => (
                   <div
-                    key={idx}
-                    className="p-4 rounded-xl border border-[#F0F4F8] hover:border-[#D6E4F0] hover:bg-[#FBFDFF] transition-all flex items-center justify-between gap-4"
+                    key={item.id || idx}
+                    onClick={() => setSelectedLetter(item)}
+                    className="p-4 rounded-xl border border-[#F0F4F8] hover:border-[#0F685D]/30 hover:bg-[#F9FBFC] transition-all flex items-center justify-between gap-4 cursor-pointer group"
+                    title="Klik untuk melihat detail pengajuan"
                   >
                     {/* Sisi Kiri: Ikon Biru & Nama + ID Surat */}
                     <div className="flex items-center gap-3.5 w-1/3">
-                      <div className="w-9 h-9 rounded-xl bg-[#EBF2FF] text-[#2F65CB] flex items-center justify-center flex-shrink-0">
+                      <div className="w-9 h-9 rounded-xl bg-[#EBF2FF] text-[#2F65CB] group-hover:bg-[#E6F6F4] group-hover:text-[#0F685D] transition-colors flex items-center justify-center flex-shrink-0">
                         <FileText className="w-4 h-4" />
                       </div>
                       <div>
-                        <h4 className="text-xs font-bold text-[#1A253C]">{item.name}</h4>
+                        <h4 className="text-xs font-bold text-[#1A253C] group-hover:text-[#0F685D] transition-colors">
+                          {item.pemohon_name || item.name}
+                        </h4>
                         <p className="text-[10px] text-[#718096] mt-0.5">
-                          {item.id} • {item.date}
+                          {item.nomor || item.id} • {item.date}
                         </p>
                       </div>
                     </div>
 
                     {/* Sisi Tengah: Jenis Surat */}
                     <div className="text-xs text-[#4A5568] w-1/3 text-left">
-                      {item.type}
+                      {item.jenis_label || item.type}
                     </div>
 
                     {/* Sisi Kanan: Badge Status Pill & Chevron */}
                     <div className="flex items-center justify-end gap-3 w-1/3">
-                      <span className={`px-3 py-1 rounded-full text-[10px] font-semibold ${item.statusClass}`}>
-                        {item.status}
+                      <span className={`px-3 py-1 rounded-full text-[10px] font-semibold ${item.status_class || item.statusClass}`}>
+                        {item.status_label || item.status}
                       </span>
-                      <ChevronRight className="w-4 h-4 text-[#A0AEC0]" />
+                      <ChevronRight className="w-4 h-4 text-[#A0AEC0] group-hover:text-[#0F685D] group-hover:translate-x-0.5 transition-all" />
                     </div>
                   </div>
                 ))}
@@ -348,7 +412,7 @@ export default function AdminDashboard({ auth }) {
             </div>
 
             {/* ================= CARD 2: AKTIVITAS TERBARU (LEBAR) ================= */}
-            <div className="p-6 rounded-2xl bg-white border border-[#E9EFF6] shadow-[0px_2px_4px_0px_rgba(20,30,55,0.02)] space-y-5">
+            <div className="p-6 rounded-2xl bg-white border border-[#E9EFF6] shadow-sm space-y-5">
               <div>
                 <h3 className="text-sm font-bold text-[#1A253C] font-heading">
                   Aktivitas terbaru
@@ -360,7 +424,7 @@ export default function AdminDashboard({ auth }) {
 
               {/* List Vertikal Aktivitas */}
               <div className="space-y-4">
-                {recentActivities.map((act, idx) => {
+                {activitiesList.map((act, idx) => {
                   const Icon = act.icon;
                   return (
                     <div key={idx} className="flex items-start gap-3.5">
@@ -380,6 +444,120 @@ export default function AdminDashboard({ auth }) {
           </main>
         </div>
       </div>
+
+      {/* ================= DRAWER SLIDE-OVER DETAIL PENGURUS RT ================= */}
+      {selectedLetter && (
+        <div className="fixed inset-0 z-50 overflow-hidden">
+          {/* Backdrop Blur Gelap */}
+          <div
+            className="fixed inset-0 bg-slate-900/40 backdrop-blur-[2px] transition-opacity duration-300"
+            onClick={() => setSelectedLetter(null)}
+          />
+
+          {/* Drawer Panel di Sisi Kanan */}
+          <div className="fixed inset-y-0 right-0 z-50 w-full max-w-[420px] bg-white shadow-2xl flex flex-col justify-between p-8 overflow-y-auto transform transition-transform duration-300 ease-in-out">
+            {/* Tombol Tutup Silang di Kanan Atas */}
+            <button
+              type="button"
+              onClick={() => setSelectedLetter(null)}
+              className="absolute top-6 right-6 p-2 rounded-xl text-[#94A3B8] hover:text-[#1A253C] hover:bg-slate-100 transition-colors cursor-pointer"
+              aria-label="Tutup detail"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            {/* Konten Atas Drawer */}
+            <div className="space-y-6 pt-2">
+              {/* Ikon Kartu Identitas Hijau/Teal */}
+              <div className="w-12 h-12 rounded-2xl bg-[#E6F6F4] text-[#0F685D] border border-[#BDE8E2] flex items-center justify-center">
+                <IdCard className="w-6 h-6" />
+              </div>
+
+              {/* Judul & Nama Warga */}
+              <div className="space-y-1.5">
+                <span className="text-[11px] font-bold tracking-wider uppercase text-[#0E8F84]">
+                  DETAIL ADMINISTRASI
+                </span>
+                <h2 className="text-2xl font-bold text-[#1A253C] font-heading leading-tight">
+                  {selectedLetter.pemohon_name || selectedLetter.name}
+                </h2>
+                <p className="text-xs text-[#718096] leading-relaxed">
+                  Informasi lengkap telah terhubung dengan arsip RT 01/08 Sukatani.
+                </p>
+              </div>
+
+              {/* Status Badge */}
+              <div className="pt-2">
+                <p className="text-xs text-[#718096] font-medium mb-2">Status</p>
+                <span className="inline-flex items-center px-3.5 py-1 rounded-full text-xs font-semibold bg-[#E6F6F4] text-[#0F685D] border border-[#BDE8E2]">
+                  {selectedLetter.status === 'selesai'
+                    ? 'Selesai & Ditandatangani'
+                    : selectedLetter.status === 'terbit'
+                      ? 'Aktif & terverifikasi'
+                      : (selectedLetter.status_label || selectedLetter.status || 'Aktif & terverifikasi')}
+                </span>
+              </div>
+
+              <div className="border-t border-[#F0F4F8]" />
+
+              {/* Terakhir Diperbarui */}
+              <div>
+                <p className="text-xs text-[#718096] font-medium mb-1">Terakhir diperbarui</p>
+                <p className="text-sm font-bold text-[#1A253C]">
+                  {selectedLetter.updated_at_formatted || '18 Juni 2025, 10.24'}
+                </p>
+              </div>
+
+              <div className="border-t border-[#F0F4F8]" />
+
+              {/* Petugas */}
+              <div>
+                <p className="text-xs text-[#718096] font-medium mb-1">Petugas</p>
+                <p className="text-sm font-bold text-[#1A253C]">
+                  {selectedLetter.petugas_name || 'Budi Santoso'}
+                </p>
+              </div>
+
+              {/* Rincian Surat */}
+              <div className="p-4 rounded-xl bg-[#F8FAFC] border border-[#EAEFF5] space-y-2.5 text-xs">
+                <div className="flex justify-between items-center">
+                  <span className="text-[#718096]">Nomor Pengajuan</span>
+                  <span className="font-bold text-[#0F685D]">{selectedLetter.nomor || selectedLetter.id}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-[#718096]">Jenis Surat</span>
+                  <span className="font-semibold text-[#1A253C]">{selectedLetter.jenis_label || selectedLetter.type}</span>
+                </div>
+                {selectedLetter.keperluan && (
+                  <div className="pt-2 border-t border-[#EAEFF5]">
+                    <span className="text-[#718096] block mb-0.5">Keperluan</span>
+                    <span className="text-[#1A253C] font-medium">{selectedLetter.keperluan}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Tombol Aksi di Bawah Drawer */}
+            <div className="pt-6 border-t border-[#F0F4F8] space-y-3 mt-6">
+              <Link
+                href={selectedLetter.id && typeof selectedLetter.id === 'number'
+                  ? route('admin.surat.show', selectedLetter.id)
+                  : route('admin.surat.index')}
+                className="w-full py-3 rounded-xl bg-[#0F685D] hover:bg-[#0B5249] text-white text-xs font-semibold shadow-sm transition-all text-center flex items-center justify-center cursor-pointer"
+              >
+                Perbarui data
+              </Link>
+              <button
+                type="button"
+                onClick={() => setSelectedLetter(null)}
+                className="w-full py-3 rounded-xl border border-[#CBD5E1] text-[#4A5568] hover:bg-slate-50 text-xs font-semibold transition-all text-center cursor-pointer"
+              >
+                Tutup detail
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
