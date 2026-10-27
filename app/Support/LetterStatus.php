@@ -8,6 +8,8 @@ class LetterStatus
 
     public const TERBIT = 'terbit';
 
+    public const SELESAI_RT = 'selesai_rt';
+
     public const SELESAI = 'selesai';
 
     /**
@@ -18,6 +20,7 @@ class LetterStatus
         return [
             self::DIAJUKAN,
             self::TERBIT,
+            self::SELESAI_RT,
             self::SELESAI,
         ];
     }
@@ -30,6 +33,7 @@ class LetterStatus
         return [
             self::DIAJUKAN => 'Diajukan',
             self::TERBIT => 'Terbit',
+            self::SELESAI_RT => 'Selesai (oleh Ketua RT)',
             self::SELESAI => 'Selesai/Ditandatangani',
         ];
     }
@@ -37,5 +41,10 @@ class LetterStatus
     public static function label(string $status): string
     {
         return self::labels()[$status] ?? $status;
+    }
+
+    public static function canAccessDraftPdf(string $status): bool
+    {
+        return $status === self::TERBIT;
     }
 }
