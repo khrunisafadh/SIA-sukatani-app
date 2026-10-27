@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\SuratAdminController;
 use App\Http\Controllers\Admin\UserRoleController;
 use App\Http\Controllers\Admin\WargaController;
 use App\Http\Controllers\Portal\PindahDatangController;
+use App\Http\Controllers\Portal\PortalDashboardController;
 use App\Http\Controllers\Portal\SuratPortalController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
@@ -94,9 +95,11 @@ Route::middleware(['auth', 'role:ketua_rt'])->prefix('admin')->name('admin.')->g
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth', 'role:warga'])->prefix('portal')->name('portal.')->group(function () {
-    Route::get('/', function () {
-        return Inertia::render('Portal/Dashboard');
-    })->name('dashboard');
+    Route::get('/', [PortalDashboardController::class, 'index'])->name('dashboard');
+
+    // Modul Data Kependudukan Warga (Detail & Pembaruan Mandiri)
+    Route::get('data-warga', [PortalDashboardController::class, 'wargaDetail'])->name('warga.index');
+    Route::put('data-warga', [PortalDashboardController::class, 'updateWargaDetail'])->name('warga.update');
 
     // Modul 3: Pengajuan Surat Digital Warga
     Route::get('pengajuan-surat', [SuratPortalController::class, 'index'])->name('surat.index');
