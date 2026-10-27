@@ -42,49 +42,60 @@ function formatSubmittedAt(value) {
     )} WIB`;
 }
 
-export default function PindahDatangTracking() {
+export default function PindahDatangTracking({ permohonan = null }) {
     const report = useMemo(() => {
+        if (permohonan) {
+            return permohonan;
+        }
         try {
             const raw = window.sessionStorage.getItem('sia.pindahDatang.latest');
             return raw ? { ...DEFAULT_REPORT, ...JSON.parse(raw) } : DEFAULT_REPORT;
         } catch {
             return DEFAULT_REPORT;
         }
-    }, []);
+    }, [permohonan]);
 
-    const ticket = report.ticket?.replace('#MUT-', '#PD-') ?? '#PD-2025-0616-01';
-    const displayTicket = ticket.startsWith('#PD-') ? ticket : '#PD-2025-0616-01';
+    const rawTicket = report.ticket || report.nomor_tiket || '#PD-2025-0616-01';
+    const ticketClean = rawTicket.replace('#MUT-', '#PD-');
+    const displayTicket = ticketClean.startsWith('#') ? ticketClean : `#${ticketClean}`;
 
-    const steps = [
-        {
-            n: 1,
-            title: 'Tahap 1: Laporan Terkirim',
-            desc: `${formatSubmittedAt(report.submittedAt)}`,
-            note: 'Selesai Diverifikasi Sistem',
-            state: 'done',
-        },
-        {
-            n: 2,
-            title: 'Tahap 2: Diperiksa Ketua RT',
-            desc: 'Sedang Berlangsung',
-            note: 'Penelitian kelengkapan domisili',
-            state: 'current',
-        },
-        {
-            n: 3,
-            title: 'Tahap 3: Verifikasi Berkas',
-            desc: 'Menunggu Tahap 2',
-            note: 'Pencocokan e-KTP & Kartu Keluarga',
-            state: 'todo',
-        },
-        {
-            n: 4,
-            title: 'Tahap 4: Penerbitan Surat',
-            desc: 'Tahap Akhir',
-            note: 'Update Buku Induk RT & TTE Surat',
-            state: 'todo',
-        },
-    ];
+    const steps = useMemo(() => {
+        const status = report.status || 'menunggu_pemeriksaan';
+        const isSelesai = status === 'selesai';
+        const isSedangDiperiksa = status === 'sedang_diperiksa';
+        const isRevisi = status === 'perlu_revisi';
+
+        return [
+            {
+                n: 1,
+                title: 'Tahap 1: Laporan Terkirim',
+                desc: `${formatSubmittedAt(report.submittedAt)}`,
+                note: 'Selesai Diverifikasi Sistem',
+                state: 'done',
+            },
+            {
+                n: 2,
+                title: 'Tahap 2: Diperiksa Ketua RT',
+                desc: isSelesai || isSedangDiperiksa ? 'Selesai Diperiksa' : isRevisi ? 'Perlu Revisi Dokumen' : 'Sedang Berlangsung',
+                note: isRevisi ? (report.alasanRevisi || 'Ada catatan perbaikan pengurus') : 'Penelitian kelengkapan domisili',
+                state: isSelesai || isSedangDiperiksa ? 'done' : 'current',
+            },
+            {
+                n: 3,
+                title: 'Tahap 3: Verifikasi Berkas',
+                desc: isSelesai ? 'Berkas Valid' : isSedangDiperiksa ? 'Sedang Diverifikasi' : 'Menunggu Tahap 2',
+                note: 'Pencocokan e-KTP & Kartu Keluarga',
+                state: isSelesai ? 'done' : isSedangDiperiksa ? 'current' : 'todo',
+            },
+            {
+                n: 4,
+                title: 'Tahap 4: Penerbitan Surat',
+                desc: isSelesai ? 'TTE & Terbit' : 'Tahap Akhir',
+                note: isSelesai ? 'Surat Siap Digunakan' : 'Update Buku Induk RT & TTE Surat',
+                state: isSelesai ? 'done' : 'todo',
+            },
+        ];
+    }, [report]);
 
     return (
         <WargaLayout>
@@ -105,7 +116,7 @@ export default function PindahDatangTracking() {
                             </span>
                         </div>
                         <p className="mt-1 text-[12px] leading-relaxed text-[#0F5A45]/90">
-                            Permohonan datang warga Anda telah masuk dalam antrean verifikasi{' '}
+                            Permohonan {report.jenis === 'pindah' ? 'pindah' : 'datang'} warga Anda telah masuk dalam antrean verifikasi{' '}
                             <strong>Pak Budi Santoso (Ketua RT 01)</strong>. No. Tiket Pelaporan:{' '}
                             <span className="font-semibold">{displayTicket}</span>
                         </p>
@@ -158,10 +169,27 @@ export default function PindahDatangTracking() {
                                 <p className="font-heading text-[18px] font-extrabold">{displayTicket}</p>
                             </div>
                         </div>
-                        <span className="inline-flex items-center gap-2 self-start rounded-full bg-[#E8F0FF] px-3 py-1 text-[12px] font-semibold text-[#2F6BFF]">
-                            <span className="h-2 w-2 rounded-full bg-[#2F6BFF]" />
-                            Menunggu Pemeriksaan
-                        </span>
+                        {report.status === 'selesai' ? (
+                            <span className="inline-flex items-center gap-2 self-start rounded-full bg-[#E7F6EF] px-3 py-1 text-[12px] font-semibold text-[#11704E]">
+                                <span className="h-2 w-2 rounded-full bg-[#11704E]" />
+                                Selesai / Terverifikasi
+                            </span>
+                        ) : report.status === 'sedang_diperiksa' ? (
+                            <span className="inline-flex items-center gap-2 self-start rounded-full bg-[#FFF1E8] px-3 py-1 text-[12px] font-semibold text-[#D46B08]">
+                                <span className="h-2 w-2 rounded-full bg-[#D46B08]" />
+                                Sedang Diperiksa
+                            </span>
+                        ) : report.status === 'perlu_revisi' ? (
+                            <span className="inline-flex items-center gap-2 self-start rounded-full bg-[#FFEAE8] px-3 py-1 text-[12px] font-semibold text-[#E24B4A]">
+                                <span className="h-2 w-2 rounded-full bg-[#E24B4A]" />
+                                Perlu Revisi Dokumen
+                            </span>
+                        ) : (
+                            <span className="inline-flex items-center gap-2 self-start rounded-full bg-[#E8F0FF] px-3 py-1 text-[12px] font-semibold text-[#2F6BFF]">
+                                <span className="h-2 w-2 rounded-full bg-[#2F6BFF]" />
+                                Menunggu Pemeriksaan
+                            </span>
+                        )}
                     </div>
 
                     <div className="mt-5 grid gap-4 border-b border-[#EEF1F6] pb-5 sm:grid-cols-3">
@@ -263,10 +291,12 @@ export default function PindahDatangTracking() {
                     <div className="rounded-2xl border border-[#E6EAF2] bg-white p-4 shadow-sm">
                         <div className="flex items-center justify-between">
                             <p className="text-[12px] font-bold uppercase tracking-wide text-[#68748A]">Berkas Dilampirkan</p>
-                            <p className="text-[11px] font-semibold text-[#147A72]">{report.files?.length ?? 2} Dokumen Lengkap</p>
+                            <p className="text-[11px] font-semibold text-[#147A72]">
+                                {report.files && report.files.length > 0 ? `${report.files.length} Dokumen Lengkap` : '2 Dokumen Lengkap'}
+                            </p>
                         </div>
                         <div className="mt-3 space-y-2">
-                            {(report.files ?? DEFAULT_REPORT.files).map((file) => (
+                            {(report.files && report.files.length > 0 ? report.files : DEFAULT_REPORT.files).map((file) => (
                                 <div key={file.id || file.name} className="flex items-center gap-3 rounded-xl bg-[#F7F9FC] px-3 py-3">
                                     <FileText className="h-4 w-4 text-[#147A72]" />
                                     <div className="min-w-0 flex-1">
@@ -275,7 +305,19 @@ export default function PindahDatangTracking() {
                                             {file.sizeLabel} • {file.kind}
                                         </p>
                                     </div>
-                                    <Eye className="h-4 w-4 text-[#98A2B3]" />
+                                    {file.url ? (
+                                        <a
+                                            href={file.url}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            title="Buka Pratinjau Dokumen"
+                                            className="rounded-lg p-1 text-[#98A2B3] hover:bg-white hover:text-[#147A72]"
+                                        >
+                                            <Eye className="h-4 w-4" />
+                                        </a>
+                                    ) : (
+                                        <Eye className="h-4 w-4 text-[#98A2B3]" />
+                                    )}
                                 </div>
                             ))}
                         </div>

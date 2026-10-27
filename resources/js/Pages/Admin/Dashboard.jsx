@@ -365,6 +365,70 @@ export default function AdminDashboard({ auth, stats: propStats, recentLetters: 
               })}
             </div>
 
+
+            {/* Quick Access Grid: modul administrasi utama */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Modul Data Warga */}
+              <Link
+                href={route('admin.warga.index')}
+                className="p-5 rounded-2xl bg-white border border-[#E4E9F0] shadow-sm space-y-3 hover:border-[#2764D8]/40 hover:shadow-md transition block group"
+              >
+                <div className="w-10 h-10 rounded-xl bg-[#EEF4FF] flex items-center justify-center text-[#2764D8]">
+                  <Users className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-[#17233C] font-heading">Manajemen Data Warga</h3>
+                  <p className="text-xs text-[#68748A] mt-1 leading-relaxed">
+                    Kelola data warga dan lakukan pencarian dengan tetap memperhatikan perlindungan data sensitif.
+                  </p>
+                </div>
+                <div className="pt-2 border-t border-[#E4E9F0] flex items-center justify-between text-xs text-[#2764D8] font-semibold">
+                  <span>Buka data warga</span>
+                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                </div>
+              </Link>
+
+              {/* Modul Pengajuan Surat */}
+              <Link
+                href={route('admin.surat.index')}
+                className="p-5 rounded-2xl bg-white border border-[#E4E9F0] shadow-sm space-y-3 hover:border-[#11704E]/40 hover:shadow-md transition block group"
+              >
+                <div className="w-10 h-10 rounded-xl bg-[#E7F6EF] flex items-center justify-center text-[#11704E]">
+                  <FileText className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-[#17233C] font-heading">Verifikasi Pengajuan Surat</h3>
+                  <p className="text-xs text-[#68748A] mt-1 leading-relaxed">
+                    Pantau permohonan surat pengantar dan domisili yang diajukan warga.
+                  </p>
+                </div>
+                <div className="pt-2 border-t border-[#E4E9F0] flex items-center justify-between text-xs text-[#11704E] font-semibold">
+                  <span>Buka pengajuan surat</span>
+                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                </div>
+              </Link>
+
+              {/* Modul Mutasi */}
+              <Link
+                href={route('admin.pindah-datang.index')}
+                className="p-5 rounded-2xl bg-white border border-[#E4E9F0] shadow-sm space-y-3 hover:border-[#97620D]/40 hover:shadow-md transition block group"
+              >
+                <div className="w-10 h-10 rounded-xl bg-[#FFF2D9] flex items-center justify-center text-[#97620D]">
+                  <ArrowLeftRight className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-[#17233C] font-heading">Laporan Mutasi Warga</h3>
+                  <p className="text-xs text-[#68748A] mt-1 leading-relaxed">
+                    Akses pelaporan warga pindah atau datang untuk ditinjau pengurus RT.
+                  </p>
+                </div>
+                <div className="pt-2 border-t border-[#E4E9F0] flex items-center justify-between text-xs text-[#97620D] font-semibold">
+                  <span>Buka data mutasi</span>
+                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                </div>
+              </Link>
+            </div>
+
             {/* ================= CARD 1: PENGAJUAN SURAT TERBARU (LEBAR) ================= */}
             <div className="p-6 rounded-2xl bg-white border border-[#E9EFF6] shadow-sm space-y-5">
               <div className="flex items-center justify-between">
