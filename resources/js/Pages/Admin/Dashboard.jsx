@@ -584,17 +584,17 @@ export default function AdminDashboard({ auth, stats: propStats, recentLetters: 
               <div>
                 <p className="text-xs text-[#718096] font-medium mb-1">Terakhir diperbarui</p>
                 <p className="text-sm font-bold text-[#1A253C]">
-                  {selectedLetter.updated_at_formatted || '18 Juni 2025, 10.24'}
+                  {selectedLetter.created_at_formatted || selectedLetter.updated_at_formatted || '18 Juni 2025, 10.24'}
                 </p>
               </div>
 
               <div className="border-t border-[#F0F4F8]" />
 
-              {/* Petugas */}
+              {/* Pemohon (Sesuai Database) */}
               <div>
-                <p className="text-xs text-[#718096] font-medium mb-1">Petugas</p>
+                <p className="text-xs text-[#718096] font-medium mb-1">Pemohon</p>
                 <p className="text-sm font-bold text-[#1A253C]">
-                  {selectedLetter.petugas_name || 'Budi Santoso'}
+                  {selectedLetter.pemohon_name || selectedLetter.name || 'Rizky Pratama'}
                 </p>
               </div>
 
