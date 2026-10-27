@@ -4,6 +4,11 @@ use App\Http\Controllers\Admin\MutasiAdminController;
 use App\Http\Controllers\Admin\SuratAdminController;
 use App\Http\Controllers\Admin\UserRoleController;
 use App\Http\Controllers\Portal\PindahDatangController;
+use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Admin\SuratAdminController;
+use App\Http\Controllers\Admin\UserRoleController;
+use App\Http\Controllers\Admin\WargaController;
+use App\Http\Controllers\Portal\SuratPortalController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -27,9 +32,6 @@ Route::get('/', function () {
 |--------------------------------------------------------------------------
 | Redirect Universal /dashboard
 |--------------------------------------------------------------------------
-| Mengarahkan pengguna ke ranah masing-masing berdasarkan rolenya:
-| - Pengurus (ketua_rt / sekretaris) -> /admin/dashboard
-| - Warga -> /portal
 */
 Route::get('/dashboard', function () {
     $user = auth()->user();
@@ -45,23 +47,26 @@ Route::get('/dashboard', function () {
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth', 'role:ketua_rt,sekretaris'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/dashboard', function () {
-        return Inertia::render('Admin/Dashboard');
-    })->name('dashboard');
+    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
 
+    // Pengajuan Surat Admin (Verifikasi, Pantau, Pengesahan Fisik RT & RW, Akses PDF Terbit)
     Route::get('pengajuan-surat', [SuratAdminController::class, 'index'])->name('surat.index');
-    Route::get('pengajuan-surat/buat', [SuratAdminController::class, 'create'])
-        ->middleware('role:ketua_rt')
-        ->name('surat.create');
-    Route::post('pengajuan-surat', [SuratAdminController::class, 'store'])
-        ->middleware('role:ketua_rt')
-        ->name('surat.store');
     Route::get('pengajuan-surat/{pengajuanSurat}', [SuratAdminController::class, 'show'])->name('surat.show');
+    Route::post('pengajuan-surat/{pengajuanSurat}/verifikasi', [SuratAdminController::class, 'verify'])->name('surat.verify');
+    Route::post('pengajuan-surat/{pengajuanSurat}/pengesahan/rt', [SuratAdminController::class, 'confirmRt'])->name('surat.confirm-rt');
+    Route::post('pengajuan-surat/{pengajuanSurat}/pengesahan/rw', [SuratAdminController::class, 'confirmRw'])->name('surat.confirm-rw');
     Route::post('pengajuan-surat/{pengajuanSurat}/pengesahan', [SuratAdminController::class, 'confirmEndorsement'])->name('surat.confirm');
     Route::get('pengajuan-surat/{pengajuanSurat}/pdf', [SuratAdminController::class, 'preview'])->name('surat.pdf.preview');
     Route::get('pengajuan-surat/{pengajuanSurat}/pdf/unduh', [SuratAdminController::class, 'download'])->name('surat.pdf.download');
 
-    // Rute Verifikasi Laporan Pindah / Datang (POV Admin/Ketua RT)
+
+    // Modul Data Warga
+    Route::get('/warga', [WargaController::class, 'index'])->name('warga.index');
+    Route::get('/warga/create', [WargaController::class, 'create'])->name('warga.create');
+    Route::post('/warga', [WargaController::class, 'store'])->name('warga.store');
+    Route::get('/warga/check-nik', [WargaController::class, 'checkNik'])->name('warga.check-nik');
+
+    // Modul Verifikasi Laporan Pindah / Datang
     Route::get('pindah-datang', [MutasiAdminController::class, 'index'])->name('mutasi.index');
     Route::get('pindah-datang/ekspor', [MutasiAdminController::class, 'export'])->name('mutasi.export');
     Route::get('pindah-datang/{permohonanMutasi}', [MutasiAdminController::class, 'show'])->name('mutasi.show');
@@ -71,12 +76,11 @@ Route::middleware(['auth', 'role:ketua_rt,sekretaris'])->prefix('admin')->name('
     Route::get('pindah-datang/{permohonanMutasi}/dokumen/{dokumenMutasi}/unduh', [MutasiAdminController::class, 'downloadDocument'])->name('mutasi.document.download');
     Route::get('pindah-datang/{permohonanMutasi}/dokumen/{dokumenMutasi}/pratinjau', [MutasiAdminController::class, 'previewDocument'])->name('mutasi.document.preview');
 
-    // Tempat rute CRUD Warga (Anggota 1: Khoirunnisa)
-    // Route::resource('warga', WargaController::class);
 
-    // Tempat rute Verifikasi Mutasi & Audit Log (Anggota 3: Ghita)
-    // Route::get('laporan-mutasi', [MutasiController::class, 'index'])->name('mutasi.index');
-    // Route::get('audit-logs', [AuditLogController::class, 'index'])->name('audit.index');
+    // Modul Laporan Pindah / Datang (Fitur Masih Dalam Pengembangan)
+    Route::get('/pindah-datang', function () {
+        return Inertia::render('Admin/PindahDatang/Index');
+    })->name('pindah-datang.index');
 });
 
 Route::middleware(['auth', 'role:ketua_rt'])->prefix('admin')->name('admin.')->group(function () {
@@ -96,8 +100,13 @@ Route::middleware(['auth', 'role:warga'])->prefix('portal')->name('portal.')->gr
         return Inertia::render('Portal/Dashboard');
     })->name('dashboard');
 
-    // Tempat rute Pengajuan Surat & PDF (Anggota 2: Aliya)
-    // Route::resource('surat', SuratController::class);
+    // Modul 3: Pengajuan Surat Digital Warga
+    Route::get('pengajuan-surat', [SuratPortalController::class, 'index'])->name('surat.index');
+    Route::get('pengajuan-surat/buat', [SuratPortalController::class, 'create'])->name('surat.create');
+    Route::post('pengajuan-surat', [SuratPortalController::class, 'store'])->name('surat.store');
+    Route::get('pengajuan-surat/{pengajuanSurat}', [SuratPortalController::class, 'show'])->name('surat.show');
+    Route::get('pengajuan-surat/{pengajuanSurat}/pdf', [SuratPortalController::class, 'preview'])->name('surat.pdf.preview');
+    Route::get('pengajuan-surat/{pengajuanSurat}/pdf/unduh', [SuratPortalController::class, 'download'])->name('surat.pdf.download');
 
     // Lapor Mandiri Mutasi (Anggota 3: Ghita) — frontend & backend pelaporan pindah/datang
     Route::get('pindah-datang', [PindahDatangController::class, 'create'])->name('pindah-datang.create');

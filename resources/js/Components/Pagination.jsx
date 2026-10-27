@@ -30,10 +30,10 @@ export default function Pagination({ meta, links }) {
                             href={link.url || '#'}
                             preserveScroll
                             preserveState
-                            className={`min-w-8 rounded-md border px-2 py-1 text-center text-xs ${
+                            className={`min-w-8 rounded-xl border px-2.5 py-1 text-center text-xs font-medium transition-colors ${
                                 link.active
-                                    ? 'border-[#267F83] bg-[#267F83] text-white'
-                                    : 'border-[#E3E8EC] bg-white text-[#202833] hover:border-[#267F83]'
+                                    ? 'border-[#0F685D] bg-[#0F685D] text-white font-semibold shadow-xs'
+                                    : 'border-[#E2E8F0] bg-white text-[#1A253C] hover:border-[#0F685D] hover:text-[#0F685D]'
                             } ${!link.url ? 'pointer-events-none opacity-40' : ''}`}
                             dangerouslySetInnerHTML={{ __html: link.label }}
                         />

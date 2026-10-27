@@ -136,30 +136,30 @@ export default function UsersIndex({ users, filters, roleOptions, total }) {
                 <button
                     type="button"
                     onClick={() => setCreateOpen(true)}
-                    className="inline-flex items-center gap-2 rounded-lg bg-[#267F83] px-4 py-2 text-sm font-semibold text-white hover:bg-[#1F686C]"
+                    className="btn-admin-primary"
                 >
                     <Plus className="h-4 w-4" />
-                    Tambah Akun
+                    <span>Tambah Akun</span>
                 </button>
             }
         >
-            <Head title="Pengguna & Role" />
+            <Head title="Pengguna & Role - SIA Sukatani" />
 
-            <div className="overflow-hidden rounded-xl border border-[#E3E8EC] bg-white">
+            <div className="card-admin overflow-hidden">
                 <form
-                    className="flex flex-col gap-3 border-b border-[#E3E8EC] p-4 lg:flex-row lg:items-center"
+                    className="flex flex-col gap-3 border-b border-[#EDF2F7] p-4 lg:flex-row lg:items-center bg-[#FCFDFE]"
                     onSubmit={(event) => {
                         event.preventDefault();
                         applyFilters();
                     }}
                 >
                     <div className="relative flex-1">
-                        <Search className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-[#97A0AF]" />
+                        <Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-[#94A3B8]" />
                         <input
                             value={q}
                             onChange={(event) => setQ(event.target.value)}
                             placeholder="Cari nama, username, atau email..."
-                            className="h-10 w-full rounded-lg border border-[#E3E8EC] pl-9 pr-3 text-sm"
+                            className="input-admin pl-9"
                         />
                     </div>
                     <select
@@ -168,7 +168,7 @@ export default function UsersIndex({ users, filters, roleOptions, total }) {
                             setRoleFilter(event.target.value);
                             applyFilters({ role: event.target.value });
                         }}
-                        className="h-10 rounded-lg border border-[#E3E8EC] text-sm"
+                        className="select-admin"
                     >
                         <option value="">Semua role</option>
                         {Object.entries(roleOptions).map(([value, label]) => (
@@ -177,13 +177,13 @@ export default function UsersIndex({ users, filters, roleOptions, total }) {
                             </option>
                         ))}
                     </select>
-                    <button type="submit" className="h-10 rounded-lg bg-[#267F83] px-4 text-sm font-semibold text-white">
+                    <button type="submit" className="btn-admin-primary">
                         Cari
                     </button>
                     <button
                         type="button"
                         onClick={resetFilters}
-                        className="inline-flex h-10 items-center gap-1 rounded-lg border border-[#E3E8EC] px-3 text-sm text-[#667085]"
+                        className="btn-admin-secondary"
                     >
                         <RotateCcw className="h-3.5 w-3.5" />
                         Reset
@@ -191,38 +191,46 @@ export default function UsersIndex({ users, filters, roleOptions, total }) {
                 </form>
 
                 <div className="overflow-x-auto">
-                    <table className="min-w-full text-left text-sm">
-                        <thead className="bg-[#F8FAFB] text-xs uppercase tracking-wide text-[#667085]">
+                    <table className="table-admin">
+                        <thead>
                             <tr>
-                                <th className="px-4 py-3 font-semibold">Nama</th>
-                                <th className="px-4 py-3 font-semibold">Username</th>
-                                <th className="px-4 py-3 font-semibold">Role</th>
-                                <th className="px-4 py-3 font-semibold">Status</th>
-                                <th className="px-4 py-3 font-semibold">Aktivitas terakhir</th>
-                                <th className="px-4 py-3 text-right font-semibold">Aksi</th>
+                                <th>Nama</th>
+                                <th>Username</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Aktivitas terakhir</th>
+                                <th className="text-right">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
                             {users.data.length === 0 ? (
                                 <tr>
-                                    <td colSpan={6} className="px-4 py-12 text-center text-sm text-[#667085]">
+                                    <td colSpan={6} className="px-4 py-12 text-center text-xs text-[#718096]">
                                         Tidak ada akun yang sesuai filter.
                                     </td>
                                 </tr>
                             ) : (
                                 users.data.map((user) => (
-                                    <tr key={user.id} className="border-t border-[#E3E8EC]">
-                                        <td className="px-4 py-3 font-medium">{user.name}</td>
-                                        <td className="px-4 py-3">{user.username}</td>
-                                        <td className="px-4 py-3">{user.role_label}</td>
-                                        <td className="px-4 py-3">{user.status}</td>
-                                        <td className="px-4 py-3">{user.last_activity_at || '-'}</td>
-                                        <td className="px-4 py-3">
-                                            <div className="flex justify-end gap-2">
+                                    <tr key={user.id}>
+                                        <td className="font-semibold text-[#1A253C]">{user.name}</td>
+                                        <td className="text-[#0F685D] font-medium">{user.username}</td>
+                                        <td>
+                                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-[#E6F6F4] text-[#0F685D] border border-[#BDE8E2]">
+                                                {user.role_label}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-[#EAF7EE] text-[#14833B]">
+                                                {user.status}
+                                            </span>
+                                        </td>
+                                        <td className="text-[#718096]">{user.last_activity_at || '-'}</td>
+                                        <td>
+                                            <div className="flex justify-end gap-1.5">
                                                 <button
                                                     type="button"
                                                     onClick={() => openRole(user)}
-                                                    className="rounded-md border border-[#E3E8EC] p-1.5 text-[#267F83] hover:bg-slate-50"
+                                                    className="btn-admin-icon"
                                                     title="Ubah role"
                                                 >
                                                     <Pencil className="h-4 w-4" />
@@ -230,7 +238,7 @@ export default function UsersIndex({ users, filters, roleOptions, total }) {
                                                 <button
                                                     type="button"
                                                     onClick={() => openReset(user)}
-                                                    className="rounded-md border border-[#E3E8EC] p-1.5 text-[#267F83] hover:bg-slate-50"
+                                                    className="btn-admin-icon"
                                                     title="Reset akses akun"
                                                 >
                                                     <KeyRound className="h-4 w-4" />
@@ -243,43 +251,43 @@ export default function UsersIndex({ users, filters, roleOptions, total }) {
                         </tbody>
                     </table>
                 </div>
-                <div className="border-t border-[#E3E8EC] px-4 py-3">
+                <div className="border-t border-[#EDF2F7] px-5 py-4">
                     <Pagination meta={users} links={users.links} />
                 </div>
             </div>
 
             <Modal show={createOpen} onClose={closeCreate} maxWidth="lg">
-                <form onSubmit={submitCreate} className="p-6">
-                    <div className="mb-4 flex items-start justify-between">
+                <form onSubmit={submitCreate} className="p-6 sm:p-8">
+                    <div className="mb-5 flex items-start justify-between">
                         <div>
-                            <h3 className="text-base font-semibold">Tambah Akun Pengguna</h3>
-                            <p className="mt-1 text-sm text-[#667085]">
+                            <h3 className="text-base font-bold text-[#1A253C] font-heading">Tambah Akun Pengguna</h3>
+                            <p className="mt-1 text-xs text-[#718096]">
                                 Masukkan data akun dan tetapkan password sementara. Pengguna wajib mengganti password saat login pertama kali.
                             </p>
                         </div>
-                        <button type="button" onClick={closeCreate} aria-label="Tutup">
+                        <button type="button" onClick={closeCreate} aria-label="Tutup" className="text-[#94A3B8] hover:text-[#1A253C] p-1 rounded-lg">
                             <X className="h-4 w-4" />
                         </button>
                     </div>
                     <div className="space-y-4">
                         <div>
-                            <label className="text-sm font-medium" htmlFor="name">Nama lengkap</label>
-                            <input id="name" value={createForm.data.name} onChange={(e) => createForm.setData('name', e.target.value)} className={`mt-1 h-10 w-full rounded-lg border px-3 text-sm ${createForm.errors.name ? 'border-red-500' : 'border-[#E3E8EC]'}`} />
+                            <label className="text-xs font-semibold text-[#1A253C]" htmlFor="name">Nama lengkap</label>
+                            <input id="name" value={createForm.data.name} onChange={(e) => createForm.setData('name', e.target.value)} className={`mt-1.5 h-10 w-full rounded-xl border px-3.5 text-xs text-[#1A253C] bg-white transition-colors focus:outline-none focus:ring-2 focus:ring-[#0F685D]/20 focus:border-[#0F685D] ${createForm.errors.name ? 'border-red-500' : 'border-[#E2E8F0]'}`} />
                             {createForm.errors.name && <p className="mt-1 text-xs text-red-600">{createForm.errors.name}</p>}
                         </div>
                         <div>
-                            <label className="text-sm font-medium" htmlFor="username">Username</label>
-                            <input id="username" value={createForm.data.username} onChange={(e) => createForm.setData('username', e.target.value)} className={`mt-1 h-10 w-full rounded-lg border px-3 text-sm ${createForm.errors.username ? 'border-red-500' : 'border-[#E3E8EC]'}`} />
+                            <label className="text-xs font-semibold text-[#1A253C]" htmlFor="username">Username</label>
+                            <input id="username" value={createForm.data.username} onChange={(e) => createForm.setData('username', e.target.value)} className={`mt-1.5 h-10 w-full rounded-xl border px-3.5 text-xs text-[#1A253C] bg-white transition-colors focus:outline-none focus:ring-2 focus:ring-[#0F685D]/20 focus:border-[#0F685D] ${createForm.errors.username ? 'border-red-500' : 'border-[#E2E8F0]'}`} />
                             {createForm.errors.username && <p className="mt-1 text-xs text-red-600">{createForm.errors.username}</p>}
                         </div>
                         <div>
-                            <label className="text-sm font-medium" htmlFor="email">Email</label>
-                            <input id="email" type="email" value={createForm.data.email} onChange={(e) => createForm.setData('email', e.target.value)} className={`mt-1 h-10 w-full rounded-lg border px-3 text-sm ${createForm.errors.email ? 'border-red-500' : 'border-[#E3E8EC]'}`} />
+                            <label className="text-xs font-semibold text-[#1A253C]" htmlFor="email">Email</label>
+                            <input id="email" type="email" value={createForm.data.email} onChange={(e) => createForm.setData('email', e.target.value)} className={`mt-1.5 h-10 w-full rounded-xl border px-3.5 text-xs text-[#1A253C] bg-white transition-colors focus:outline-none focus:ring-2 focus:ring-[#0F685D]/20 focus:border-[#0F685D] ${createForm.errors.email ? 'border-red-500' : 'border-[#E2E8F0]'}`} />
                             {createForm.errors.email && <p className="mt-1 text-xs text-red-600">{createForm.errors.email}</p>}
                         </div>
                         <div>
-                            <label className="text-sm font-medium" htmlFor="role">Role</label>
-                            <select id="role" value={createForm.data.role} onChange={(e) => createForm.setData('role', e.target.value)} className={`mt-1 h-10 w-full rounded-lg border px-3 text-sm ${createForm.errors.role ? 'border-red-500' : 'border-[#E3E8EC]'}`}>
+                            <label className="text-xs font-semibold text-[#1A253C]" htmlFor="role">Role</label>
+                            <select id="role" value={createForm.data.role} onChange={(e) => createForm.setData('role', e.target.value)} className={`mt-1.5 h-10 w-full rounded-xl border px-3.5 text-xs text-[#1A253C] bg-white transition-colors focus:outline-none focus:ring-2 focus:ring-[#0F685D]/20 focus:border-[#0F685D] ${createForm.errors.role ? 'border-red-500' : 'border-[#E2E8F0]'}`}>
                                 <option value="">Pilih role</option>
                                 {Object.entries(roleOptions).map(([value, label]) => (
                                     <option key={value} value={value}>{label}</option>
@@ -288,20 +296,20 @@ export default function UsersIndex({ users, filters, roleOptions, total }) {
                             {createForm.errors.role && <p className="mt-1 text-xs text-red-600">{createForm.errors.role}</p>}
                         </div>
                         <div>
-                            <label className="text-sm font-medium" htmlFor="password">Password sementara</label>
-                            <div className="relative mt-1">
+                            <label className="text-xs font-semibold text-[#1A253C]" htmlFor="password">Password sementara</label>
+                            <div className="relative mt-1.5">
                                 <input
                                     id="password"
                                     type={createShowPassword ? 'text' : 'password'}
                                     value={createForm.data.password}
                                     placeholder="Minimal 8 karakter"
                                     onChange={(e) => createForm.setData('password', e.target.value)}
-                                    className={`h-10 w-full rounded-lg border pl-3 pr-10 text-sm ${createForm.errors.password ? 'border-red-500' : 'border-[#E3E8EC]'}`}
+                                    className={`h-10 w-full rounded-xl border pl-3.5 pr-10 text-xs text-[#1A253C] bg-white transition-colors focus:outline-none focus:ring-2 focus:ring-[#0F685D]/20 focus:border-[#0F685D] ${createForm.errors.password ? 'border-red-500' : 'border-[#E2E8F0]'}`}
                                 />
                                 <button
                                     type="button"
                                     onClick={() => setCreateShowPassword(!createShowPassword)}
-                                    className="absolute right-3 top-2.5 text-[#68748A] hover:text-[#17233C]"
+                                    className="absolute right-3 top-2.5 text-[#94A3B8] hover:text-[#1A253C]"
                                     aria-label={createShowPassword ? 'Sembunyikan password' : 'Tampilkan password'}
                                 >
                                     {createShowPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -310,20 +318,20 @@ export default function UsersIndex({ users, filters, roleOptions, total }) {
                             {createForm.errors.password && <p className="mt-1 text-xs text-red-600">{createForm.errors.password}</p>}
                         </div>
                         <div>
-                            <label className="text-sm font-medium" htmlFor="password_confirmation">Konfirmasi password sementara</label>
-                            <div className="relative mt-1">
+                            <label className="text-xs font-semibold text-[#1A253C]" htmlFor="password_confirmation">Konfirmasi password sementara</label>
+                            <div className="relative mt-1.5">
                                 <input
                                     id="password_confirmation"
                                     type={createShowConfirm ? 'text' : 'password'}
                                     value={createForm.data.password_confirmation}
                                     placeholder="Ulangi password sementara"
                                     onChange={(e) => createForm.setData('password_confirmation', e.target.value)}
-                                    className={`h-10 w-full rounded-lg border pl-3 pr-10 text-sm ${createForm.errors.password_confirmation ? 'border-red-500' : 'border-[#E3E8EC]'}`}
+                                    className={`h-10 w-full rounded-xl border pl-3.5 pr-10 text-xs text-[#1A253C] bg-white transition-colors focus:outline-none focus:ring-2 focus:ring-[#0F685D]/20 focus:border-[#0F685D] ${createForm.errors.password_confirmation ? 'border-red-500' : 'border-[#E2E8F0]'}`}
                                 />
                                 <button
                                     type="button"
                                     onClick={() => setCreateShowConfirm(!createShowConfirm)}
-                                    className="absolute right-3 top-2.5 text-[#68748A] hover:text-[#17233C]"
+                                    className="absolute right-3 top-2.5 text-[#94A3B8] hover:text-[#1A253C]"
                                     aria-label={createShowConfirm ? 'Sembunyikan password' : 'Tampilkan password'}
                                 >
                                     {createShowConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -332,9 +340,9 @@ export default function UsersIndex({ users, filters, roleOptions, total }) {
                             {createForm.errors.password_confirmation && <p className="mt-1 text-xs text-red-600">{createForm.errors.password_confirmation}</p>}
                         </div>
                     </div>
-                    <div className="mt-6 flex justify-end gap-2">
-                        <button type="button" onClick={closeCreate} className="rounded-lg border border-[#E3E8EC] px-4 py-2 text-sm">Batal</button>
-                        <button type="submit" disabled={createForm.processing} className="rounded-lg bg-[#267F83] px-4 py-2 text-sm font-semibold text-white disabled:opacity-60">
+                    <div className="mt-6 flex justify-end gap-2.5 border-t border-[#EDF2F7] pt-5">
+                        <button type="button" onClick={closeCreate} className="btn-admin-secondary">Batal</button>
+                        <button type="submit" disabled={createForm.processing} className="btn-admin-primary">
                             {createForm.processing ? 'Menyimpan...' : 'Simpan Akun Baru'}
                         </button>
                     </div>
@@ -353,7 +361,7 @@ export default function UsersIndex({ users, filters, roleOptions, total }) {
                 <select
                     value={roleForm.data.role}
                     onChange={(event) => roleForm.setData('role', event.target.value)}
-                    className={`mt-4 h-10 w-full rounded-lg border px-3 text-sm ${roleForm.errors.role ? 'border-red-500' : 'border-[#E3E8EC]'}`}
+                    className={`mt-4 h-10 w-full rounded-xl border px-3.5 text-xs text-[#1A253C] bg-white transition-colors focus:outline-none focus:ring-2 focus:ring-[#0F685D]/20 focus:border-[#0F685D] ${roleForm.errors.role ? 'border-red-500' : 'border-[#E2E8F0]'}`}
                 >
                     {Object.entries(roleOptions).map(([value, label]) => (
                         <option key={value} value={value}>{label}</option>
@@ -363,34 +371,34 @@ export default function UsersIndex({ users, filters, roleOptions, total }) {
             </ConfirmModal>
 
             <Modal show={Boolean(resetUser)} onClose={closeReset} maxWidth="md">
-                <form onSubmit={submitReset} className="p-6">
-                    <div className="mb-4 flex items-start justify-between">
+                <form onSubmit={submitReset} className="p-6 sm:p-8">
+                    <div className="mb-5 flex items-start justify-between">
                         <div>
-                            <h3 className="text-base font-semibold">Reset Akses Pengguna</h3>
-                            <p className="mt-1 text-sm text-[#667085]">
+                            <h3 className="text-base font-bold text-[#1A253C] font-heading">Reset Akses Pengguna</h3>
+                            <p className="mt-1 text-xs text-[#718096]">
                                 {resetUser ? `Tetapkan password sementara baru untuk akun ${resetUser.name} (${resetUser.username}). Pengguna wajib mengganti password saat login berikutnya.` : ''}
                             </p>
                         </div>
-                        <button type="button" onClick={closeReset} aria-label="Tutup">
+                        <button type="button" onClick={closeReset} aria-label="Tutup" className="text-[#94A3B8] hover:text-[#1A253C] p-1 rounded-lg">
                             <X className="h-4 w-4" />
                         </button>
                     </div>
                     <div className="space-y-4">
                         <div>
-                            <label className="text-sm font-medium" htmlFor="reset_password">Password sementara baru</label>
-                            <div className="relative mt-1">
+                            <label className="text-xs font-semibold text-[#1A253C]" htmlFor="reset_password">Password sementara baru</label>
+                            <div className="relative mt-1.5">
                                 <input
                                     id="reset_password"
                                     type={resetShowPassword ? 'text' : 'password'}
                                     value={resetForm.data.password}
                                     placeholder="Minimal 8 karakter"
                                     onChange={(e) => resetForm.setData('password', e.target.value)}
-                                    className={`h-10 w-full rounded-lg border pl-3 pr-10 text-sm ${resetForm.errors.password ? 'border-red-500' : 'border-[#E3E8EC]'}`}
+                                    className={`h-10 w-full rounded-xl border pl-3.5 pr-10 text-xs text-[#1A253C] bg-white transition-colors focus:outline-none focus:ring-2 focus:ring-[#0F685D]/20 focus:border-[#0F685D] ${resetForm.errors.password ? 'border-red-500' : 'border-[#E2E8F0]'}`}
                                 />
                                 <button
                                     type="button"
                                     onClick={() => setResetShowPassword(!resetShowPassword)}
-                                    className="absolute right-3 top-2.5 text-[#68748A] hover:text-[#17233C]"
+                                    className="absolute right-3 top-2.5 text-[#94A3B8] hover:text-[#1A253C]"
                                     aria-label={resetShowPassword ? 'Sembunyikan password' : 'Tampilkan password'}
                                 >
                                     {resetShowPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -399,20 +407,20 @@ export default function UsersIndex({ users, filters, roleOptions, total }) {
                             {resetForm.errors.password && <p className="mt-1 text-xs text-red-600">{resetForm.errors.password}</p>}
                         </div>
                         <div>
-                            <label className="text-sm font-medium" htmlFor="reset_password_confirmation">Konfirmasi password sementara</label>
-                            <div className="relative mt-1">
+                            <label className="text-xs font-semibold text-[#1A253C]" htmlFor="reset_password_confirmation">Konfirmasi password sementara</label>
+                            <div className="relative mt-1.5">
                                 <input
                                     id="reset_password_confirmation"
                                     type={resetShowConfirm ? 'text' : 'password'}
                                     value={resetForm.data.password_confirmation}
                                     placeholder="Ulangi password sementara baru"
                                     onChange={(e) => resetForm.setData('password_confirmation', e.target.value)}
-                                    className={`h-10 w-full rounded-lg border pl-3 pr-10 text-sm ${resetForm.errors.password_confirmation ? 'border-red-500' : 'border-[#E3E8EC]'}`}
+                                    className={`h-10 w-full rounded-xl border pl-3.5 pr-10 text-xs text-[#1A253C] bg-white transition-colors focus:outline-none focus:ring-2 focus:ring-[#0F685D]/20 focus:border-[#0F685D] ${resetForm.errors.password_confirmation ? 'border-red-500' : 'border-[#E2E8F0]'}`}
                                 />
                                 <button
                                     type="button"
                                     onClick={() => setResetShowConfirm(!resetShowConfirm)}
-                                    className="absolute right-3 top-2.5 text-[#68748A] hover:text-[#17233C]"
+                                    className="absolute right-3 top-2.5 text-[#94A3B8] hover:text-[#1A253C]"
                                     aria-label={resetShowConfirm ? 'Sembunyikan password' : 'Tampilkan password'}
                                 >
                                     {resetShowConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -421,9 +429,9 @@ export default function UsersIndex({ users, filters, roleOptions, total }) {
                             {resetForm.errors.password_confirmation && <p className="mt-1 text-xs text-red-600">{resetForm.errors.password_confirmation}</p>}
                         </div>
                     </div>
-                    <div className="mt-6 flex justify-end gap-2">
-                        <button type="button" onClick={closeReset} className="rounded-lg border border-[#E3E8EC] px-4 py-2 text-sm">Batal</button>
-                        <button type="submit" disabled={resetForm.processing} className="rounded-lg bg-[#267F83] px-4 py-2 text-sm font-semibold text-white disabled:opacity-60">
+                    <div className="mt-6 flex justify-end gap-2.5 border-t border-[#EDF2F7] pt-5">
+                        <button type="button" onClick={closeReset} className="btn-admin-secondary">Batal</button>
+                        <button type="submit" disabled={resetForm.processing} className="btn-admin-primary">
                             {resetForm.processing ? 'Menyimpan...' : 'Simpan Password Baru'}
                         </button>
                     </div>

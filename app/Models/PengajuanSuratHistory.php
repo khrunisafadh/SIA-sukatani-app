@@ -21,6 +21,11 @@ class PengajuanSuratHistory extends Model
         return $this->belongsTo(PengajuanSurat::class, 'pengajuan_surat_id');
     }
 
+    public function pengajuanSurat(): BelongsTo
+    {
+        return $this->letter();
+    }
+
     public function actor(): BelongsTo
     {
         return $this->belongsTo(User::class, 'actor_id');

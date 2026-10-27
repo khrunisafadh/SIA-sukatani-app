@@ -33,9 +33,9 @@ export default function FirstLoginPassword() {
                     {/* Badge Lokasi */}
                     <div className="flex justify-center">
                         <div className="inline-flex items-center gap-2 rounded-full border border-[#C4C6CF]/60 bg-white px-3.5 py-1.5 text-xs font-semibold shadow-sm">
-                            <MapPin className="h-3.5 w-3.5 text-[#267F83]" />
-                            <span className="text-[#267F83]">Sukatani • Tapos • Depok</span>
-                            <span className="h-1.5 w-1.5 rounded-full bg-[#267F83]" />
+                            <MapPin className="h-3.5 w-3.5 text-[#0F685D]" />
+                            <span className="text-[#0F685D]">Sukatani • Tapos • Depok</span>
+                            <span className="h-1.5 w-1.5 rounded-full bg-[#0F685D]" />
                             <span className="font-bold text-[#43474E]">RT 01 / RW 08</span>
                         </div>
                     </div>
@@ -49,7 +49,7 @@ export default function FirstLoginPassword() {
                 </div>
 
                 <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-                    <div className="rounded-xl border border-[#E3E8EC] bg-white px-6 py-8 shadow-sm sm:px-10">
+                    <div className="card-admin px-6 py-8 shadow-sm sm:px-10">
                         {/* Notice Banner */}
                         <div className="mb-6 flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50/80 p-3.5 text-xs text-amber-800">
                             <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
@@ -80,8 +80,8 @@ export default function FirstLoginPassword() {
                                         placeholder="Masukkan password sementara"
                                         autoComplete="current-password"
                                         onChange={(e) => setData('current_password', e.target.value)}
-                                        className={`h-10 w-full rounded-lg border bg-white pl-9 pr-10 text-sm text-[#17233C] placeholder-[#97A0AF] transition-colors focus:border-[#267F83] focus:outline-none focus:ring-2 focus:ring-[#267F83]/20 ${
-                                            errors.current_password ? 'border-red-500' : 'border-[#E3E8EC]'
+                                        className={`h-10 w-full rounded-xl border bg-white pl-9 pr-10 text-xs text-[#17233C] placeholder-[#97A0AF] transition-colors focus:border-[#0F685D] focus:outline-none focus:ring-2 focus:ring-[#0F685D]/20 ${
+                                            errors.current_password ? 'border-red-500' : 'border-[#E2E8F0]'
                                         }`}
                                         required
                                     />
@@ -119,8 +119,8 @@ export default function FirstLoginPassword() {
                                         placeholder="Minimal 8 karakter"
                                         autoComplete="new-password"
                                         onChange={(e) => setData('password', e.target.value)}
-                                        className={`h-10 w-full rounded-lg border bg-white pl-9 pr-10 text-sm text-[#17233C] placeholder-[#97A0AF] transition-colors focus:border-[#267F83] focus:outline-none focus:ring-2 focus:ring-[#267F83]/20 ${
-                                            errors.password ? 'border-red-500' : 'border-[#E3E8EC]'
+                                        className={`h-10 w-full rounded-xl border bg-white pl-9 pr-10 text-xs text-[#17233C] placeholder-[#97A0AF] transition-colors focus:border-[#0F685D] focus:outline-none focus:ring-2 focus:ring-[#0F685D]/20 ${
+                                            errors.password ? 'border-red-500' : 'border-[#E2E8F0]'
                                         }`}
                                         required
                                     />
@@ -158,8 +158,8 @@ export default function FirstLoginPassword() {
                                         placeholder="Ulangi password baru"
                                         autoComplete="new-password"
                                         onChange={(e) => setData('password_confirmation', e.target.value)}
-                                        className={`h-10 w-full rounded-lg border bg-white pl-9 pr-10 text-sm text-[#17233C] placeholder-[#97A0AF] transition-colors focus:border-[#267F83] focus:outline-none focus:ring-2 focus:ring-[#267F83]/20 ${
-                                            errors.password_confirmation ? 'border-red-500' : 'border-[#E3E8EC]'
+                                        className={`h-10 w-full rounded-xl border bg-white pl-9 pr-10 text-xs text-[#17233C] placeholder-[#97A0AF] transition-colors focus:border-[#0F685D] focus:outline-none focus:ring-2 focus:ring-[#0F685D]/20 ${
+                                            errors.password_confirmation ? 'border-red-500' : 'border-[#E2E8F0]'
                                         }`}
                                         required
                                     />
@@ -181,7 +181,7 @@ export default function FirstLoginPassword() {
                                 <button
                                     type="submit"
                                     disabled={processing}
-                                    className="flex h-10 w-full items-center justify-center rounded-lg bg-[#267F83] px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-[#1F686C] focus:outline-none focus:ring-2 focus:ring-[#267F83] focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
+                                    className="flex h-10 w-full items-center justify-center rounded-xl bg-[#0F685D] px-4 text-xs font-semibold text-white shadow-sm transition hover:bg-[#0B5249] focus:outline-none focus:ring-2 focus:ring-[#0F685D] focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
                                 >
                                     {processing ? 'Menyimpan...' : 'Simpan Password Baru'}
                                 </button>
@@ -189,7 +189,7 @@ export default function FirstLoginPassword() {
                         </form>
 
                         {/* Sign Out Option */}
-                        <div className="mt-6 border-t border-[#E3E8EC] pt-4 text-center">
+                        <div className="mt-6 border-t border-[#EDF2F7] pt-4 text-center">
                             <button
                                 type="button"
                                 onClick={handleLogout}
