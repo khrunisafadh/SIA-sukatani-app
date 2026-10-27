@@ -3,8 +3,9 @@
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\SuratAdminController;
 use App\Http\Controllers\Admin\UserRoleController;
-use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\WargaController;
+use App\Http\Controllers\Portal\SuratPortalController;
+use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -44,14 +45,12 @@ Route::get('/dashboard', function () {
 Route::middleware(['auth', 'role:ketua_rt,sekretaris'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
 
+    // Pengajuan Surat Admin (Verifikasi, Pantau, Pengesahan Fisik RT & RW, Akses PDF Terbit)
     Route::get('pengajuan-surat', [SuratAdminController::class, 'index'])->name('surat.index');
-    Route::get('pengajuan-surat/buat', [SuratAdminController::class, 'create'])
-        ->middleware('role:ketua_rt')
-        ->name('surat.create');
-    Route::post('pengajuan-surat', [SuratAdminController::class, 'store'])
-        ->middleware('role:ketua_rt')
-        ->name('surat.store');
     Route::get('pengajuan-surat/{pengajuanSurat}', [SuratAdminController::class, 'show'])->name('surat.show');
+    Route::post('pengajuan-surat/{pengajuanSurat}/verifikasi', [SuratAdminController::class, 'verify'])->name('surat.verify');
+    Route::post('pengajuan-surat/{pengajuanSurat}/pengesahan/rt', [SuratAdminController::class, 'confirmRt'])->name('surat.confirm-rt');
+    Route::post('pengajuan-surat/{pengajuanSurat}/pengesahan/rw', [SuratAdminController::class, 'confirmRw'])->name('surat.confirm-rw');
     Route::post('pengajuan-surat/{pengajuanSurat}/pengesahan', [SuratAdminController::class, 'confirmEndorsement'])->name('surat.confirm');
     Route::get('pengajuan-surat/{pengajuanSurat}/pdf', [SuratAdminController::class, 'preview'])->name('surat.pdf.preview');
     Route::get('pengajuan-surat/{pengajuanSurat}/pdf/unduh', [SuratAdminController::class, 'download'])->name('surat.pdf.download');
@@ -85,8 +84,13 @@ Route::middleware(['auth', 'role:warga'])->prefix('portal')->name('portal.')->gr
         return Inertia::render('Portal/Dashboard');
     })->name('dashboard');
 
-    // Tempat rute Pengajuan Surat & PDF (Anggota 2: Aliya)
-    // Route::resource('surat', SuratController::class);
+    // Modul 3: Pengajuan Surat Digital Warga
+    Route::get('pengajuan-surat', [SuratPortalController::class, 'index'])->name('surat.index');
+    Route::get('pengajuan-surat/buat', [SuratPortalController::class, 'create'])->name('surat.create');
+    Route::post('pengajuan-surat', [SuratPortalController::class, 'store'])->name('surat.store');
+    Route::get('pengajuan-surat/{pengajuanSurat}', [SuratPortalController::class, 'show'])->name('surat.show');
+    Route::get('pengajuan-surat/{pengajuanSurat}/pdf', [SuratPortalController::class, 'preview'])->name('surat.pdf.preview');
+    Route::get('pengajuan-surat/{pengajuanSurat}/pdf/unduh', [SuratPortalController::class, 'download'])->name('surat.pdf.download');
 
     // Lapor Mandiri Mutasi (Anggota 3: Ghita) — frontend pelaporan pindah/datang
     Route::get('pindah-datang', function () {

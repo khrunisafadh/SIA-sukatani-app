@@ -19,9 +19,8 @@ const navItems = [
     { label: 'Beranda', href: 'portal.dashboard', icon: Home },
     { label: 'Data Warga', href: null, icon: Users },
     { label: 'Pindah / Datang', href: 'portal.pindah-datang.create', icon: ArrowLeftRight, match: 'portal.pindah-datang.*' },
-    { label: 'Pengajuan Surat', href: null, icon: FileText },
+    { label: 'Pengajuan Surat', href: 'portal.surat.index', icon: FileText, match: 'portal.surat.*' },
     { label: 'Audit Trail', href: null, icon: ClipboardList },
-    { label: 'Bantuan Pengurus RT', href: null, icon: HelpCircle },
 ];
 
 function isActive(item) {
@@ -108,7 +107,7 @@ export default function WargaLayout({ children, topBarLabel = 'Lingkungan RT 01 
                             <div>
                                 <p className="text-[12px] font-semibold">Keamanan Data RT</p>
                                 <p className="mt-0.5 text-[10px] leading-relaxed text-white/75">
-                                    Terenkripsi &amp; Terverifikasi
+                                    Akses warga terenkripsi &amp; mengikuti matriks RBAC wilayah.
                                 </p>
                             </div>
                         </div>

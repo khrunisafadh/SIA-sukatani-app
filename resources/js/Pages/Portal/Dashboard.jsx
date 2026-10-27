@@ -49,8 +49,11 @@ export default function PortalDashboard({ auth }) {
 
                     {/* Menu Layanan Warga */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {/* Layanan 1: Ajukan Surat (Tugas Aliya) */}
-                        <div className="p-6 rounded-2xl bg-white border border-[#E4E9F0] shadow-sm space-y-4">
+                        {/* Layanan 1: Ajukan Surat */}
+                        <Link
+                            href={route('portal.surat.index')}
+                            className="p-6 rounded-2xl bg-white border border-[#E4E9F0] shadow-sm space-y-4 hover:border-[#2764D8]/30 transition block"
+                        >
                             <div className="flex items-center justify-between">
                                 <div className="w-10 h-10 rounded-xl bg-[#EEF4FF] flex items-center justify-center text-[#2764D8]">
                                     <FileText className="w-5 h-5" />
@@ -64,14 +67,14 @@ export default function PortalDashboard({ auth }) {
                                     Pengajuan Surat Digital
                                 </h3>
                                 <p className="text-xs text-[#68748A] mt-1 leading-relaxed">
-                                    Pilih jenis surat pengantar atau surat keterangan domisili untuk keperluan administrasi resmi Anda.
+                                    Pilih jenis surat keterangan atau pernyataan untuk keperluan administrasi resmi Anda dan pantau statusnya secara berkala.
                                 </p>
                             </div>
                             <div className="pt-2 border-t border-[#E4E9F0] flex items-center justify-between text-xs text-[#2764D8] font-semibold">
-                                <span>Modul Pengajuan (Aliya)</span>
+                                <span>Buka Riwayat Pengajuan</span>
                                 <ArrowRight className="w-4 h-4" />
                             </div>
-                        </div>
+                        </Link>
 
                         {/* Layanan 2: Lapor Pindah / Datang (Tugas Ghita) */}
                         <Link
