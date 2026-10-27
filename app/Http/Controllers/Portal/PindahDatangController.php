@@ -25,6 +25,7 @@ class PindahDatangController extends Controller
         $defaultWarga = Warga::query()
             ->with('unitRumah')
             ->where('user_id', $user->id)
+            ->orWhere('nik', $user->username)
             ->first();
 
         $units = UnitRumah::query()
@@ -35,13 +36,20 @@ class PindahDatangController extends Controller
         return Inertia::render('Portal/PindahDatang/Create', [
             'units' => $units,
             'defaultWarga' => $defaultWarga ? [
-                'nama' => $defaultWarga->nama,
-                'nik' => $defaultWarga->nik,
-                'no_kk' => $defaultWarga->no_kk,
-                'telepon' => $defaultWarga->telepon,
-                'alamat_ktp' => $defaultWarga->alamat_ktp,
-                'unit' => $defaultWarga->unitRumah?->nama_unit ?? '',
-            ] : null,
+                'nama' => $defaultWarga->nama_lengkap ?: $defaultWarga->nama ?: $user->name,
+                'nik' => $defaultWarga->nik ?: ($user->username ?: ''),
+                'no_kk' => $defaultWarga->no_kk ?: '',
+                'telepon' => $defaultWarga->no_wa ?: $defaultWarga->telepon ?: '',
+                'alamat_ktp' => $defaultWarga->alamat_lengkap ?: $defaultWarga->alamat_ktp ?: '',
+                'unit' => $defaultWarga->unitRumah?->nama_unit ?? ($defaultWarga->nomor_rumah ? "{$defaultWarga->nama_jalan} {$defaultWarga->nomor_rumah}" : ''),
+            ] : [
+                'nama' => $user->name,
+                'nik' => is_numeric($user->username) && strlen($user->username) === 16 ? $user->username : '',
+                'no_kk' => '',
+                'telepon' => '',
+                'alamat_ktp' => '',
+                'unit' => '',
+            ],
         ]);
     }
 
@@ -189,16 +197,42 @@ class PindahDatangController extends Controller
             $permohonan = (clone $query)->where('nomor_tiket', $ticket)->first();
             // Jika tiket tidak ketemu dan user punya data, fallback ke latest milik user
             if (! $permohonan && $user) {
-                $permohonan = (clone $query)->where('user_id', $user->id)->latest()->first();
+                $permohonan = (clone $query)
+                    ->where(function ($q) use ($user) {
+                        $q->where('user_id', $user->id)
+                            ->orWhere('nik_pemohon', $user->username);
+                    })
+                    ->latest()
+                    ->first();
             }
         } else {
-            $permohonan = $query->where('user_id', $user->id)->latest()->first();
+            $permohonan = $query
+                ->where(function ($q) use ($user) {
+                    $q->where('user_id', $user->id)
+                        ->orWhere('nik_pemohon', $user->username);
+                })
+                ->latest()
+                ->first();
         }
 
-        $payload = $permohonan ? $this->formatTrackingPayload($permohonan) : null;
+        // Ambil riwayat lengkap laporan mutasi user dari database
+        $historyList = PermohonanMutasi::query()
+            ->with(['unitRumah', 'dokumen'])
+            ->where(function ($q) use ($user) {
+                $q->where('user_id', $user->id)
+                    ->orWhere('nik_pemohon', $user->username);
+            })
+            ->orderByDesc('created_at')
+            ->get()
+            ->map(fn (PermohonanMutasi $m) => $this->formatTrackingPayload($m))
+            ->values()
+            ->all();
+
+        $payload = $permohonan ? $this->formatTrackingPayload($permohonan) : (count($historyList) > 0 ? $historyList[0] : null);
 
         return Inertia::render('Portal/PindahDatang/Tracking', [
             'permohonan' => $payload,
+            'history' => $historyList,
         ]);
     }
 
@@ -214,18 +248,30 @@ class PindahDatangController extends Controller
             ];
         })->values()->all();
 
+        $createdAtWib = $m->created_at ? $m->created_at->copy()->timezone('Asia/Jakarta') : now()->timezone('Asia/Jakarta');
+
         return [
             'id' => $m->id,
             'ticket' => $m->nomor_tiket,
             'nomor_tiket' => $m->nomor_tiket,
             'jenis' => $m->jenis_mutasi,
             'nama' => $m->nama_pemohon,
+            'nik' => $m->nik_pemohon,
+            'no_kk' => $m->no_kk,
+            'telepon' => $m->telepon,
+            'alamatAsal' => $m->alamat_asal,
+            'alamatTujuan' => $m->alamat_tujuan,
             'unit' => $m->unitRumah?->nama_unit ?? $m->unit_rumah_custom ?? 'Unit belum ditentukan',
             'statusTinggal' => $m->status_tinggal ?? 'Kontrak / Sewa Tahunan',
             'status' => $m->status,
             'statusLabel' => $m->statusLabel(),
             'alasanRevisi' => $m->alasan_revisi,
-            'submittedAt' => $m->created_at?->toISOString() ?? now()->toISOString(),
+            'catatanPemeriksaan' => $m->catatan_pemeriksaan,
+            'checklistAlamat' => (bool) $m->checklist_alamat,
+            'checklistNik' => (bool) $m->checklist_nik,
+            'checklistDokumen' => (bool) $m->checklist_dokumen,
+            'submittedAt' => $createdAtWib->toISOString(),
+            'submittedAtFormatted' => $createdAtWib->locale('id')->translatedFormat('d M Y, H.i') . ' WIB',
             'files' => $files,
         ];
     }

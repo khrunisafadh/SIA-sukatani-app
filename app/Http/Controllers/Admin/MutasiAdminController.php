@@ -241,12 +241,18 @@ class MutasiAdminController extends Controller
                     [
                         'no_kk' => $permohonanMutasi->no_kk,
                         'nama' => $permohonanMutasi->nama_pemohon,
+                        'nama_lengkap' => $permohonanMutasi->nama_pemohon,
                         'telepon' => $permohonanMutasi->telepon,
+                        'no_wa' => $permohonanMutasi->telepon,
                         'status_warga' => $statusWarga,
+                        'status_domisili' => $permohonanMutasi->status_tinggal ?? 'Warga Tetap',
                         'unit_rumah_id' => $permohonanMutasi->unit_rumah_id,
                         'alamat_ktp' => $permohonanMutasi->alamat_asal,
+                        'alamat_lengkap' => $permohonanMutasi->alamat_tujuan,
                         'is_kepala_keluarga' => true,
                         'hubungan_keluarga' => 'Kepala Keluarga',
+                        'shdk' => 'Kepala Keluarga',
+                        'status_administrasi' => 'Aktif',
                     ]
                 );
 

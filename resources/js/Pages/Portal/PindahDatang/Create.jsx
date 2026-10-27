@@ -1,10 +1,11 @@
 import WargaLayout from '@/Layouts/WargaLayout';
-import { Head, router, usePage } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import {
     AlertTriangle,
     ArrowRight,
     CalendarDays,
     CheckCircle2,
+    Clock3,
     CloudUpload,
     Eye,
     FileImage,
@@ -166,14 +167,13 @@ export default function PindahDatangCreate({ units = [], defaultWarga = null }) 
                         Catat perpindahan warga secara daring untuk verifikasi tertib administrasi RT 01/08.
                     </p>
                 </div>
-                <button
-                    type="button"
-                    onClick={() => window.location.reload()}
-                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#2F6BFF] px-4 py-2.5 text-[13px] font-semibold text-white shadow-sm hover:bg-[#2459B4]"
+                <Link
+                    href={route('portal.pindah-datang.tracking')}
+                    className="inline-flex items-center justify-center gap-2 rounded-xl border border-[#CBD5E1] bg-white px-4 py-2.5 text-[13px] font-semibold text-[#1A253C] hover:bg-slate-50 transition shadow-sm cursor-pointer"
                 >
-                    <Plus className="h-4 w-4" />
-                    Buat Laporan Baru
-                </button>
+                    <Clock3 className="h-4 w-4 text-[#0F685D]" />
+                    <span>Pantau Status Laporan</span>
+                </Link>
             </div>
 
             <div className="mb-5 flex gap-3 rounded-2xl border border-[#F3D7A3] bg-[#FFF6E5] px-4 py-3">

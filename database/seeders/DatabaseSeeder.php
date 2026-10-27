@@ -160,5 +160,8 @@ class DatabaseSeeder extends Seeder
         foreach ($samples as $sample) {
             Warga::updateOrCreate(['nik' => $sample['nik']], $sample);
         }
+
+        // Jalankan MutasiSeeder untuk sinkronisasi master unit rumah RT 01 & permohonan mutasi
+        $this->call(MutasiSeeder::class);
     }
 }
