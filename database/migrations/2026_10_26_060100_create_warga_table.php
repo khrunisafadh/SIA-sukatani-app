@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -46,6 +47,44 @@ return new class extends Migration
 
             $table->index(['status_warga', 'unit_rumah_id']);
         });
+
+        // Salin data lama dari tabel wargas jika ada
+        if (Schema::hasTable('wargas')) {
+            $existing = DB::table('wargas')->get();
+            foreach ($existing as $row) {
+                DB::table('warga')->insert([
+                    'id' => $row->id,
+                    'user_id' => $row->user_id,
+                    'nik' => $row->nik,
+                    'no_kk' => $row->no_kk,
+                    'nama' => $row->nama_lengkap,
+                    'nama_lengkap' => $row->nama_lengkap,
+                    'jenis_kelamin' => $row->gender ?? 'L',
+                    'gender' => $row->gender ?? 'L',
+                    'tempat_lahir' => $row->tempat_lahir,
+                    'tanggal_lahir' => $row->tgl_lahir,
+                    'tgl_lahir' => $row->tgl_lahir,
+                    'agama' => $row->agama,
+                    'goldar' => $row->goldar,
+                    'shdk' => $row->shdk,
+                    'nama_jalan' => $row->nama_jalan,
+                    'blok_rumah' => $row->blok_rumah,
+                    'nomor_rumah' => $row->nomor_rumah,
+                    'detail_alamat' => $row->detail_alamat,
+                    'alamat_lengkap' => $row->alamat_lengkap,
+                    'pekerjaan' => $row->pekerjaan,
+                    'no_wa' => $row->no_wa,
+                    'telepon' => $row->no_wa,
+                    'status_domisili' => $row->status_domisili,
+                    'status_warga' => str_contains(strtolower($row->status_domisili ?? ''), 'tetap') ? 'tetap' : 'kontrak',
+                    'status_administrasi' => $row->status_administrasi ?? 'Aktif',
+                    'foto_ktp' => $row->foto_ktp,
+                    'foto_kk' => $row->foto_kk,
+                    'created_at' => $row->created_at,
+                    'updated_at' => $row->updated_at,
+                ]);
+            }
+        }
     }
 
     public function down(): void
