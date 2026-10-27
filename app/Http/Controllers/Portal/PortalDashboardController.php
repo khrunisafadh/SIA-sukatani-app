@@ -27,11 +27,9 @@ class PortalDashboardController extends Controller
 
         // Ambil riwayat pengajuan surat warga
         $lettersQuery = PengajuanSurat::query()
-            ->where(function ($q) use ($user, $warga) {
-                $q->where('pemohon_id', $user->id);
-                if ($warga && $warga->nik) {
-                    $q->orWhere('pemohon_nik', $warga->nik);
-                }
+            ->where(function ($q) use ($user) {
+                $q->where('pemohon_id', $user->id)
+                    ->orWhere('created_by', $user->id);
             })
             ->orderByDesc('created_at')
             ->orderByDesc('id')
