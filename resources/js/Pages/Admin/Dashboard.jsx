@@ -586,6 +586,12 @@ export default function AdminDashboard({ auth, stats: propStats, recentLetters: 
                 <p className="text-sm font-bold text-[#1A253C]">
                   {selectedLetter.created_at_formatted || selectedLetter.updated_at_formatted || '18 Juni 2025, 10.24'}
                 </p>
+                {selectedLetter.created_at_relative && (
+                  <div className="mt-1 flex items-center gap-1.5 text-xs font-medium text-[#0F685D]">
+                    <Clock className="w-3.5 h-3.5 text-[#0F685D]" />
+                    <span>{selectedLetter.created_at_relative}</span>
+                  </div>
+                )}
               </div>
 
               <div className="border-t border-[#F0F4F8]" />

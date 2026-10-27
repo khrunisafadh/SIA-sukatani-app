@@ -40,9 +40,11 @@ class AdminDashboardController extends Controller
                 default => 'bg-[#F1F5F9] text-[#475569] border border-[#E2E8F0]',
             };
 
-            // Ambil waktu real-time kapan surat dibuat
+            // Ambil waktu real-time kapan surat dibuat dalam zona waktu Indonesia (Asia/Jakarta / WIB)
             $createdAt = $letter->created_at ?? $letter->updated_at ?? now();
-            $createdAtFormatted = $createdAt->timezone(config('app.timezone'))->translatedFormat('d F Y, H.i');
+            $createdAtWib = $createdAt->copy()->timezone('Asia/Jakarta');
+            $createdAtFormatted = $createdAtWib->locale('id')->translatedFormat('d F Y, H.i') . ' WIB';
+            $relativeTime = $createdAt->copy()->locale('id')->diffForHumans();
 
             return [
                 'id' => $letter->id,
@@ -57,8 +59,9 @@ class AdminDashboardController extends Controller
                 'status_label' => $letter->statusLabel(),
                 'status_class' => $statusClass,
                 'petugas_name' => $letter->completedBy?->name ?? $letter->creator?->name ?? 'Budi Santoso',
-                'date' => $createdAt->timezone(config('app.timezone'))->format('d M Y'),
+                'date' => $createdAtWib->locale('id')->translatedFormat('d M Y'),
                 'created_at_formatted' => $createdAtFormatted,
+                'created_at_relative' => $relativeTime,
                 'updated_at_formatted' => $createdAtFormatted,
                 'show_url' => route('admin.surat.show', $letter->id),
             ];
@@ -76,7 +79,7 @@ class AdminDashboardController extends Controller
                     'id' => $history->id,
                     'title' => $isCompleted ? 'Status surat diperbarui' : 'Pengajuan surat baru',
                     'desc' => ($history->letter?->nomor ?? 'Surat') . ' (' . LetterStatus::label($history->status) . ')',
-                    'time' => $history->created_at?->timezone(config('app.timezone'))->format('H.i') ?? 'Baru saja',
+                    'time' => $history->created_at?->timezone('Asia/Jakarta')->format('H.i') . ' WIB' ?? 'Baru saja',
                     'status' => $history->status,
                 ];
             });
