@@ -23,6 +23,13 @@ import {
 export default function AdminDashboard({ auth, stats: propStats, recentLetters: propRecentLetters, recentHistories: propRecentHistories }) {
   const [selectedLetter, setSelectedLetter] = useState(null);
 
+  const todayDateFormatted = new Date().toLocaleDateString('id-ID', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  }).toUpperCase();
+
   // Close drawer on Escape key
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -221,9 +228,11 @@ export default function AdminDashboard({ auth, stats: propStats, recentLetters: 
                     <FileText className="w-4 h-4 text-[#A7D7D0]" />
                     <span>Pengajuan Surat</span>
                   </div>
-                  <span className="w-5 h-5 rounded-full bg-[#E58917] text-white flex items-center justify-center font-bold text-[10px]">
-                    2
-                  </span>
+                  {(auth?.pending_letters_count ?? 0) > 0 && (
+                    <span className="w-5 h-5 rounded-full bg-[#E58917] text-white flex items-center justify-center font-bold text-[10px]">
+                      {auth.pending_letters_count}
+                    </span>
+                  )}
                 </Link>
 
                 {/* Audit Trail */}
@@ -285,16 +294,23 @@ export default function AdminDashboard({ auth, stats: propStats, recentLetters: 
               <span className="text-xs text-[#718096] font-medium">Kecamatan Tapos, Kota Depok</span>
             </div>
 
-            <div className="flex items-center gap-3 cursor-pointer py-1.5 px-2 rounded-xl hover:bg-slate-50 transition-colors">
+            <Link
+              href={route('profile.edit')}
+              className="flex items-center gap-3 cursor-pointer py-1.5 px-2 rounded-xl hover:bg-slate-50 transition-colors"
+            >
               <div className="w-9 h-9 rounded-full bg-[#EAF0FC] text-[#2F65CB] flex items-center justify-center font-bold text-xs">
-                BS
+                {auth?.user?.name ? (auth.user.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()) : 'BS'}
               </div>
               <div className="text-left">
-                <h4 className="text-xs font-bold text-[#1A253C] leading-none">Budi Santoso</h4>
-                <p className="text-[10px] text-[#718096] mt-0.5">Ketua RT 01/08</p>
+                <h4 className="text-xs font-bold text-[#1A253C] leading-none">
+                  {auth?.user?.name || 'Budi Santoso'}
+                </h4>
+                <p className="text-[10px] text-[#718096] mt-0.5">
+                  {auth?.user?.role_label || 'Ketua RT 01/08'}
+                </p>
               </div>
               <ChevronRight className="w-3.5 h-3.5 text-[#A0AEC0] ml-1" />
-            </div>
+            </Link>
           </header>
 
           {/* Konten Halaman */}
@@ -303,10 +319,10 @@ export default function AdminDashboard({ auth, stats: propStats, recentLetters: 
             <div className="flex items-end justify-between">
               <div className="space-y-1">
                 <span className="text-[11px] font-bold tracking-wider uppercase text-[#2F65CB]">
-                  RABU, 18 JUNI 2025
+                  {todayDateFormatted}
                 </span>
                 <h2 className="text-[26px] font-bold text-[#1A253C] font-heading tracking-tight leading-tight">
-                  Selamat datang, Pak Budi
+                  Selamat datang, {auth?.user?.name || 'Pak Budi'}
                 </h2>
                 <p className="text-xs text-[#718096]">
                   Berikut ringkasan administrasi RT 01/08 hari ini.
@@ -347,6 +363,70 @@ export default function AdminDashboard({ auth, stats: propStats, recentLetters: 
                   </div>
                 );
               })}
+            </div>
+
+
+            {/* Quick Access Grid: modul administrasi utama */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Modul Data Warga */}
+              <Link
+                href={route('admin.warga.index')}
+                className="p-5 rounded-2xl bg-white border border-[#E4E9F0] shadow-sm space-y-3 hover:border-[#2764D8]/40 hover:shadow-md transition block group"
+              >
+                <div className="w-10 h-10 rounded-xl bg-[#EEF4FF] flex items-center justify-center text-[#2764D8]">
+                  <Users className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-[#17233C] font-heading">Manajemen Data Warga</h3>
+                  <p className="text-xs text-[#68748A] mt-1 leading-relaxed">
+                    Kelola data warga dan lakukan pencarian dengan tetap memperhatikan perlindungan data sensitif.
+                  </p>
+                </div>
+                <div className="pt-2 border-t border-[#E4E9F0] flex items-center justify-between text-xs text-[#2764D8] font-semibold">
+                  <span>Buka data warga</span>
+                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                </div>
+              </Link>
+
+              {/* Modul Pengajuan Surat */}
+              <Link
+                href={route('admin.surat.index')}
+                className="p-5 rounded-2xl bg-white border border-[#E4E9F0] shadow-sm space-y-3 hover:border-[#11704E]/40 hover:shadow-md transition block group"
+              >
+                <div className="w-10 h-10 rounded-xl bg-[#E7F6EF] flex items-center justify-center text-[#11704E]">
+                  <FileText className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-[#17233C] font-heading">Verifikasi Pengajuan Surat</h3>
+                  <p className="text-xs text-[#68748A] mt-1 leading-relaxed">
+                    Pantau permohonan surat pengantar dan domisili yang diajukan warga.
+                  </p>
+                </div>
+                <div className="pt-2 border-t border-[#E4E9F0] flex items-center justify-between text-xs text-[#11704E] font-semibold">
+                  <span>Buka pengajuan surat</span>
+                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                </div>
+              </Link>
+
+              {/* Modul Mutasi */}
+              <Link
+                href={route('admin.pindah-datang.index')}
+                className="p-5 rounded-2xl bg-white border border-[#E4E9F0] shadow-sm space-y-3 hover:border-[#97620D]/40 hover:shadow-md transition block group"
+              >
+                <div className="w-10 h-10 rounded-xl bg-[#FFF2D9] flex items-center justify-center text-[#97620D]">
+                  <ArrowLeftRight className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-[#17233C] font-heading">Laporan Mutasi Warga</h3>
+                  <p className="text-xs text-[#68748A] mt-1 leading-relaxed">
+                    Akses pelaporan warga pindah atau datang untuk ditinjau pengurus RT.
+                  </p>
+                </div>
+                <div className="pt-2 border-t border-[#E4E9F0] flex items-center justify-between text-xs text-[#97620D] font-semibold">
+                  <span>Buka data mutasi</span>
+                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                </div>
+              </Link>
             </div>
 
             {/* ================= CARD 1: PENGAJUAN SURAT TERBARU (LEBAR) ================= */}

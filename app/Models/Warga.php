@@ -1,3 +1,4 @@
+
 <?php
 
 namespace App\Models;
@@ -5,10 +6,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Warga extends Model
 {
     use HasFactory, SoftDeletes;
+
+    protected $table = 'warga';
 
     protected $fillable = [
         'user_id',
@@ -34,33 +39,62 @@ class Warga extends Model
         'foto_kk',
     ];
 
+    protected function casts(): array
+    {
+        return [
+            'tgl_lahir' => 'date',
+        ];
+    }
+
     /**
-     * Relasi ke akun user jika warga memiliki akun login
+     * Relasi ke akun pengguna.
      */
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
     /**
-     * Helper untuk masking NIK: 3276••••0142
+     * Relasi ke unit rumah warga.
      */
-    public function getMaskedNikAttribute(): string
+    public function unitRumah(): BelongsTo
     {
-        if (strlen($this->nik) >= 8) {
-            return substr($this->nik, 0, 4) . '••••' . substr($this->nik, -4);
-        }
-        return $this->nik;
+        return $this->belongsTo(UnitRumah::class, 'unit_rumah_id');
     }
 
     /**
-     * Helper untuk masking No KK: KK 3276••••0008
+     * Relasi ke permohonan mutasi warga.
+     */
+    public function permohonanMutasi(): HasMany
+    {
+        return $this->hasMany(PermohonanMutasi::class, 'warga_id');
+    }
+
+    /**
+     * Masking NIK: menampilkan 4 digit awal dan 4 digit akhir.
+     */
+    public function getMaskedNikAttribute(): string
+    {
+        if (strlen((string) $this->nik) !== 16) {
+            return (string) $this->nik;
+        }
+
+        return substr($this->nik, 0, 4)
+            . '••••'
+            . substr($this->nik, -4);
+    }
+
+    /**
+     * Masking nomor KK.
      */
     public function getMaskedNoKkAttribute(): string
     {
-        if (strlen($this->no_kk) >= 8) {
-            return 'KK ' . substr($this->no_kk, 0, 4) . '••••' . substr($this->no_kk, -4);
+        if (strlen((string) $this->no_kk) !== 16) {
+            return (string) $this->no_kk;
         }
-        return $this->no_kk;
+
+        return 'KK ' . substr($this->no_kk, 0, 4)
+            . '••••'
+            . substr($this->no_kk, -4);
     }
 }
