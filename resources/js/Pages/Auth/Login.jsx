@@ -9,19 +9,15 @@ import {
   Lock, 
   Eye, 
   EyeOff, 
-  ArrowRight,
-  MessageCircle
+  ArrowRight
 } from 'lucide-react';
 
-export default function Login({ status, canResetPassword }) {
+export default function Login({ status }) {
   const [showPassword, setShowPassword] = useState(false);
 
-  // Link WhatsApp Ketua RT (ganti nomor dan teks pesan sesuai kebutuhan)
-  const whatsappUrl = "https://wa.me/6281234567890?text=Halo%20Ketua%20RT%2001/08%20Sukatani,%20saya%20butuh%20bantuan%20terkait%20akses%20akun%20SIA%20Sukatani.";
-
   const { data, setData, post, processing, errors, reset } = useForm({
-    login: 'ketua.rt01',
-    password: 'password123',
+    login: '',
+    password: '',
     remember: false,
   });
 
@@ -36,120 +32,113 @@ export default function Login({ status, canResetPassword }) {
     <>
       <Head title="Masuk ke Sistem - SIA Sukatani" />
 
-      <div className="min-h-screen w-full flex bg-[#F5F7FA] font-sans antialiased text-[#17233C]">
-        {/* ================= LEFT PANEL: Neighborhood Identity (45%) ================= */}
-        <div className="hidden lg:flex lg:w-[48%] xl:w-[45%] relative flex-col justify-between p-12 bg-gradient-to-br from-[#EEF4FF] via-[#F2F3FF] to-[#E7EEFB] border-r border-[#C4C6CF]/40 overflow-hidden">
-          {/* Backdrop Blur Accents */}
-          <div className="absolute -top-24 -left-24 w-80 h-80 rounded-full bg-[#89F5E7]/25 blur-3xl pointer-events-none" />
-          <div className="absolute -bottom-20 -right-20 w-80 h-80 rounded-full bg-[#D5E3FF]/50 blur-3xl pointer-events-none" />
-
-          {/* Top: Header Identity (Logo & Teks SIA Sukatani Dihapus Sesuai Permintaan) */}
-          <div className="relative z-10 space-y-8">
-            {/* Badge Lokasi */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/90 border border-[#C4C6CF]/60 shadow-sm text-xs font-semibold backdrop-blur-sm">
-              <MapPin className="w-3.5 h-3.5 text-[#006A61]" />
-              <span className="text-[#006A61]">Sukatani • Tapos • Depok</span>
-              <span className="w-1.5 h-1.5 rounded-full bg-[#006A61]" />
-              <span className="text-[#43474E] font-bold">RT 01 / RW 08</span>
+      <div className="min-h-screen w-full flex bg-[#F4F7FA] font-sans antialiased text-[#10264F]">
+        {/* ================= LEFT PANEL: Identitas SIA Sukatani (45%) ================= */}
+        <div className="hidden lg:flex lg:w-[45%] xl:w-[42%] flex-col justify-between p-10 xl:p-14 bg-[#006B61] text-white relative">
+          {/* Top: Header Identity */}
+          <div className="space-y-6">
+            <div className="flex flex-col">
+              <span className="font-extrabold text-2xl tracking-tight text-white font-heading leading-tight">
+                SIA Sukatani
+              </span>
+              <span className="text-xs text-[#A8E5DE] mt-0.5">
+                Sistem Informasi Administrasi RT 01 / RW 08
+              </span>
             </div>
 
-            {/* Heading & Deskripsi */}
-            <div className="space-y-4 max-w-lg">
-              <h1 className="text-3xl xl:text-4xl font-extrabold text-[#022448] leading-tight font-heading tracking-tight">
-                Sistem Informasi <br />
-                Administrasi RT 01/08 <br />
-                Sukatani
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/15 text-xs font-medium text-[#A8E5DE]">
+              <MapPin className="w-3.5 h-3.5 text-[#A8E5DE]" />
+              <span>Sukatani • Tapos • Kota Depok</span>
+            </div>
+          </div>
+
+          {/* Middle: Deskripsi Layanan Singkat */}
+          <div className="space-y-6 my-auto py-8">
+            <div className="space-y-3">
+              <h1 className="text-3xl xl:text-4xl font-extrabold text-white leading-tight font-heading tracking-tight">
+                Layanan Administrasi <br />
+                Warga RT 01 / RW 08
               </h1>
-              <p className="text-sm xl:text-base text-[#43474E] leading-relaxed">
-                Layanan administrasi warga dalam satu akses yang lebih mudah, tertib, dan transparan untuk seluruh warga rukun tetangga.
+              <p className="text-sm xl:text-base text-white/80 leading-relaxed max-w-md">
+                Portal mandiri untuk pengajuan surat pengantar, verifikasi data kependudukan, serta transparansi laporan kas lingkungan RT Sukatani secara tertata.
               </p>
             </div>
 
-            {/* 3 Value Proposition Cards */}
-            <div className="grid grid-cols-3 gap-3 pt-4 max-w-lg">
-              <div className="p-3.5 bg-white/80 rounded-2xl border border-white shadow-sm backdrop-blur-sm space-y-1">
-                <div className="w-8 h-8 rounded-lg bg-[#E7EEFB] flex items-center justify-center text-[#2764D8] mb-2">
-                  <Users className="w-4 h-4" />
+            {/* Ringkasan Fitur Layanan */}
+            <div className="pt-4 space-y-3 max-w-sm">
+              <div className="flex items-center gap-3 text-xs text-white/90">
+                <div className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0 text-[#A8E5DE]">
+                  <FileText className="w-3.5 h-3.5" />
                 </div>
-                <h4 className="text-xs font-bold text-[#022448] leading-tight font-heading">Data Pengurus</h4>
-                <p className="text-[11px] text-[#43474E]">Terpusat & akurat</p>
+                <span>Pengajuan surat pengantar & domisili online</span>
               </div>
-
-              <div className="p-3.5 bg-white/80 rounded-2xl border border-white shadow-sm backdrop-blur-sm space-y-1">
-                <div className="w-8 h-8 rounded-lg bg-[#E7F6EF] flex items-center justify-center text-[#11704E] mb-2">
-                  <FileText className="w-4 h-4" />
+              <div className="flex items-center gap-3 text-xs text-white/90">
+                <div className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0 text-[#A8E5DE]">
+                  <Users className="w-3.5 h-3.5" />
                 </div>
-                <h4 className="text-xs font-bold text-[#022448] leading-tight font-heading">Surat Pengantar</h4>
-                <p className="text-[11px] text-[#43474E]">Proses cepat digital</p>
+                <span>Data kependudukan warga tetap & sewa terverifikasi</span>
               </div>
-
-              <div className="p-3.5 bg-white/80 rounded-2xl border border-white shadow-sm backdrop-blur-sm space-y-1">
-                <div className="w-8 h-8 rounded-lg bg-[#FFF2D9] flex items-center justify-center text-[#97620D] mb-2">
-                  <Coins className="w-4 h-4" />
+              <div className="flex items-center gap-3 text-xs text-white/90">
+                <div className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0 text-[#A8E5DE]">
+                  <Coins className="w-3.5 h-3.5" />
                 </div>
-                <h4 className="text-xs font-bold text-[#022448] leading-tight font-heading">Iuran Transparan</h4>
-                <p className="text-[11px] text-[#43474E]">Laporan kas terbuka</p>
+                <span>Transparansi pencatatan kas rukun tetangga</span>
               </div>
             </div>
           </div>
 
           {/* Bottom Footer Info */}
-          <div className="relative z-10 flex items-center justify-between text-xs text-[#74777F] pt-8 border-t border-[#C4C6CF]/30">
+          <div className="pt-6 border-t border-white/10 flex items-center justify-between text-xs text-white/60">
             <span>Kelurahan Sukatani, Kec. Tapos</span>
-            <span className="font-semibold tracking-wider font-heading">KODEPOS 16454</span>
+            <span>Kode Pos 16454</span>
           </div>
         </div>
 
-        {/* ================= RIGHT PANEL: Login Form (55%) ================= */}
-        <div className="flex-1 flex flex-col justify-center items-center px-6 sm:px-12 lg:px-16 xl:px-24 bg-white">
-          <div className="w-full max-w-[430px] space-y-8">
+        {/* ================= RIGHT PANEL: Form Login (55%) ================= */}
+        <div className="flex-1 flex flex-col justify-center items-center px-6 sm:px-10 lg:px-12 xl:px-16 py-12">
+          {/* Mobile Branding Indicator */}
+          <div className="lg:hidden text-center space-y-1 mb-6">
+            <span className="font-extrabold text-xl text-[#10264F] font-heading">
+              SIA Sukatani
+            </span>
+            <p className="text-xs text-[#566175]">
+              Administrasi RT 01 / RW 08 Sukatani
+            </p>
+          </div>
+
+          <div className="w-full max-w-[420px] bg-white p-7 sm:p-9 rounded-2xl border border-[#E2E8F0] shadow-sm space-y-6">
             {/* Header Form */}
-            <div className="space-y-2">
-              <span className="text-[11px] font-bold tracking-widest uppercase text-[#2764D8]">
-                Selamat datang
+            <div className="space-y-1.5">
+              <span className="text-[11px] font-bold tracking-widest uppercase text-[#006B61] font-heading">
+                PORTAL MASUK
               </span>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-[#17233C] tracking-tight font-heading">
-                Masuk ke sistem
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-[#10264F] tracking-tight font-heading">
+                Masuk ke Akun
               </h2>
-              <p className="text-sm text-[#43474E]">
-                Masuk ke akun Anda untuk mengakses layanan administrasi warga.
+              <p className="text-xs sm:text-sm text-[#566175] leading-relaxed">
+                Silakan masukkan username atau email beserta kata sandi yang telah didaftarkan.
               </p>
             </div>
 
             {/* Session status alert */}
             {status && (
-              <div className="p-3 rounded-lg bg-green-50 border border-green-200 text-xs text-green-700">
+              <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 font-medium">
                 {status}
               </div>
             )}
 
-            {/* Demo credential tip box */}
-            <div className="p-3 rounded-xl bg-[#EEF4FF] border border-[#2764D8]/20 text-xs text-[#10264F] space-y-1">
-              <p className="font-bold text-[#2764D8]">Akun Default (Siap Digunakan):</p>
-              <div className="grid grid-cols-2 gap-2 text-[11px]">
-                <div>
-                  <span className="text-[#68748A]">Username / Email:</span><br />
-                  <code className="font-mono bg-white px-1 py-0.5 rounded border border-[#D5DCE6]">ketua.rt01</code>
-                </div>
-                <div>
-                  <span className="text-[#68748A]">Kata Sandi:</span><br />
-                  <code className="font-mono bg-white px-1 py-0.5 rounded border border-[#D5DCE6]">password123</code>
-                </div>
-              </div>
-            </div>
-
             {/* Form */}
-            <form onSubmit={submit} className="space-y-5">
+            <form onSubmit={submit} className="space-y-4">
               {/* Field: Username / Email */}
               <div className="space-y-1.5">
                 <label 
                   htmlFor="login" 
-                  className="block text-xs font-semibold text-[#39445A]"
+                  className="block text-xs font-semibold text-[#10264F]"
                 >
-                  Email atau username
+                  Username atau Email
                 </label>
                 <div className="relative flex items-center">
-                  <span className="absolute left-3.5 text-[#97A0AF] pointer-events-none">
+                  <span className="absolute left-3.5 text-[#8C98A9] pointer-events-none">
                     <User className="w-4 h-4" />
                   </span>
                   <input
@@ -157,17 +146,17 @@ export default function Login({ status, canResetPassword }) {
                     type="text"
                     name="login"
                     value={data.login}
-                    placeholder="Contoh: ketua.rt01"
+                    placeholder="Masukkan username atau email"
                     autoComplete="username"
                     onChange={(e) => setData('login', e.target.value)}
-                    className={`w-full h-11 pl-10 pr-4 text-sm rounded-lg border bg-white placeholder-[#97A0AF] text-[#17233C] transition-colors focus:outline-none focus:ring-2 focus:ring-[#2764D8]/20 focus:border-[#2764D8] ${
-                      errors.login ? 'border-red-500' : 'border-[#D9DFE8]'
+                    className={`w-full h-11 pl-10 pr-4 text-xs sm:text-sm rounded-xl border bg-white placeholder-[#9AA5B5] text-[#10264F] transition-all focus:outline-none focus:ring-2 focus:ring-[#006B61]/20 focus:border-[#006B61] ${
+                      errors.login ? 'border-red-500 bg-red-50/20' : 'border-[#E2E8F0]'
                     }`}
                     required
                   />
                 </div>
                 {errors.login && (
-                  <p className="text-xs text-red-600 mt-1">{errors.login}</p>
+                  <p className="text-xs text-red-600 mt-1 font-medium">{errors.login}</p>
                 )}
               </div>
 
@@ -175,12 +164,12 @@ export default function Login({ status, canResetPassword }) {
               <div className="space-y-1.5">
                 <label 
                   htmlFor="password" 
-                  className="block text-xs font-semibold text-[#39445A]"
+                  className="block text-xs font-semibold text-[#10264F]"
                 >
-                  Kata sandi
+                  Kata Sandi
                 </label>
                 <div className="relative flex items-center">
-                  <span className="absolute left-3.5 text-[#97A0AF] pointer-events-none">
+                  <span className="absolute left-3.5 text-[#8C98A9] pointer-events-none">
                     <Lock className="w-4 h-4" />
                   </span>
                   <input
@@ -191,26 +180,26 @@ export default function Login({ status, canResetPassword }) {
                     placeholder="Masukkan kata sandi"
                     autoComplete="current-password"
                     onChange={(e) => setData('password', e.target.value)}
-                    className={`w-full h-11 pl-10 pr-11 text-sm rounded-lg border bg-white placeholder-[#97A0AF] text-[#17233C] transition-colors focus:outline-none focus:ring-2 focus:ring-[#2764D8]/20 focus:border-[#2764D8] ${
-                      errors.password ? 'border-red-500' : 'border-[#D9DFE8]'
+                    className={`w-full h-11 pl-10 pr-11 text-xs sm:text-sm rounded-xl border bg-white placeholder-[#9AA5B5] text-[#10264F] transition-all focus:outline-none focus:ring-2 focus:ring-[#006B61]/20 focus:border-[#006B61] ${
+                      errors.password ? 'border-red-500 bg-red-50/20' : 'border-[#E2E8F0]'
                     }`}
                     required
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3.5 text-[#68748A] hover:text-[#17233C] transition-colors p-0.5 focus:outline-none"
+                    className="absolute right-3.5 text-[#8C98A9] hover:text-[#10264F] transition-colors p-1 focus:outline-none cursor-pointer"
                     aria-label={showPassword ? "Sembunyikan kata sandi" : "Tampilkan kata sandi"}
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
                 {errors.password && (
-                  <p className="text-xs text-red-600 mt-1">{errors.password}</p>
+                  <p className="text-xs text-red-600 mt-1 font-medium">{errors.password}</p>
                 )}
               </div>
 
-              {/* Remember Me & Forgot Password */}
+              {/* Remember Me */}
               <div className="flex items-center justify-between pt-1">
                 <label className="flex items-center gap-2 cursor-pointer select-none">
                   <input
@@ -218,46 +207,31 @@ export default function Login({ status, canResetPassword }) {
                     name="remember"
                     checked={data.remember}
                     onChange={(e) => setData('remember', e.target.checked)}
-                    className="w-4 h-4 rounded border-[#D9DFE8] text-[#2764D8] focus:ring-[#2764D8]/30 cursor-pointer"
+                    className="w-4 h-4 rounded border-[#D1D5DB] text-[#006B61] focus:ring-[#006B61]/30 cursor-pointer"
                   />
-                  <span className="text-xs text-[#68748A]">Ingat saya</span>
+                  <span className="text-xs text-[#566175]">Ingat saya</span>
                 </label>
-
-                {canResetPassword && (
-                  <Link
-                    href={route('password.request')}
-                    className="text-xs text-[#2764D8] hover:text-[#1d4ed8] font-medium transition-colors"
-                  >
-                    Lupa kata sandi?
-                  </Link>
-                )}
               </div>
 
               {/* Button Submit */}
               <button
                 type="submit"
                 disabled={processing}
-                className="w-full h-11 flex items-center justify-center gap-2 px-4 rounded-lg bg-[#2764D8] hover:bg-[#1f54ba] text-white text-sm font-semibold shadow-md shadow-[#2764D8]/20 hover:shadow-[#2764D8]/30 transition-all disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
+                className="w-full h-11 flex items-center justify-center gap-2 px-4 rounded-xl bg-[#006B61] hover:bg-[#00554d] text-white text-xs sm:text-sm font-semibold shadow-sm transition-all disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
               >
-                <span>{processing ? 'Memproses...' : 'Masuk ke sistem'}</span>
+                <span>{processing ? 'Memproses Masuk...' : 'Masuk ke Sistem'}</span>
                 {!processing && <ArrowRight className="w-4 h-4" />}
               </button>
             </form>
 
-            {/* Footer Tambahan - Link WA Ketua RT */}
-            <div className="pt-4 text-center">
-              <p className="text-xs text-[#68748A]">
-                Butuh bantuan akses akun?{' '}
-                <a
-                href={whatsappUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[#2764D8] font-semibold hover:underline"
-                >
-                  <MessageCircle className="w-3.5 h-3.5 text-[#25D366]" />
-                  <span>Hubungi Ketua RT</span>
-                </a>
-              </p>
+            {/* Back to landing page */}
+            <div className="pt-2 text-center border-t border-[#E2E8F0]/80">
+              <Link
+                href="/"
+                className="text-xs text-[#566175] hover:text-[#006B61] transition-colors font-medium inline-flex items-center gap-1.5"
+              >
+                <span>← Kembali ke Beranda</span>
+              </Link>
             </div>
           </div>
         </div>

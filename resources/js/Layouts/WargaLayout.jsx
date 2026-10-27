@@ -149,7 +149,10 @@ export default function WargaLayout({ children, topBarLabel = 'Lingkungan RT 01 
                             <Bell className="h-4 w-4" />
                             <span className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-[#E24B4A]" />
                         </button>
-                        <div className="flex items-center gap-2 rounded-full border border-[#E6EAF2] bg-white py-1 pl-3 pr-1">
+                        <Link
+                            href={route('profile.edit')}
+                            className="flex items-center gap-2 rounded-full border border-[#E6EAF2] bg-white py-1 pl-3 pr-1 hover:border-[#147A72] transition-colors cursor-pointer"
+                        >
                             <div className="hidden text-right sm:block">
                                 <p className="text-[12px] font-semibold leading-tight">{auth.user.name}</p>
                                 <p className="text-[10px] text-[#68748A]">Warga RT 01</p>
@@ -157,7 +160,7 @@ export default function WargaLayout({ children, topBarLabel = 'Lingkungan RT 01 
                             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#147A72] text-xs font-bold text-white">
                                 {auth.user.name?.charAt(0) ?? 'W'}
                             </div>
-                        </div>
+                        </Link>
                     </div>
                 </header>
 

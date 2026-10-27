@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Head, Link, useForm } from '@inertiajs/react';
+import AdminLayout from '@/Layouts/AdminLayout';
 import { 
   Home, 
   Users, 
@@ -150,181 +151,19 @@ export default function WargaCreate({ auth }) {
   };
 
   return (
-    <>
+    <AdminLayout
+      title="Data Warga & Kependudukan"
+      description="Kelola basis data penduduk, verifikasi domisili, dan kepemilikan rumah RT 01/08."
+      breadcrumbs={[
+        { label: 'Layanan Administrasi', href: route('admin.dashboard') },
+        { label: 'Data Warga', href: route('admin.warga.index') },
+        { label: 'Tambah Data Warga' },
+      ]}
+    >
       <Head title="Tambah Data Warga Baru - SIA RT 01/08 Sukatani" />
 
-      <div className="min-h-screen bg-[#F6F8FB] font-sans antialiased text-[#1A253C] flex relative">
-        {/* ================= SIDEBAR TEAL GELAP (#287971) ================= */}
-        <aside className="w-[260px] bg-[#287971] text-white flex flex-col justify-between fixed inset-y-0 left-0 z-30 select-none shadow-sm">
-          <div className="p-6">
-            {/* Header Brand */}
-            <div className="mb-8">
-              <h1 className="font-bold text-lg text-white font-heading tracking-tight leading-snug">
-                SIA Sukatani
-              </h1>
-              <p className="text-[11px] text-[#A7D7D0] mt-0.5">
-                Administrasi Rukun Tetangga
-              </p>
-            </div>
-
-            {/* Menu Navigasi */}
-            <div className="space-y-6">
-              <div className="space-y-1">
-                <span className="block px-3 text-[10px] font-bold tracking-widest uppercase text-[#96C7C0] mb-2">
-                  MENU UTAMA
-                </span>
-
-                {/* Beranda */}
-                <Link
-                  href={route('admin.dashboard')}
-                  className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[#D0EBE7] hover:bg-[#206760] hover:text-white text-xs font-medium transition-colors"
-                >
-                  <Home className="w-4 h-4 text-[#A7D7D0]" />
-                  <span>Beranda</span>
-                </Link>
-
-                {/* Data Warga (ACTIVE) */}
-                <Link
-                  href={route('admin.warga.index')}
-                  className="flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-[#1C5F57] text-white text-xs font-semibold shadow-inner"
-                >
-                  <div className="flex items-center gap-3">
-                    <Users className="w-4 h-4 text-[#89F5E7]" />
-                    <span>Data Warga</span>
-                  </div>
-                  <ChevronRight className="w-3.5 h-3.5 text-[#89F5E7]" />
-                </Link>
-
-                {/* Pindah / Datang */}
-                <Link
-                  href={route('admin.pindah-datang.index')}
-                  className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[#D0EBE7] hover:bg-[#206760] hover:text-white text-xs font-medium transition-colors"
-                >
-                  <ArrowLeftRight className="w-4 h-4 text-[#A7D7D0]" />
-                  <span>Pindah / Datang</span>
-                </Link>
-
-                {/* Pengajuan Surat dengan Badge Oranye 2 */}
-                <Link
-                  href={route('admin.surat.index')}
-                  className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-[#D0EBE7] hover:bg-[#206760] hover:text-white text-xs font-medium transition-colors"
-                >
-                  <div className="flex items-center gap-3">
-                    <FileText className="w-4 h-4 text-[#A7D7D0]" />
-                    <span>Pengajuan Surat</span>
-                  </div>
-                  <span className="w-5 h-5 rounded-full bg-[#E58917] text-white flex items-center justify-center font-bold text-[10px]">
-                    2
-                  </span>
-                </Link>
-
-                {/* Audit Trail */}
-                <a
-                  href="#audit-trail"
-                  className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[#D0EBE7] hover:bg-[#206760] hover:text-white text-xs font-medium transition-colors"
-                >
-                  <ShieldCheck className="w-4 h-4 text-[#A7D7D0]" />
-                  <span>Audit Trail</span>
-                </a>
-
-                {/* Pengguna & Role */}
-                <Link
-                  href={route('admin.users.index')}
-                  className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[#D0EBE7] hover:bg-[#206760] hover:text-white text-xs font-medium transition-colors"
-                >
-                  <UserCog className="w-4 h-4 text-[#A7D7D0]" />
-                  <span>Pengguna & Role</span>
-                </Link>
-              </div>
-            </div>
-          </div>
-
-          {/* Footer Sidebar: Keamanan data & Tombol Keluar */}
-          <div className="p-6 border-t border-[#318B82] space-y-4">
-            <div className="p-3 rounded-xl bg-[#206760] border border-[#35968C]/40 text-xs">
-              <div className="flex items-center gap-2 text-white font-semibold mb-1">
-                <ShieldCheck className="w-4 h-4 text-[#89F5E7]" />
-                <span>Keamanan data</span>
-              </div>
-              <p className="text-[11px] text-[#A7D7D0] leading-relaxed">
-                Akses mengikuti matriks RBAC backend RT 01.
-              </p>
-            </div>
-
-            <Link
-              href={route('logout')}
-              method="post"
-              as="button"
-              className="w-full flex items-center gap-2.5 text-[#D0EBE7] hover:text-white text-xs font-medium transition-colors py-1 cursor-pointer"
-            >
-              <LogOut className="w-4 h-4" />
-              <span>Keluar</span>
-            </Link>
-          </div>
-        </aside>
-
-        {/* ================= AREA KONTEN DASHBOARD UTAMA ================= */}
-        <div className="flex-1 pl-[260px] flex flex-col min-w-0">
-          {/* Header Bar */}
-          <header className="h-[72px] bg-white border-b border-[#EAEFF5] px-10 flex items-center justify-between sticky top-0 z-20">
-            <div className="flex items-center gap-3">
-              <span className="text-[11px] font-bold tracking-wider uppercase text-[#0E8F84]">
-                SIA RT 01/08 Sukatani
-              </span>
-              <span className="text-[#A0AEC0]">•</span>
-              <span className="text-xs text-[#718096] font-medium">Kecamatan Tapos, Kota Depok</span>
-            </div>
-
-            <div className="flex items-center gap-3 cursor-pointer py-1.5 px-2 rounded-xl hover:bg-slate-50 transition-colors">
-              <div className="w-9 h-9 rounded-full bg-[#EAF0FC] text-[#2F65CB] flex items-center justify-center font-bold text-xs">
-                BS
-              </div>
-              <div className="text-left">
-                <h4 className="text-xs font-bold text-[#1A253C] leading-none">Budi Santoso</h4>
-                <p className="text-[10px] text-[#718096] mt-0.5">Ketua RT 01/08</p>
-              </div>
-              <ChevronRight className="w-3.5 h-3.5 text-[#A0AEC0] ml-1" />
-            </div>
-          </header>
-
-          {/* Latar Belakang Dashboard (Dengan efek blur/backdrop context) */}
-          <main className="p-10 space-y-6 max-w-[1240px] w-full opacity-30 pointer-events-none filter blur-[1px]">
-            <div className="flex items-end justify-between">
-              <div>
-                <span className="text-[11px] font-bold tracking-wider uppercase text-[#0d9488]">
-                  RABU, 18 JUNI 2025
-                </span>
-                <h2 className="text-[26px] font-bold text-[#1A253C] font-heading tracking-tight leading-tight">
-                  Data Warga & Kependudukan
-                </h2>
-              </div>
-              <button className="px-4 py-2.5 rounded-xl bg-[#0F685D] text-white text-xs font-semibold">
-                + Tambah data warga
-              </button>
-            </div>
-            <div className="grid grid-cols-4 gap-4">
-              <div className="bg-white p-5 rounded-2xl border border-[#E9EFF6] shadow-sm">
-                <p className="text-[11px] font-bold text-[#718096] uppercase">Total Warga</p>
-                <p className="text-2xl font-bold text-[#1A253C] mt-1">248</p>
-              </div>
-              <div className="bg-white p-5 rounded-2xl border border-[#E9EFF6] shadow-sm">
-                <p className="text-[11px] font-bold text-[#718096] uppercase">Surat Diajukan</p>
-                <p className="text-2xl font-bold text-[#1A253C] mt-1">02</p>
-              </div>
-              <div className="bg-white p-5 rounded-2xl border border-[#E9EFF6] shadow-sm">
-                <p className="text-[11px] font-bold text-[#718096] uppercase">Laporan Hunian</p>
-                <p className="text-2xl font-bold text-[#1A253C] mt-1">03</p>
-              </div>
-              <div className="bg-white p-5 rounded-2xl border border-[#E9EFF6] shadow-sm">
-                <p className="text-[11px] font-bold text-[#718096] uppercase">Surat Selesai</p>
-                <p className="text-2xl font-bold text-[#1A253C] mt-1">18</p>
-              </div>
-            </div>
-          </main>
-        </div>
-
-        {/* ================= MODAL DIALOG CONTAINER SLICING DARI CODE.HTML ================= */}
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 overflow-y-auto bg-[#022448]/40 backdrop-blur-sm transition-all duration-200">
+      {/* ================= MODAL DIALOG CONTAINER SLICING DARI CODE.HTML ================= */}
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 overflow-y-auto bg-[#022448]/40 backdrop-blur-sm transition-all duration-200">
           <div className="relative w-full max-w-4xl bg-white rounded-2xl shadow-2xl border border-[#E2E8F0] flex flex-col max-h-[92vh] overflow-hidden my-auto animate-in fade-in zoom-in-95 duration-200">
             {/* Modal Header */}
             <div className="px-6 py-5 border-b border-[#EAEFF5] bg-[#F8FAFC] flex items-start justify-between shrink-0">
@@ -1062,7 +901,6 @@ export default function WargaCreate({ auth }) {
             </form>
           </div>
         </div>
-      </div>
-    </>
+    </AdminLayout>
   );
 }

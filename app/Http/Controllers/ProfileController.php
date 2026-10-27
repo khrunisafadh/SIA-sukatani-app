@@ -18,9 +18,22 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): Response
     {
+        $user = $request->user();
+        $user->load('warga');
+
         return Inertia::render('Profile/Edit', [
-            'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
+            'mustVerifyEmail' => $user instanceof MustVerifyEmail,
             'status' => session('status'),
+            'profile' => [
+                'name' => $user->name,
+                'email' => $user->email,
+                'username' => $user->username,
+                'role' => $user->role,
+                'role_label' => $user->roleLabel(),
+                'phone' => $user->warga?->no_wa ?? '0812 3456 7890',
+                'address' => $user->warga?->alamat_lengkap ?? ($user->warga ? trim(($user->warga->nama_jalan ?? '') . ' ' . ($user->warga->nomor_rumah ?? '')) : 'Jl. Sukatani Raya No. 18'),
+                'nik' => $user->warga?->masked_nik ?? '3276••••••••0182',
+            ],
         ]);
     }
 
@@ -29,15 +42,23 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        $user = $request->user();
+        $user->fill($request->safe()->only(['name', 'email']));
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+        if ($user->isDirty('email')) {
+            $user->email_verified_at = null;
         }
 
-        $request->user()->save();
+        $user->save();
 
-        return Redirect::route('profile.edit');
+        if ($user->warga && ($request->filled('phone') || $request->filled('address'))) {
+            $user->warga->update([
+                'no_wa' => $request->input('phone') ?? $user->warga->no_wa,
+                'alamat_lengkap' => $request->input('address') ?? $user->warga->alamat_lengkap,
+            ]);
+        }
+
+        return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }
 
     /**

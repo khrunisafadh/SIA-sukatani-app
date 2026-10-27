@@ -23,6 +23,13 @@ import {
 export default function AdminDashboard({ auth, stats: propStats, recentLetters: propRecentLetters, recentHistories: propRecentHistories }) {
   const [selectedLetter, setSelectedLetter] = useState(null);
 
+  const todayDateFormatted = new Date().toLocaleDateString('id-ID', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  }).toUpperCase();
+
   // Close drawer on Escape key
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -221,9 +228,11 @@ export default function AdminDashboard({ auth, stats: propStats, recentLetters: 
                     <FileText className="w-4 h-4 text-[#A7D7D0]" />
                     <span>Pengajuan Surat</span>
                   </div>
-                  <span className="w-5 h-5 rounded-full bg-[#E58917] text-white flex items-center justify-center font-bold text-[10px]">
-                    2
-                  </span>
+                  {(auth?.pending_letters_count ?? 0) > 0 && (
+                    <span className="w-5 h-5 rounded-full bg-[#E58917] text-white flex items-center justify-center font-bold text-[10px]">
+                      {auth.pending_letters_count}
+                    </span>
+                  )}
                 </Link>
 
                 {/* Audit Trail */}
@@ -285,16 +294,23 @@ export default function AdminDashboard({ auth, stats: propStats, recentLetters: 
               <span className="text-xs text-[#718096] font-medium">Kecamatan Tapos, Kota Depok</span>
             </div>
 
-            <div className="flex items-center gap-3 cursor-pointer py-1.5 px-2 rounded-xl hover:bg-slate-50 transition-colors">
+            <Link
+              href={route('profile.edit')}
+              className="flex items-center gap-3 cursor-pointer py-1.5 px-2 rounded-xl hover:bg-slate-50 transition-colors"
+            >
               <div className="w-9 h-9 rounded-full bg-[#EAF0FC] text-[#2F65CB] flex items-center justify-center font-bold text-xs">
-                BS
+                {auth?.user?.name ? (auth.user.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()) : 'BS'}
               </div>
               <div className="text-left">
-                <h4 className="text-xs font-bold text-[#1A253C] leading-none">Budi Santoso</h4>
-                <p className="text-[10px] text-[#718096] mt-0.5">Ketua RT 01/08</p>
+                <h4 className="text-xs font-bold text-[#1A253C] leading-none">
+                  {auth?.user?.name || 'Budi Santoso'}
+                </h4>
+                <p className="text-[10px] text-[#718096] mt-0.5">
+                  {auth?.user?.role_label || 'Ketua RT 01/08'}
+                </p>
               </div>
               <ChevronRight className="w-3.5 h-3.5 text-[#A0AEC0] ml-1" />
-            </div>
+            </Link>
           </header>
 
           {/* Konten Halaman */}
@@ -303,10 +319,10 @@ export default function AdminDashboard({ auth, stats: propStats, recentLetters: 
             <div className="flex items-end justify-between">
               <div className="space-y-1">
                 <span className="text-[11px] font-bold tracking-wider uppercase text-[#2F65CB]">
-                  RABU, 18 JUNI 2025
+                  {todayDateFormatted}
                 </span>
                 <h2 className="text-[26px] font-bold text-[#1A253C] font-heading tracking-tight leading-tight">
-                  Selamat datang, Pak Budi
+                  Selamat datang, {auth?.user?.name || 'Pak Budi'}
                 </h2>
                 <p className="text-xs text-[#718096]">
                   Berikut ringkasan administrasi RT 01/08 hari ini.

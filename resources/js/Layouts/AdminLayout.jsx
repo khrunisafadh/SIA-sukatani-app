@@ -121,9 +121,11 @@ export default function AdminLayout({ title, description, breadcrumbs = [], acti
                     <FileText className="w-4 h-4 text-[#A7D7D0]" />
                     <span>Pengajuan Surat</span>
                   </div>
-                  <span className="w-5 h-5 rounded-full bg-[#E58917] text-white flex items-center justify-center font-bold text-[10px]">
-                    2
-                  </span>
+                  {(auth?.pending_letters_count ?? 0) > 0 && (
+                    <span className="w-5 h-5 rounded-full bg-[#E58917] text-white flex items-center justify-center font-bold text-[10px]">
+                      {auth.pending_letters_count}
+                    </span>
+                  )}
                 </Link>
               )}
 
@@ -194,7 +196,10 @@ export default function AdminLayout({ title, description, breadcrumbs = [], acti
             <span className="text-xs text-[#718096] font-medium">Kecamatan Tapos, Kota Depok</span>
           </div>
 
-          <div className="flex items-center gap-3 cursor-pointer py-1.5 px-2 rounded-xl hover:bg-slate-50 transition-colors">
+          <Link
+            href={route('profile.edit')}
+            className="flex items-center gap-3 cursor-pointer py-1.5 px-2 rounded-xl hover:bg-slate-50 transition-colors"
+          >
             <div className="w-9 h-9 rounded-full bg-[#EAF0FC] text-[#2F65CB] flex items-center justify-center font-bold text-xs">
               {getInitials(user?.name)}
             </div>
@@ -203,11 +208,11 @@ export default function AdminLayout({ title, description, breadcrumbs = [], acti
                 {user?.name || 'Budi Santoso'}
               </h4>
               <p className="text-[10px] text-[#718096] mt-0.5">
-                {user?.role_label || 'Ketua RT 01/08'}
+                {user?.role_label || 'Ketua RT (Admin)'}
               </p>
             </div>
             <ChevronRight className="w-3.5 h-3.5 text-[#A0AEC0] ml-1" />
-          </div>
+          </Link>
         </header>
 
         {/* Main Content Workspace */}

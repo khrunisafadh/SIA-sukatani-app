@@ -39,6 +39,11 @@ class User extends Authenticatable
         return $this->hasMany(PengajuanSurat::class, 'created_by');
     }
 
+    public function warga(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(Warga::class, 'user_id');
+    }
+
     public function isKetuaRt(): bool
     {
         return $this->role === Roles::KETUA_RT;
