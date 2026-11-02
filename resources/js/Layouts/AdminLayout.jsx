@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import AppToast from '@/Components/AppToast';
 import { Link, usePage, router } from '@inertiajs/react';
 import {
@@ -10,6 +10,8 @@ import {
     UserCog,
     LogOut,
     ChevronRight,
+    Menu,
+    X,
 } from 'lucide-react';
 
 export default function AdminLayout({
@@ -21,6 +23,7 @@ export default function AdminLayout({
 }) {
     const { auth } = usePage().props;
     const user = auth?.user;
+    const [mobileOpen, setMobileOpen] = useState(false);
 
     const isAdmin = user?.role === 'ketua_rt';
     const canLetters =
@@ -57,16 +60,36 @@ export default function AdminLayout({
         <div className="min-h-screen bg-[#F4F7FA] font-sans antialiased text-[#1A253C]">
             <AppToast />
 
+            {/* Mobile Sidebar Backdrop */}
+            {mobileOpen && (
+                <div
+                    className="fixed inset-0 z-40 bg-black/50 backdrop-blur-xs lg:hidden"
+                    onClick={() => setMobileOpen(false)}
+                />
+            )}
+
             {/* Sidebar */}
-            <aside className="fixed inset-y-0 left-0 z-30 flex w-[260px] flex-col justify-between bg-[#287971] text-white shadow-sm">
+            <aside className={`fixed inset-y-0 left-0 z-50 flex w-[260px] flex-col justify-between bg-[#287971] text-white shadow-lg transition-transform duration-200 ease-in-out lg:z-30 lg:translate-x-0 ${
+                mobileOpen ? 'translate-x-0' : '-translate-x-full'
+            }`}>
                 <div className="overflow-y-auto p-6">
-                    <div className="mb-8">
-                        <h1 className="font-heading text-lg font-bold leading-snug tracking-tight">
-                            SIA Sukatani
-                        </h1>
-                        <p className="mt-1 text-[11px] text-[#A7D7D0]">
-                            Administrasi Rukun Tetangga
-                        </p>
+                    <div className="mb-8 flex items-center justify-between">
+                        <div>
+                            <h1 className="font-heading text-lg font-bold leading-snug tracking-tight">
+                                SIA Sukatani
+                            </h1>
+                            <p className="mt-1 text-[11px] text-[#A7D7D0]">
+                                Administrasi Rukun Tetangga
+                            </p>
+                        </div>
+                        <button
+                            type="button"
+                            onClick={() => setMobileOpen(false)}
+                            className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/10 text-white hover:bg-white/20 lg:hidden cursor-pointer"
+                            aria-label="Tutup navigasi"
+                        >
+                            <X className="h-4 w-4" />
+                        </button>
                     </div>
 
                     <nav aria-label="Navigasi admin" className="space-y-6">
@@ -218,16 +241,26 @@ export default function AdminLayout({
             </aside>
 
             {/* Main content */}
-            <div className="ml-[260px] flex min-h-screen min-w-0 flex-col">
+            <div className="flex min-h-screen min-w-0 flex-col lg:ml-[260px]">
                 {/* Topbar */}
-                <header className="sticky top-0 z-20 flex min-h-[72px] items-center justify-between gap-4 border-b border-[#E2E8F0] bg-white px-6 lg:px-10">
-                    <div className="min-w-0">
-                        <p className="text-[11px] font-bold uppercase tracking-wider text-[#0E8F84]">
-                            SIA RT 01/08 Sukatani
-                        </p>
-                        <p className="mt-1 text-xs text-[#718096]">
-                            Kecamatan Tapos, Kota Depok
-                        </p>
+                <header className="sticky top-0 z-20 flex min-h-[72px] items-center justify-between gap-4 border-b border-[#E2E8F0] bg-white px-4 sm:px-6 lg:px-10">
+                    <div className="flex items-center gap-3 min-w-0">
+                        <button
+                            type="button"
+                            onClick={() => setMobileOpen(true)}
+                            className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#E2E8F0] bg-white text-[#1A253C] hover:bg-slate-50 lg:hidden cursor-pointer shrink-0"
+                            aria-label="Buka menu navigasi"
+                        >
+                            <Menu className="h-5 w-5 text-[#287971]" />
+                        </button>
+                        <div className="min-w-0">
+                            <p className="text-[11px] font-bold uppercase tracking-wider text-[#0E8F84]">
+                                SIA RT 01/08 Sukatani
+                            </p>
+                            <p className="mt-0.5 text-xs text-[#718096] truncate">
+                                Kecamatan Tapos, Kota Depok
+                            </p>
+                        </div>
                     </div>
 
                     <Link

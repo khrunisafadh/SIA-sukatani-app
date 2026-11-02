@@ -15,6 +15,7 @@ import {
   Clock,
   ArrowRight,
   X,
+  Menu,
   IdCard,
   Contact,
   HelpCircle
@@ -22,6 +23,7 @@ import {
 
 export default function AdminDashboard({ auth, stats: propStats, recentLetters: propRecentLetters, recentHistories: propRecentHistories }) {
   const [selectedLetter, setSelectedLetter] = useState(null);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   const todayDateFormatted = new Date().toLocaleDateString('id-ID', {
     weekday: 'long',
@@ -172,17 +174,37 @@ export default function AdminDashboard({ auth, stats: propStats, recentLetters: 
       <Head title="Dashboard - SIA Sukatani" />
 
       <div className="min-h-screen bg-[#F6F8FB] font-sans antialiased text-[#1A253C] flex">
+        {/* Mobile Backdrop */}
+        {mobileOpen && (
+          <div
+            className="fixed inset-0 z-40 bg-black/50 backdrop-blur-xs lg:hidden"
+            onClick={() => setMobileOpen(false)}
+          />
+        )}
+
         {/* ================= SIDEBAR TEAL GELAP (#287971) ================= */}
-        <aside className="w-[260px] bg-[#287971] text-white flex flex-col justify-between fixed inset-y-0 left-0 z-30 select-none shadow-sm">
+        <aside className={`w-[260px] bg-[#287971] text-white flex flex-col justify-between fixed inset-y-0 left-0 z-50 select-none shadow-lg transition-transform duration-200 ease-in-out lg:z-30 lg:translate-x-0 ${
+          mobileOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}>
           <div className="p-6">
             {/* Header Brand */}
-            <div className="mb-8">
-              <h1 className="font-bold text-lg text-white font-heading tracking-tight leading-snug">
-                SIA Sukatani
-              </h1>
-              <p className="text-[11px] text-[#A7D7D0] mt-0.5">
-                Administrasi Rukun Tetangga
-              </p>
+            <div className="mb-8 flex items-center justify-between">
+              <div>
+                <h1 className="font-bold text-lg text-white font-heading tracking-tight leading-snug">
+                  SIA Sukatani
+                </h1>
+                <p className="text-[11px] text-[#A7D7D0] mt-0.5">
+                  Administrasi Rukun Tetangga
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setMobileOpen(false)}
+                className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/10 text-white hover:bg-white/20 lg:hidden cursor-pointer"
+                aria-label="Tutup navigasi"
+              >
+                <X className="h-4 w-4" />
+              </button>
             </div>
 
             {/* Menu Navigasi */}
@@ -283,25 +305,35 @@ export default function AdminDashboard({ auth, stats: propStats, recentLetters: 
         </aside>
 
         {/* ================= MAIN CONTENT AREA ================= */}
-        <div className="flex-1 pl-[260px] flex flex-col min-w-0">
+        <div className="flex-1 flex flex-col min-w-0 lg:pl-[260px]">
           {/* Header Bar */}
-          <header className="h-[72px] bg-white border-b border-[#EAEFF5] px-10 flex items-center justify-between sticky top-0 z-20">
-            <div className="flex items-center gap-3">
-              <span className="text-[11px] font-bold tracking-wider uppercase text-[#0E8F84]">
-                SIA RT 01/08 Sukatani
-              </span>
-              <span className="text-[#A0AEC0]">•</span>
-              <span className="text-xs text-[#718096] font-medium">Kecamatan Tapos, Kota Depok</span>
+          <header className="h-[72px] bg-white border-b border-[#EAEFF5] px-4 sm:px-6 lg:px-10 flex items-center justify-between sticky top-0 z-20 gap-4">
+            <div className="flex items-center gap-3 min-w-0">
+              <button
+                type="button"
+                onClick={() => setMobileOpen(true)}
+                className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#E2E8F0] bg-white text-[#1A253C] hover:bg-slate-50 lg:hidden cursor-pointer shrink-0"
+                aria-label="Buka menu navigasi"
+              >
+                <Menu className="h-5 w-5 text-[#287971]" />
+              </button>
+              <div className="min-w-0">
+                <span className="text-[11px] font-bold tracking-wider uppercase text-[#0E8F84]">
+                  SIA RT 01/08 Sukatani
+                </span>
+                <span className="text-[#A0AEC0] hidden sm:inline mx-2">•</span>
+                <span className="text-xs text-[#718096] font-medium hidden sm:inline truncate">Kecamatan Tapos, Kota Depok</span>
+              </div>
             </div>
 
             <Link
               href={route('profile.edit')}
-              className="flex items-center gap-3 cursor-pointer py-1.5 px-2 rounded-xl hover:bg-slate-50 transition-colors"
+              className="flex items-center gap-3 cursor-pointer py-1.5 px-2 rounded-xl hover:bg-slate-50 transition-colors shrink-0"
             >
               <div className="w-9 h-9 rounded-full bg-[#EAF0FC] text-[#2F65CB] flex items-center justify-center font-bold text-xs">
                 {auth?.user?.name ? (auth.user.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()) : 'BS'}
               </div>
-              <div className="text-left">
+              <div className="text-left hidden sm:block">
                 <h4 className="text-xs font-bold text-[#1A253C] leading-none">
                   {auth?.user?.name || 'Budi Santoso'}
                 </h4>
@@ -314,14 +346,14 @@ export default function AdminDashboard({ auth, stats: propStats, recentLetters: 
           </header>
 
           {/* Konten Halaman */}
-          <main className="p-10 space-y-6 max-w-[1240px] w-full">
+          <main className="p-4 sm:p-6 lg:p-10 space-y-6 max-w-[1240px] w-full">
             {/* Greeting Header & Tombol Tambah Data Warga */}
-            <div className="flex items-end justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
               <div className="space-y-1">
                 <span className="text-[11px] font-bold tracking-wider uppercase text-[#2F65CB]">
                   {todayDateFormatted}
                 </span>
-                <h2 className="text-[26px] font-bold text-[#1A253C] font-heading tracking-tight leading-tight">
+                <h2 className="text-xl sm:text-[26px] font-bold text-[#1A253C] font-heading tracking-tight leading-tight">
                   Selamat datang, {auth?.user?.name || 'Pak Budi'}
                 </h2>
                 <p className="text-xs text-[#718096]">
@@ -332,7 +364,7 @@ export default function AdminDashboard({ auth, stats: propStats, recentLetters: 
               {/* Tombol Hijau Gelap: + Tambah data warga */}
               <Link
                 href={route('admin.warga.create')}
-                className="btn-admin-primary"
+                className="btn-admin-primary self-start sm:self-auto"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>Tambah data warga</span>
@@ -340,7 +372,7 @@ export default function AdminDashboard({ auth, stats: propStats, recentLetters: 
             </div>
 
             {/* 4 Stat Cards Row */}
-            <div className="grid grid-cols-4 gap-4 pt-1">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4 pt-1">
               {stats.map((stat, i) => {
                 const IconComp = stat.icon;
                 return (
@@ -456,31 +488,31 @@ export default function AdminDashboard({ auth, stats: propStats, recentLetters: 
                   <div
                     key={item.id || idx}
                     onClick={() => setSelectedLetter(item)}
-                    className="p-4 rounded-xl border border-[#F0F4F8] hover:border-[#0F685D]/30 hover:bg-[#F9FBFC] transition-all flex items-center justify-between gap-4 cursor-pointer group"
+                    className="p-3.5 sm:p-4 rounded-xl border border-[#F0F4F8] hover:border-[#0F685D]/30 hover:bg-[#F9FBFC] transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 cursor-pointer group"
                     title="Klik untuk melihat detail pengajuan"
                   >
                     {/* Sisi Kiri: Ikon Biru & Nama + ID Surat */}
-                    <div className="flex items-center gap-3.5 w-1/3">
+                    <div className="flex items-center gap-3.5 sm:w-1/3 min-w-0">
                       <div className="w-9 h-9 rounded-xl bg-[#EBF2FF] text-[#2F65CB] group-hover:bg-[#E6F6F4] group-hover:text-[#0F685D] transition-colors flex items-center justify-center flex-shrink-0">
                         <FileText className="w-4 h-4" />
                       </div>
-                      <div>
-                        <h4 className="text-xs font-bold text-[#1A253C] group-hover:text-[#0F685D] transition-colors">
+                      <div className="min-w-0">
+                        <h4 className="text-xs font-bold text-[#1A253C] group-hover:text-[#0F685D] transition-colors truncate">
                           {item.pemohon_name || item.name}
                         </h4>
-                        <p className="text-[10px] text-[#718096] mt-0.5">
+                        <p className="text-[10px] text-[#718096] mt-0.5 truncate">
                           {item.nomor || item.id} • {item.date}
                         </p>
                       </div>
                     </div>
 
                     {/* Sisi Tengah: Jenis Surat */}
-                    <div className="text-xs text-[#4A5568] w-1/3 text-left">
+                    <div className="text-xs text-[#4A5568] sm:w-1/3 text-left">
                       {item.jenis_label || item.type}
                     </div>
 
                     {/* Sisi Kanan: Badge Status Pill & Chevron */}
-                    <div className="flex items-center justify-end gap-3 w-1/3">
+                    <div className="flex items-center justify-between sm:justify-end gap-3 sm:w-1/3">
                       <span className={`px-3 py-1 rounded-full text-[10px] font-semibold ${item.status_class || item.statusClass}`}>
                         {item.status_label || item.status}
                       </span>

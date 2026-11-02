@@ -6,6 +6,7 @@ import {
   Users, 
   Coins, 
   User, 
+  ShieldCheck,
   Lock, 
   Eye, 
   EyeOff, 
@@ -95,7 +96,7 @@ export default function Login({ status }) {
         </div>
 
         {/* ================= RIGHT PANEL: Form Login (55%) ================= */}
-        <div className="flex-1 flex flex-col justify-center items-center px-6 sm:px-10 lg:px-12 xl:px-16 py-12">
+        <div className="flex-1 flex flex-col justify-center items-center px-4 sm:px-10 lg:px-12 xl:px-16 py-8 sm:py-12">
           {/* Mobile Branding Indicator */}
           <div className="lg:hidden text-center space-y-1 mb-6">
             <span className="font-extrabold text-xl text-[#10264F] font-heading">
@@ -106,7 +107,7 @@ export default function Login({ status }) {
             </p>
           </div>
 
-          <div className="w-full max-w-[420px] bg-white p-7 sm:p-9 rounded-2xl border border-[#E2E8F0] shadow-sm space-y-6">
+          <div className="w-full max-w-[420px] bg-white p-5 sm:p-8 rounded-2xl border border-[#E2E8F0] shadow-sm space-y-6">
             {/* Header Form */}
             <div className="space-y-1.5">
               <span className="text-[11px] font-bold tracking-widest uppercase text-[#006B61] font-heading">
@@ -139,39 +140,42 @@ export default function Login({ status }) {
                   onClick={() => {
                     setData((prev) => ({ ...prev, login: 'bendahara.rt01', password: 'password123' }));
                   }}
-                  className={`py-1.5 px-2 rounded-lg font-semibold border text-center transition-all ${
+                  className={`py-1.5 px-2 rounded-lg font-semibold border text-center transition-all flex items-center justify-center gap-1 ${
                     data.login === 'bendahara.rt01'
                       ? 'border-[#006B61] bg-[#006B61] text-white shadow-sm'
                       : 'border-[#CBD5E1] bg-white text-[#10264F] hover:bg-slate-50'
                   }`}
                 >
-                  💰 Bendahara
+                  <Coins className="w-3.5 h-3.5 shrink-0" />
+                  <span>Bendahara</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => {
                     setData((prev) => ({ ...prev, login: 'ketua.rt01', password: 'password123' }));
                   }}
-                  className={`py-1.5 px-2 rounded-lg font-semibold border text-center transition-all ${
+                  className={`py-1.5 px-2 rounded-lg font-semibold border text-center transition-all flex items-center justify-center gap-1 ${
                     data.login === 'ketua.rt01'
                       ? 'border-[#006B61] bg-[#006B61] text-white shadow-sm'
                       : 'border-[#CBD5E1] bg-white text-[#10264F] hover:bg-slate-50'
                   }`}
                 >
-                  👑 Ketua RT
+                  <ShieldCheck className="w-3.5 h-3.5 shrink-0" />
+                  <span>Ketua RT</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => {
                     setData((prev) => ({ ...prev, login: 'rizky.pratama', password: 'password123' }));
                   }}
-                  className={`py-1.5 px-2 rounded-lg font-semibold border text-center transition-all ${
+                  className={`py-1.5 px-2 rounded-lg font-semibold border text-center transition-all flex items-center justify-center gap-1 ${
                     data.login === 'rizky.pratama'
                       ? 'border-[#006B61] bg-[#006B61] text-white shadow-sm'
                       : 'border-[#CBD5E1] bg-white text-[#10264F] hover:bg-slate-50'
                   }`}
                 >
-                  👤 Warga
+                  <User className="w-3.5 h-3.5 shrink-0" />
+                  <span>Warga</span>
                 </button>
               </div>
             </div>
