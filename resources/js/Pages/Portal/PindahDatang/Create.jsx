@@ -80,12 +80,14 @@ export default function PindahDatangCreate({ units = [], defaultWarga = null }) 
 
     const validate = () => {
         const next = {};
-        if (!form.nama.trim()) next.nama = 'Nama lengkap wajib diisi.';
-        if (!/^\d{16}$/.test(form.nik)) next.nik = 'NIK harus 16 digit.';
-        if (!/^\d{16}$/.test(form.kk)) next.kk = 'Nomor KK harus 16 digit.';
+        if (!form.nama || !form.nama.trim()) next.nama = 'Nama lengkap wajib diisi.';
+        const cleanNik = (form.nik || '').replace(/\s+/g, '');
+        const cleanKk = (form.kk || '').replace(/\s+/g, '');
+        if (!/^\d{16}$/.test(cleanNik)) next.nik = 'NIK harus 16 digit angka.';
+        if (!/^\d{16}$/.test(cleanKk)) next.kk = 'Nomor KK harus 16 digit angka.';
         if (!form.tanggal) next.tanggal = 'Tanggal rencana wajib diisi.';
-        if (!form.alamatAsal.trim()) next.alamatAsal = 'Alamat asal wajib diisi.';
-        if (!form.unit.trim()) next.unit = 'Pilih atau isi unit rumah.';
+        if (!form.alamatAsal || !form.alamatAsal.trim()) next.alamatAsal = 'Alamat asal wajib diisi.';
+        if (!form.unit || !form.unit.trim()) next.unit = 'Pilih atau isi unit rumah.';
         if (!form.statusTinggal) next.statusTinggal = 'Pilih status tempat tinggal.';
         if (files.length < 1) next.files = 'Unggah berkas dokumen persyaratan (minimal KTP & Kartu Keluarga).';
         setErrors(next);
@@ -108,23 +110,19 @@ export default function PindahDatangCreate({ units = [], defaultWarga = null }) 
 
         setSubmitting(true);
 
-        const formData = new FormData();
-        formData.append('jenis', jenis);
-        formData.append('nama', form.nama);
-        formData.append('nik', form.nik);
-        formData.append('kk', form.kk);
-        formData.append('tanggal', form.tanggal);
-        formData.append('alamatAsal', form.alamatAsal);
-        formData.append('unit', form.unit);
-        formData.append('statusTinggal', form.statusTinggal);
+        const payload = {
+            jenis,
+            nama: form.nama,
+            nik: (form.nik || '').replace(/\s+/g, ''),
+            kk: (form.kk || '').replace(/\s+/g, ''),
+            tanggal: form.tanggal,
+            alamatAsal: form.alamatAsal,
+            unit: form.unit,
+            statusTinggal: form.statusTinggal,
+            files: files.map((f) => f.raw).filter(Boolean),
+        };
 
-        files.forEach((fileItem) => {
-            if (fileItem.raw) {
-                formData.append('files[]', fileItem.raw);
-            }
-        });
-
-        router.post(route('portal.pindah-datang.store'), formData, {
+        router.post(route('portal.pindah-datang.store'), payload, {
             forceFormData: true,
             onError: (backendErrors) => {
                 setSubmitting(false);
@@ -138,17 +136,39 @@ export default function PindahDatangCreate({ units = [], defaultWarga = null }) 
     };
 
     const onPickFiles = (event) => {
-        const picked = Array.from(event.target.files || []).map((file) => ({
-            id: `${file.name}-${file.lastModified}-${Math.random()}`,
-            name: file.name,
-            sizeLabel: formatBytes(file.size),
-            kind: file.type.includes('pdf') ? 'Dokumen PDF' : 'Berkas Pendukung',
-            type: file.type.includes('pdf') ? 'pdf' : 'image',
-            raw: file,
-        }));
-        setFiles((current) => [...current, ...picked]);
+        const rawFiles = Array.from(event.target.files || []);
+        const validFiles = [];
+        let sizeError = null;
+
+        for (const file of rawFiles) {
+            if (file.size > 10 * 1024 * 1024) {
+                sizeError = `Berkas "${file.name}" melebihi batas maksimal 10 MB.`;
+                continue;
+            }
+            validFiles.push({
+                id: `${file.name}-${file.lastModified}-${Math.random()}`,
+                name: file.name,
+                sizeLabel: formatBytes(file.size),
+                kind: file.type.includes('pdf') ? 'Dokumen PDF' : 'Berkas Pendukung',
+                type: file.type.includes('pdf') ? 'pdf' : 'image',
+                raw: file,
+            });
+        }
+
+        if (sizeError) {
+            setErrors((current) => ({ ...current, files: sizeError }));
+        } else {
+            setErrors((current) => {
+                const next = { ...current };
+                delete next.files;
+                return next;
+            });
+        }
+
+        if (validFiles.length > 0) {
+            setFiles((current) => [...current, ...validFiles]);
+        }
         event.target.value = '';
-        setErrors((current) => ({ ...current, files: undefined }));
     };
 
     return (
@@ -200,6 +220,20 @@ export default function PindahDatangCreate({ units = [], defaultWarga = null }) 
                             Langkah 1 dari 2
                         </span>
                     </div>
+
+                    {Object.keys(errors).length > 0 && (
+                        <div className="mt-4 rounded-xl border border-[#FECDD3] bg-[#FFF1F2] p-4 text-xs text-[#9F1239]">
+                            <div className="flex items-center gap-2 font-bold mb-1">
+                                <AlertTriangle className="h-4 w-4 text-[#E11D48]" />
+                                <span>Mohon periksa data yang belum sesuai:</span>
+                            </div>
+                            <ul className="list-disc list-inside space-y-0.5 text-[11px]">
+                                {Object.entries(errors).map(([field, msg]) => (
+                                    <li key={field}>{msg}</li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
 
                     <div className="mt-5">
                         <label className="text-[12px] font-semibold">

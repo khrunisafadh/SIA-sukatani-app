@@ -58,20 +58,20 @@ class PindahDatangController extends Controller
         $validated = $request->validate([
             'jenis' => ['required', 'string', 'in:datang,pindah'],
             'nama' => ['required', 'string', 'max:255'],
-            'nik' => ['required', 'digits:16'],
-            'kk' => ['required', 'digits:16'],
+            'nik' => ['required', 'string', 'min:16', 'max:25'],
+            'kk' => ['required', 'string', 'min:16', 'max:25'],
             'tanggal' => ['required', 'date'],
             'alamatAsal' => ['required', 'string', 'max:1000'],
             'unit' => ['required', 'string', 'max:255'],
             'statusTinggal' => ['required', 'string', 'max:255'],
             'files' => ['required', 'array', 'min:1'],
-            'files.*' => ['required', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:5120'],
+            'files.*' => ['required', 'file', 'max:10240'],
         ], [
             'nama.required' => 'Nama lengkap pemohon wajib diisi.',
             'nik.required' => 'NIK pemohon wajib diisi.',
-            'nik.digits' => 'NIK harus berjumlah 16 digit angka.',
+            'nik.min' => 'NIK harus minimal 16 digit angka.',
             'kk.required' => 'Nomor Kartu Keluarga (KK) wajib diisi.',
-            'kk.digits' => 'Nomor KK harus berjumlah 16 digit angka.',
+            'kk.min' => 'Nomor KK harus minimal 16 digit angka.',
             'tanggal.required' => 'Tanggal rencana wajib diisi.',
             'alamatAsal.required' => 'Alamat asal lengkap wajib diisi.',
             'unit.required' => 'Unit rumah di RT 01/08 wajib diisi atau dipilih.',
@@ -79,9 +79,12 @@ class PindahDatangController extends Controller
             'files.required' => 'Dokumen pendukung wajib diunggah.',
             'files.min' => 'Unggah berkas dokumen persyaratan (minimal KTP Pemohon & KK).',
             'files.*.file' => 'Berkas yang diunggah tidak valid.',
-            'files.*.mimes' => 'Format berkas dokumen harus JPG, PNG, atau PDF.',
-            'files.*.max' => 'Ukuran berkas maksimal 5 MB per dokumen.',
+            'files.*.uploaded' => 'Berkas gagal diunggah. Pastikan ukuran file tidak melebihi batas upload server (maksimal 10 MB).',
+            'files.*.max' => 'Ukuran berkas maksimal 10 MB per dokumen.',
         ]);
+
+        $cleanNik = preg_replace('/[^0-9]/', '', $validated['nik']) ?: $validated['nik'];
+        $cleanKk = preg_replace('/[^0-9]/', '', $validated['kk']) ?: $validated['kk'];
 
         $user = $request->user();
 
@@ -94,7 +97,7 @@ class PindahDatangController extends Controller
         // Cari kecocokan data warga
         $warga = Warga::query()
             ->where('user_id', $user->id)
-            ->orWhere('nik', $validated['nik'])
+            ->orWhere('nik', $cleanNik)
             ->first();
 
         // Tentukan alamat asal & tujuan sesuai jenis mutasi
@@ -110,6 +113,8 @@ class PindahDatangController extends Controller
 
         $mutasi = DB::transaction(function () use (
             $validated,
+            $cleanNik,
+            $cleanKk,
             $user,
             $warga,
             $unitModel,
@@ -124,9 +129,9 @@ class PindahDatangController extends Controller
                 'warga_id' => $warga?->id,
                 'jenis_mutasi' => $validated['jenis'],
                 'nama_pemohon' => $validated['nama'],
-                'nik_pemohon' => $validated['nik'],
-                'no_kk' => $validated['kk'],
-                'telepon' => $warga?->telepon ?? '081234567890',
+                'nik_pemohon' => $cleanNik,
+                'no_kk' => $cleanKk,
+                'telepon' => $warga?->no_wa ?? ($warga?->telepon ?? '081234567890'),
                 'tanggal_rencana' => $validated['tanggal'],
                 'alamat_asal' => $alamatAsal,
                 'alamat_tujuan' => $alamatTujuan,
