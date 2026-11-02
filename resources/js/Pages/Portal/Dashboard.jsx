@@ -8,7 +8,8 @@ import {
   Check, 
   Users, 
   Clock, 
-  Plus
+  Plus,
+  AlertCircle
 } from 'lucide-react';
 
 export default function PortalDashboard({ auth, warga, recentLetters = [], notifications = [] }) {
@@ -25,53 +26,9 @@ export default function PortalDashboard({ auth, warga, recentLetters = [], notif
     return name.substring(0, 2).toUpperCase();
   };
 
-  // Fallback pengajuan jika belum ada data di database warga
-  const displayLetters = (recentLetters && recentLetters.length > 0) ? recentLetters : [
-    {
-      id: 1,
-      jenis_label: 'Surat Pengantar',
-      nomor: 'SIA-250128-014',
-      tanggal_format: 'Diajukan 20 Januari 2025',
-      status: 'diproses',
-      status_label: 'Diproses'
-    },
-    {
-      id: 2,
-      jenis_label: 'Keterangan Domisili',
-      nomor: 'SIA-250110-002',
-      tanggal_format: 'Diajukan 10 Januari 2025',
-      status: 'terbit',
-      status_label: 'Terbit'
-    }
-  ];
-
-  // Fallback notifikasi aktivitas
-  const displayNotifications = (notifications && notifications.length > 0) ? notifications : [
-    {
-      id: 1,
-      type: 'surat',
-      title: 'Pengajuan surat baru',
-      desc: 'Siti Rahmawati mengajukan Surat Pengantar',
-      time: '5 menit lalu',
-      icon: 'file-text'
-    },
-    {
-      id: 2,
-      type: 'terbit',
-      title: 'Status surat diperbarui',
-      desc: 'Pengajuan SIA-250125-007 telah terbit',
-      time: '1 jam lalu',
-      icon: 'check'
-    },
-    {
-      id: 3,
-      type: 'warga',
-      title: 'Data warga diperbarui',
-      desc: 'Profil keluarga Budi Santoso diperbarui',
-      time: 'Kemarin, 16.40',
-      icon: 'users'
-    }
-  ];
+  // Data riil pengajuan surat dan notifikasi langsung dari database
+  const displayLetters = recentLetters || [];
+  const displayNotifications = notifications || [];
 
   return (
     <WargaLayout>
@@ -184,19 +141,21 @@ export default function PortalDashboard({ auth, warga, recentLetters = [], notif
             <div className="p-6 rounded-2xl bg-white border border-[#E9EFF6] shadow-xs space-y-3">
               {displayLetters.length > 0 ? (
                 displayLetters.map((item) => {
-                  const isDiproses = item.status_label === 'Diproses' || item.status === 'diajukan';
-                  const isTerbit = item.status_label === 'Terbit' || item.status === 'selesai';
+                  const isDiajukan = item.status === 'diajukan';
+                  const isSelesaiRt = item.status === 'selesai_rt';
+                  const isTerbit = item.status === 'terbit' || item.status === 'selesai';
 
                   return (
-                    <div
+                    <Link
                       key={item.id}
-                      className="p-4 rounded-xl border border-[#EDF2F7] bg-white hover:bg-[#FBFDFF] flex items-center justify-between transition-colors"
+                      href={route('portal.surat.show', item.id)}
+                      className="p-4 rounded-xl border border-[#EDF2F7] bg-white hover:bg-[#FBFDFF] hover:border-[#0E8F84]/30 flex items-center justify-between transition-all group block cursor-pointer"
                     >
                       <div>
-                        <span className="text-[11px] text-[#718096] block">
+                        <span className="text-[11px] text-[#718096] block font-medium">
                           {item.jenis_label}
                         </span>
-                        <h4 className="font-bold text-sm text-[#1A253C] font-mono mt-0.5">
+                        <h4 className="font-bold text-sm text-[#1A253C] font-mono mt-0.5 group-hover:text-[#0E8F84] transition-colors">
                           {item.nomor}
                         </h4>
                         <p className="text-[11px] text-[#A0AEC0] mt-0.5">
@@ -204,28 +163,37 @@ export default function PortalDashboard({ auth, warga, recentLetters = [], notif
                         </p>
                       </div>
 
-                      <div>
+                      <div className="flex items-center gap-2">
                         <span
                           className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold ${
-                            isDiproses
+                            isDiajukan
                               ? 'bg-[#FFF3DA] text-[#A66700] border border-[#FFE4A8]'
+                              : isSelesaiRt
+                              ? 'bg-[#EEF4FF] text-[#2F65CB] border border-[#C8DCFF]'
                               : isTerbit
                               ? 'bg-[#EAF7EE] text-[#14833B] border border-[#B7E7D2]'
-                              : 'bg-[#EEF4FF] text-[#2F65CB] border border-[#C8DCFF]'
+                              : 'bg-[#F1F5F9] text-[#475569] border border-[#E2E8F0]'
                           }`}
                         >
                           {item.status_label}
                         </span>
+                        <ArrowRight className="w-3.5 h-3.5 text-[#A0AEC0] group-hover:text-[#0E8F84] group-hover:translate-x-0.5 transition-all" />
                       </div>
-                    </div>
+                    </Link>
                   );
                 })
               ) : (
                 <div className="py-8 text-center text-[#718096] space-y-3">
-                  <p className="text-xs">Belum ada pengajuan surat yang aktif.</p>
+                  <div className="w-12 h-12 rounded-2xl bg-[#E8F6F4] text-[#0E8F84] flex items-center justify-center mx-auto">
+                    <FileText className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-[#1A253C]">Belum Ada Pengajuan Surat</p>
+                    <p className="text-[11px] text-[#A0AEC0] mt-0.5">Surat pengantar atau domisili yang Anda buat akan langsung dipantau di sini.</p>
+                  </div>
                   <Link
                     href={route('portal.surat.create')}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#0E8F84] text-white text-xs font-semibold hover:bg-[#0B756C] transition-colors"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#0E8F84] text-white text-xs font-semibold hover:bg-[#0B756C] transition-colors cursor-pointer"
                   >
                     <Plus className="w-3.5 h-3.5" />
                     <span>Ajukan Surat Sekarang</span>
@@ -242,30 +210,40 @@ export default function PortalDashboard({ auth, warga, recentLetters = [], notif
             </h3>
 
             <div className="p-6 rounded-2xl bg-white border border-[#E9EFF6] shadow-xs space-y-5">
-              {displayNotifications.map((notif) => (
-                <div key={notif.id} className="flex items-start gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-[#E8F6F4] text-[#0E8F84] flex items-center justify-center shrink-0 mt-0.5">
-                    {notif.icon === 'check' ? (
-                      <Check className="w-4 h-4 text-[#14833B]" />
-                    ) : notif.icon === 'users' ? (
-                      <Users className="w-4 h-4 text-[#0E8F84]" />
-                    ) : (
-                      <FileText className="w-4 h-4 text-[#0E8F84]" />
-                    )}
+              {displayNotifications.length > 0 ? (
+                displayNotifications.map((notif) => (
+                  <div key={notif.id} className="flex items-start gap-3">
+                    <div className="w-9 h-9 rounded-xl bg-[#E8F6F4] text-[#0E8F84] flex items-center justify-center shrink-0 mt-0.5">
+                      {notif.icon === 'check' ? (
+                        <Check className="w-4 h-4 text-[#14833B]" />
+                      ) : notif.icon === 'alert' ? (
+                        <AlertCircle className="w-4 h-4 text-[#D97706]" />
+                      ) : notif.icon === 'arrow-left-right' ? (
+                        <ArrowLeftRight className="w-4 h-4 text-[#0E8F84]" />
+                      ) : notif.icon === 'users' ? (
+                        <Users className="w-4 h-4 text-[#0E8F84]" />
+                      ) : (
+                        <FileText className="w-4 h-4 text-[#0E8F84]" />
+                      )}
+                    </div>
+                    <div className="space-y-0.5 flex-1 min-w-0">
+                      <h4 className="font-bold text-xs text-[#1A253C]">
+                        {notif.title}
+                      </h4>
+                      <p className="text-[11px] text-[#718096] leading-relaxed">
+                        {notif.desc}
+                      </p>
+                      <span className="text-[10px] text-[#A0AEC0] block">
+                        {notif.time}
+                      </span>
+                    </div>
                   </div>
-                  <div className="space-y-0.5">
-                    <h4 className="font-bold text-xs text-[#1A253C]">
-                      {notif.title}
-                    </h4>
-                    <p className="text-[11px] text-[#718096] leading-relaxed">
-                      {notif.desc}
-                    </p>
-                    <span className="text-[10px] text-[#A0AEC0] block">
-                      {notif.time}
-                    </span>
-                  </div>
+                ))
+              ) : (
+                <div className="py-6 text-center text-[#718096] text-xs">
+                  Belum ada notifikasi aktivitas terbaru.
                 </div>
-              ))}
+              )}
             </div>
           </div>
         </div>
