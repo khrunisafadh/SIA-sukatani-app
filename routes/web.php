@@ -178,7 +178,7 @@ Route::middleware(['auth', 'role:warga'])->prefix('portal')->name('portal.')->gr
 | 4. Modul Bendahara (Kelola Transparansi Kas & Aliran Kas RT)
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth', 'role:bendahara,ketua_rt'])->prefix('bendahara')->name('bendahara.')->group(function () {
+Route::middleware(['auth', 'role:bendahara'])->prefix('bendahara')->name('bendahara.')->group(function () {
     Route::get('/', [BendaharaController::class, 'index'])->name('index');
     Route::get('/dashboard', [BendaharaController::class, 'index'])->name('dashboard');
     Route::post('/transaksi', [BendaharaController::class, 'store'])->name('transaksi.store');

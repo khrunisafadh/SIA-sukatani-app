@@ -143,4 +143,16 @@ class BendaharaKasTest extends TestCase
 
         $response->assertForbidden();
     }
+
+    public function test_ketua_rt_cannot_access_bendahara_dashboard(): void
+    {
+        $ketuaRt = User::factory()->create([
+            'username' => 'ketua.rt01',
+            'role' => 'ketua_rt',
+        ]);
+
+        $response = $this->actingAs($ketuaRt)->get(route('bendahara.dashboard'));
+
+        $response->assertForbidden();
+    }
 }
