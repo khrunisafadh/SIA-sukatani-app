@@ -33,7 +33,21 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        $user = $request->user();
+
+        if ($user?->must_change_password) {
+            return redirect()->route('password.first-login');
+        }
+
+        if ($user && in_array($user->role, ['ketua_rt', 'sekretaris'], true)) {
+            return redirect()->intended(route('admin.dashboard', absolute: false));
+        }
+
+        if ($user && $user->role === 'bendahara') {
+            return redirect()->intended(route('bendahara.dashboard', absolute: false));
+        }
+
+        return redirect()->intended(route('portal.dashboard', absolute: false));
     }
 
     /**

@@ -29,10 +29,31 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $user = $request->user();
+
+        $pendingLettersCount = 0;
+        if ($user && in_array($user->role, ['ketua_rt', 'sekretaris'], true) && \Illuminate\Support\Facades\Schema::hasTable('pengajuan_surat')) {
+            $pendingLettersCount = \App\Models\PengajuanSurat::query()
+                ->where('status', \App\Support\LetterStatus::DIAJUKAN)
+                ->count();
+        }
+
         return [
             ...parent::share($request),
             'auth' => [
-                'user' => $request->user(),
+                'user' => $user ? [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'username' => $user->username,
+                    'email' => $user->email,
+                    'role' => $user->role,
+                    'role_label' => $user->roleLabel(),
+                ] : null,
+                'pending_letters_count' => $pendingLettersCount,
+            ],
+            'flash' => [
+                'success' => $request->session()->get('success'),
+                'error' => $request->session()->get('error'),
             ],
         ];
     }
