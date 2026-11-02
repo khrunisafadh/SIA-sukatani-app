@@ -5,11 +5,15 @@ use App\Http\Controllers\Admin\MutasiAdminController;
 use App\Http\Controllers\Admin\SuratAdminController;
 use App\Http\Controllers\Admin\UserRoleController;
 use App\Http\Controllers\Admin\WargaController;
+use App\Http\Controllers\Bendahara\BendaharaController;
 use App\Http\Controllers\Portal\PindahDatangController;
 use App\Http\Controllers\Portal\PortalDashboardController;
 use App\Http\Controllers\Portal\SuratPortalController;
 use App\Http\Controllers\ProfileController;
+use App\Models\TransaksiKas;
+use Carbon\Carbon;
 use Illuminate\Foundation\Application;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -18,12 +22,59 @@ use Inertia\Inertia;
 | 1. Halaman Publik (Sebelum Login) - Siapapun Dapat Mengakses
 |--------------------------------------------------------------------------
 */
-Route::get('/', function () {
+Route::get('/', function (Request $request) {
+    $periods = ['Januari–Juni 2025', 'Juli–Desember 2024', 'Januari–Juni 2024'];
+    $selectedPeriod = $request->query('periode', 'Januari–Juni 2025');
+    $allInPeriod = collect();
+    $totalPemasukan = 12500000;
+    $totalPengeluaran = 3750000;
+    $saldoAkhir = 8750000;
+
+    if (\Illuminate\Support\Facades\Schema::hasTable('transaksi_kas')) {
+        $dbPeriods = TransaksiKas::query()
+            ->distinct()
+            ->orderBy('periode', 'desc')
+            ->pluck('periode')
+            ->toArray();
+
+        if (!empty($dbPeriods)) {
+            $periods = $dbPeriods;
+            if (!$request->has('periode')) {
+                $selectedPeriod = $periods[0];
+            }
+        }
+
+        $allInPeriod = TransaksiKas::where('periode', $selectedPeriod)
+            ->orderBy('tanggal', 'desc')
+            ->orderBy('id', 'desc')
+            ->get();
+
+        if ($allInPeriod->isNotEmpty()) {
+            $totalPemasukan = (int) TransaksiKas::where('periode', $selectedPeriod)->where('jenis', 'pemasukan')->sum('nominal');
+            $totalPengeluaran = (int) TransaksiKas::where('periode', $selectedPeriod)->where('jenis', 'pengeluaran')->sum('nominal');
+            $saldoAkhir = $totalPemasukan - $totalPengeluaran;
+        }
+    }
+
+    $monthlyFlow = BendaharaController::calculateMonthlyFlow($allInPeriod, $selectedPeriod);
+
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
         'canRegister' => Route::has('register'),
         'laravelVersion' => Application::VERSION,
         'phpVersion' => PHP_VERSION,
+        'kasData' => [
+            'summary' => [
+                'saldoAkhir' => $saldoAkhir,
+                'totalPemasukan' => $totalPemasukan,
+                'totalPengeluaran' => $totalPengeluaran,
+                'pembaruanTerakhir' => Carbon::now()->translatedFormat('d F Y'),
+            ],
+            'monthlyFlow' => $monthlyFlow,
+            'transactions' => $allInPeriod->take(6)->values(),
+            'periods' => $periods,
+            'selectedPeriod' => $selectedPeriod,
+        ],
     ]);
 });
 
@@ -36,6 +87,9 @@ Route::get('/dashboard', function () {
     $user = auth()->user();
     if ($user && in_array($user->role, ['ketua_rt', 'sekretaris'], true)) {
         return redirect()->route('admin.dashboard');
+    }
+    if ($user && $user->role === 'bendahara') {
+        return redirect()->route('bendahara.dashboard');
     }
     return redirect()->route('portal.dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
@@ -64,6 +118,10 @@ Route::middleware(['auth', 'role:ketua_rt,sekretaris'])->prefix('admin')->name('
     Route::get('/warga/create', [WargaController::class, 'create'])->name('warga.create');
     Route::post('/warga', [WargaController::class, 'store'])->name('warga.store');
     Route::get('/warga/check-nik', [WargaController::class, 'checkNik'])->name('warga.check-nik');
+    Route::get('/warga/{warga}', [WargaController::class, 'show'])->name('warga.show');
+    Route::get('/warga/{warga}/edit', [WargaController::class, 'edit'])->name('warga.edit');
+    Route::put('/warga/{warga}', [WargaController::class, 'update'])->name('warga.update');
+    Route::delete('/warga/{warga}', [WargaController::class, 'destroy'])->name('warga.destroy');
 
     // Modul Verifikasi Laporan Pindah / Datang
     Route::get('pindah-datang', [MutasiAdminController::class, 'index'])->name('mutasi.index');
@@ -113,6 +171,18 @@ Route::middleware(['auth', 'role:warga'])->prefix('portal')->name('portal.')->gr
     Route::get('pindah-datang', [PindahDatangController::class, 'create'])->name('pindah-datang.create');
     Route::post('pindah-datang', [PindahDatangController::class, 'store'])->name('pindah-datang.store');
     Route::get('pindah-datang/status', [PindahDatangController::class, 'tracking'])->name('pindah-datang.tracking');
+});
+
+/*
+|--------------------------------------------------------------------------
+| 4. Modul Bendahara (Kelola Transparansi Kas & Aliran Kas RT)
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'role:bendahara,ketua_rt'])->prefix('bendahara')->name('bendahara.')->group(function () {
+    Route::get('/', [BendaharaController::class, 'index'])->name('index');
+    Route::get('/dashboard', [BendaharaController::class, 'index'])->name('dashboard');
+    Route::post('/transaksi', [BendaharaController::class, 'store'])->name('transaksi.store');
+    Route::delete('/transaksi/{transaksiKas}', [BendaharaController::class, 'destroy'])->name('transaksi.destroy');
 });
 
 /*

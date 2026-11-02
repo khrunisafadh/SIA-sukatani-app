@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import { 
   Building2, 
   MapPin, 
@@ -23,9 +23,48 @@ import {
   AlertTriangle
 } from 'lucide-react';
 
-export default function Welcome({ canLogin = true }) {
+export default function Welcome({ canLogin = true, kasData = null }) {
   const [openFaq, setOpenFaq] = useState(null);
-  const [selectedPeriod, setSelectedPeriod] = useState('Januari–Juni 2025');
+  const [selectedPeriod, setSelectedPeriod] = useState(kasData?.selectedPeriod || 'Januari–Juni 2025');
+
+  const summary = kasData?.summary || {
+    saldoAkhir: 8750000,
+    totalPemasukan: 12500000,
+    totalPengeluaran: 3750000,
+    pembaruanTerakhir: '30 Juni 2025',
+  };
+
+  const monthlyFlow = kasData?.monthlyFlow || [
+    { month: 'Jan', pemasukan: 1500000, pengeluaran: 350000 },
+    { month: 'Feb', pemasukan: 1900000, pengeluaran: 450000 },
+    { month: 'Mar', pemasukan: 2100000, pengeluaran: 500000 },
+    { month: 'Apr', pemasukan: 1950000, pengeluaran: 550000 },
+    { month: 'Mei', pemasukan: 2300000, pengeluaran: 480000 },
+    { month: 'Jun', pemasukan: 2500000, pengeluaran: 750000 },
+  ];
+
+  const transactions = kasData?.transactions || [
+    { id: 1, tanggal: '28 Jun 2025', keterangan: 'Iuran warga bulan Juni', jenis: 'pemasukan', nominal: 2500000 },
+    { id: 2, tanggal: '24 Jun 2025', keterangan: 'Kebutuhan kebersihan lingkungan', jenis: 'pengeluaran', nominal: 450000 },
+    { id: 3, tanggal: '18 Jun 2025', keterangan: 'Perawatan fasilitas lingkungan', jenis: 'pengeluaran', nominal: 350000 },
+  ];
+
+  const periods = kasData?.periods || ['Januari–Juni 2025', 'Juli–Desember 2024', 'Januari–Juni 2024'];
+
+  const formatRupiah = (val) => {
+    return 'Rp' + (val || 0).toLocaleString('id-ID');
+  };
+
+  const maxFlow = Math.max(
+    ...monthlyFlow.map((m) => Math.max(m.pemasukan, m.pengeluaran)),
+    2500000
+  );
+
+  const handlePeriodChange = (e) => {
+    const nextPeriod = e.target.value;
+    setSelectedPeriod(nextPeriod);
+    router.get('/', { periode: nextPeriod }, { preserveScroll: true, preserveState: true });
+  };
 
   const scrollToSection = (id) => {
     const el = document.getElementById(id);
@@ -373,12 +412,14 @@ export default function Welcome({ canLogin = true }) {
                 <div className="relative">
                   <select 
                     value={selectedPeriod}
-                    onChange={(e) => setSelectedPeriod(e.target.value)}
+                    onChange={handlePeriodChange}
                     className="appearance-none bg-white border border-[#E4E9F0] text-[#10264F] text-xs font-semibold py-2.5 pl-3.5 pr-9 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-[#0F8F83] focus:border-transparent cursor-pointer"
                   >
-                    <option value="Januari–Juni 2025">Januari–Juni 2025</option>
-                    <option value="Juli–Desember 2024">Juli–Desember 2024</option>
-                    <option value="Januari–Juni 2024">Januari–Juni 2024</option>
+                    {periods.map((p) => (
+                      <option key={p} value={p}>
+                        {p}
+                      </option>
+                    ))}
                   </select>
                   <ChevronDown className="w-4 h-4 text-[#68748A] absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                 </div>
@@ -397,10 +438,10 @@ export default function Welcome({ canLogin = true }) {
                 </div>
                 <div>
                   <div className="text-3xl sm:text-4xl font-extrabold tracking-tight font-heading">
-                    Rp8.750.000
+                    {formatRupiah(summary.saldoAkhir)}
                   </div>
                   <div className="mt-2 text-[11px] text-[#A8E5DE]/90 font-medium">
-                    Saldo awal simulasi Rp0 · per 30 Juni 2025
+                    Saldo awal simulasi Rp0 · per {summary.pembaruanTerakhir}
                   </div>
                 </div>
               </div>
@@ -415,10 +456,10 @@ export default function Welcome({ canLogin = true }) {
                 </div>
                 <div>
                   <div className="text-3xl sm:text-4xl font-extrabold tracking-tight font-heading text-[#10264F]">
-                    Rp12.500.000
+                    {formatRupiah(summary.totalPemasukan)}
                   </div>
                   <div className="mt-2 text-[11px] text-[#8C98A9] font-medium">
-                    Januari–Juni 2025
+                    {selectedPeriod}
                   </div>
                 </div>
               </div>
@@ -433,10 +474,10 @@ export default function Welcome({ canLogin = true }) {
                 </div>
                 <div>
                   <div className="text-3xl sm:text-4xl font-extrabold tracking-tight font-heading text-[#10264F]">
-                    Rp3.750.000
+                    {formatRupiah(summary.totalPengeluaran)}
                   </div>
                   <div className="mt-2 text-[11px] text-[#8C98A9] font-medium">
-                    Januari–Juni 2025
+                    {selectedPeriod}
                   </div>
                 </div>
               </div>
@@ -491,107 +532,28 @@ export default function Welcome({ canLogin = true }) {
 
                     {/* Bars Grid */}
                     <div className="absolute left-[70px] right-4 bottom-[1px] top-2 flex items-end justify-between px-2 sm:px-6">
-                      {/* Jan */}
-                      <div className="flex flex-col items-center gap-2">
-                        <div className="flex items-end gap-1 sm:gap-2 h-44">
-                          <div 
-                            className="w-3 sm:w-6 bg-[#0F685D] rounded-t transition-all hover:opacity-90 cursor-pointer" 
-                            style={{ height: '60%' }} 
-                            title="Pemasukan: Rp1.500.000"
-                          />
-                          <div 
-                            className="w-3 sm:w-6 bg-[#EB7957] rounded-t transition-all hover:opacity-90 cursor-pointer" 
-                            style={{ height: '14%' }} 
-                            title="Pengeluaran: Rp350.000"
-                          />
-                        </div>
-                        <span className="text-xs font-semibold text-[#68748A]">Jan</span>
-                      </div>
+                      {monthlyFlow.map((item) => {
+                        const inHeight = maxFlow > 0 ? Math.min(100, Math.round((item.pemasukan / maxFlow) * 100)) : 0;
+                        const outHeight = maxFlow > 0 ? Math.min(100, Math.round((item.pengeluaran / maxFlow) * 100)) : 0;
 
-                      {/* Feb */}
-                      <div className="flex flex-col items-center gap-2">
-                        <div className="flex items-end gap-1 sm:gap-2 h-44">
-                          <div 
-                            className="w-3 sm:w-6 bg-[#0F685D] rounded-t transition-all hover:opacity-90 cursor-pointer" 
-                            style={{ height: '76%' }} 
-                            title="Pemasukan: Rp1.900.000"
-                          />
-                          <div 
-                            className="w-3 sm:w-6 bg-[#EB7957] rounded-t transition-all hover:opacity-90 cursor-pointer" 
-                            style={{ height: '18%' }} 
-                            title="Pengeluaran: Rp450.000"
-                          />
-                        </div>
-                        <span className="text-xs font-semibold text-[#68748A]">Feb</span>
-                      </div>
-
-                      {/* Mar */}
-                      <div className="flex flex-col items-center gap-2">
-                        <div className="flex items-end gap-1 sm:gap-2 h-44">
-                          <div 
-                            className="w-3 sm:w-6 bg-[#0F685D] rounded-t transition-all hover:opacity-90 cursor-pointer" 
-                            style={{ height: '84%' }} 
-                            title="Pemasukan: Rp2.100.000"
-                          />
-                          <div 
-                            className="w-3 sm:w-6 bg-[#EB7957] rounded-t transition-all hover:opacity-90 cursor-pointer" 
-                            style={{ height: '20%' }} 
-                            title="Pengeluaran: Rp500.000"
-                          />
-                        </div>
-                        <span className="text-xs font-semibold text-[#68748A]">Mar</span>
-                      </div>
-
-                      {/* Apr */}
-                      <div className="flex flex-col items-center gap-2">
-                        <div className="flex items-end gap-1 sm:gap-2 h-44">
-                          <div 
-                            className="w-3 sm:w-6 bg-[#0F685D] rounded-t transition-all hover:opacity-90 cursor-pointer" 
-                            style={{ height: '78%' }} 
-                            title="Pemasukan: Rp1.950.000"
-                          />
-                          <div 
-                            className="w-3 sm:w-6 bg-[#EB7957] rounded-t transition-all hover:opacity-90 cursor-pointer" 
-                            style={{ height: '22%' }} 
-                            title="Pengeluaran: Rp550.000"
-                          />
-                        </div>
-                        <span className="text-xs font-semibold text-[#68748A]">Apr</span>
-                      </div>
-
-                      {/* Mei */}
-                      <div className="flex flex-col items-center gap-2">
-                        <div className="flex items-end gap-1 sm:gap-2 h-44">
-                          <div 
-                            className="w-3 sm:w-6 bg-[#0F685D] rounded-t transition-all hover:opacity-90 cursor-pointer" 
-                            style={{ height: '92%' }} 
-                            title="Pemasukan: Rp2.300.000"
-                          />
-                          <div 
-                            className="w-3 sm:w-6 bg-[#EB7957] rounded-t transition-all hover:opacity-90 cursor-pointer" 
-                            style={{ height: '19%' }} 
-                            title="Pengeluaran: Rp480.000"
-                          />
-                        </div>
-                        <span className="text-xs font-semibold text-[#68748A]">Mei</span>
-                      </div>
-
-                      {/* Jun */}
-                      <div className="flex flex-col items-center gap-2">
-                        <div className="flex items-end gap-1 sm:gap-2 h-44">
-                          <div 
-                            className="w-3 sm:w-6 bg-[#0F685D] rounded-t transition-all hover:opacity-90 cursor-pointer" 
-                            style={{ height: '100%' }} 
-                            title="Pemasukan: Rp2.500.000"
-                          />
-                          <div 
-                            className="w-3 sm:w-6 bg-[#EB7957] rounded-t transition-all hover:opacity-90 cursor-pointer" 
-                            style={{ height: '30%' }} 
-                            title="Pengeluaran: Rp750.000"
-                          />
-                        </div>
-                        <span className="text-xs font-semibold text-[#68748A]">Jun</span>
-                      </div>
+                        return (
+                          <div key={item.month} className="flex flex-col items-center gap-2">
+                            <div className="flex items-end gap-1 sm:gap-2 h-44">
+                              <div 
+                                className="w-3 sm:w-6 bg-[#0F685D] rounded-t transition-all hover:opacity-90 cursor-pointer" 
+                                style={{ height: `${Math.max(inHeight, 4)}%` }} 
+                                title={`Pemasukan: ${formatRupiah(item.pemasukan)}`}
+                              />
+                              <div 
+                                className="w-3 sm:w-6 bg-[#EB7957] rounded-t transition-all hover:opacity-90 cursor-pointer" 
+                                style={{ height: `${Math.max(outHeight, 4)}%` }} 
+                                title={`Pengeluaran: ${formatRupiah(item.pengeluaran)}`}
+                              />
+                            </div>
+                            <span className="text-xs font-semibold text-[#68748A]">{item.month}</span>
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 </div>
@@ -608,11 +570,11 @@ export default function Welcome({ canLogin = true }) {
                     </div>
                     <div className="py-3.5 flex justify-between items-center">
                       <span className="text-[#68748A]">Pembaruan terakhir</span>
-                      <span className="font-semibold text-[#10264F]">30 Juni 2025</span>
+                      <span className="font-semibold text-[#10264F]">{summary.pembaruanTerakhir}</span>
                     </div>
                     <div className="py-3.5 flex justify-between items-center">
                       <span className="text-[#68748A]">Sumber data</span>
-                      <span className="font-semibold text-[#10264F]">Transaksi kas yang tercatat</span>
+                      <span className="font-semibold text-[#10264F]">Pencatatan Bendahara RT 01/08</span>
                     </div>
                   </div>
                 </div>
@@ -621,9 +583,9 @@ export default function Welcome({ canLogin = true }) {
                 <div className="p-4 rounded-xl bg-[#FFF9F2] border border-[#FEE2C7] flex items-start gap-3">
                   <AlertTriangle className="w-4 h-4 text-[#D97706] flex-shrink-0 mt-0.5" />
                   <div className="space-y-0.5">
-                    <h4 className="text-xs font-bold text-[#92400E]">Data simulasi</h4>
+                    <h4 className="text-xs font-bold text-[#92400E]">Data simulasi terhubung</h4>
                     <p className="text-[11px] text-[#B45309] leading-relaxed">
-                      Nominal pada tampilan ini bukan laporan keuangan resmi RT.
+                      Data ini disimulasikan melalui modul Bendahara RT dan terhubung langsung ke tampilan publik ini.
                     </p>
                   </div>
                 </div>
@@ -635,10 +597,10 @@ export default function Welcome({ canLogin = true }) {
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
                 <div>
                   <h3 className="text-lg font-bold text-[#10264F] font-heading">Transaksi Terbaru</h3>
-                  <p className="text-xs sm:text-sm text-[#68748A] mt-0.5">Transaksi simulasi terbaru pada periode laporan.</p>
+                  <p className="text-xs sm:text-sm text-[#68748A] mt-0.5">Transaksi simulasi terbaru pada periode {selectedPeriod}.</p>
                 </div>
-                <span className="self-start sm:self-auto text-[11px] font-bold text-[#68748A] bg-[#F1F5F9] px-3 py-1 rounded-md">
-                  Data simulasi
+                <span className="self-start sm:self-auto text-[11px] font-bold text-[#0F8F83] bg-[#E7F6EF] px-3 py-1 rounded-md">
+                  Sinkron Bendahara RT
                 </span>
               </div>
 
@@ -653,36 +615,32 @@ export default function Welcome({ canLogin = true }) {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[#E4E9F0]">
-                    <tr className="hover:bg-[#F8FAFC]/60 transition-colors">
-                      <td className="py-4 pr-4 text-[#566175] font-medium whitespace-nowrap">28 Jun 2025</td>
-                      <td className="py-4 px-4 text-[#10264F] font-semibold">Iuran warga bulan Juni</td>
-                      <td className="py-4 px-4 whitespace-nowrap">
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-[#E7F6EF] text-[#0F8F83]">
-                          Pemasukan
-                        </span>
-                      </td>
-                      <td className="py-4 pl-4 text-right font-bold text-[#0F8F83] whitespace-nowrap">+Rp2.500.000</td>
-                    </tr>
-                    <tr className="hover:bg-[#F8FAFC]/60 transition-colors">
-                      <td className="py-4 pr-4 text-[#566175] font-medium whitespace-nowrap">24 Jun 2025</td>
-                      <td className="py-4 px-4 text-[#10264F] font-semibold">Kebutuhan kebersihan lingkungan</td>
-                      <td className="py-4 px-4 whitespace-nowrap">
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-[#FEF3EB] text-[#D95D39]">
-                          Pengeluaran
-                        </span>
-                      </td>
-                      <td className="py-4 pl-4 text-right font-bold text-[#D95D39] whitespace-nowrap">-Rp450.000</td>
-                    </tr>
-                    <tr className="hover:bg-[#F8FAFC]/60 transition-colors">
-                      <td className="py-4 pr-4 text-[#566175] font-medium whitespace-nowrap">18 Jun 2025</td>
-                      <td className="py-4 px-4 text-[#10264F] font-semibold">Perawatan fasilitas lingkungan</td>
-                      <td className="py-4 px-4 whitespace-nowrap">
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-[#FEF3EB] text-[#D95D39]">
-                          Pengeluaran
-                        </span>
-                      </td>
-                      <td className="py-4 pl-4 text-right font-bold text-[#D95D39] whitespace-nowrap">-Rp350.000</td>
-                    </tr>
+                    {transactions.length === 0 ? (
+                      <tr>
+                        <td colSpan="4" className="py-6 text-center text-[#8C98A9]">
+                          Belum ada transaksi pada periode ini.
+                        </td>
+                      </tr>
+                    ) : (
+                      transactions.map((tx) => (
+                        <tr key={tx.id} className="hover:bg-[#F8FAFC]/60 transition-colors">
+                          <td className="py-4 pr-4 text-[#566175] font-medium whitespace-nowrap">{tx.tanggal}</td>
+                          <td className="py-4 px-4 text-[#10264F] font-semibold">{tx.keterangan}</td>
+                          <td className="py-4 px-4 whitespace-nowrap">
+                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold ${
+                              tx.jenis === 'pemasukan' ? 'bg-[#E7F6EF] text-[#0F8F83]' : 'bg-[#FEF3EB] text-[#D95D39]'
+                            }`}>
+                              {tx.jenis === 'pemasukan' ? 'Pemasukan' : 'Pengeluaran'}
+                            </span>
+                          </td>
+                          <td className={`py-4 pl-4 text-right font-bold whitespace-nowrap ${
+                            tx.jenis === 'pemasukan' ? 'text-[#0F8F83]' : 'text-[#D95D39]'
+                          }`}>
+                            {tx.jenis === 'pemasukan' ? '+' : '-'}{formatRupiah(tx.nominal)}
+                          </td>
+                        </tr>
+                      ))
+                    )}
                   </tbody>
                 </table>
               </div>

@@ -163,5 +163,8 @@ class DatabaseSeeder extends Seeder
 
         // Jalankan MutasiSeeder untuk sinkronisasi master unit rumah RT 01 & permohonan mutasi
         $this->call(MutasiSeeder::class);
+
+        // Jalankan TransaksiKasSeeder untuk transparansi kas RT & modul bendahara
+        $this->call(TransaksiKasSeeder::class);
     }
 }

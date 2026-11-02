@@ -127,6 +127,55 @@ export default function Login({ status }) {
               </div>
             )}
 
+            {/* Quick Demo Fill Buttons */}
+            <div className="rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-3 space-y-2">
+              <div className="flex items-center justify-between text-[11px] font-semibold text-[#68748A]">
+                <span>Pilih Peran Demo:</span>
+                <span className="text-[10px] text-[#006B61] bg-[#E7F6EF] px-2 py-0.5 rounded-md font-bold">1-Klik Isi</span>
+              </div>
+              <div className="grid grid-cols-3 gap-1.5 text-[11px]">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setData((prev) => ({ ...prev, login: 'bendahara.rt01', password: 'password123' }));
+                  }}
+                  className={`py-1.5 px-2 rounded-lg font-semibold border text-center transition-all ${
+                    data.login === 'bendahara.rt01'
+                      ? 'border-[#006B61] bg-[#006B61] text-white shadow-sm'
+                      : 'border-[#CBD5E1] bg-white text-[#10264F] hover:bg-slate-50'
+                  }`}
+                >
+                  💰 Bendahara
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setData((prev) => ({ ...prev, login: 'ketua.rt01', password: 'password123' }));
+                  }}
+                  className={`py-1.5 px-2 rounded-lg font-semibold border text-center transition-all ${
+                    data.login === 'ketua.rt01'
+                      ? 'border-[#006B61] bg-[#006B61] text-white shadow-sm'
+                      : 'border-[#CBD5E1] bg-white text-[#10264F] hover:bg-slate-50'
+                  }`}
+                >
+                  👑 Ketua RT
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setData((prev) => ({ ...prev, login: 'rizky.pratama', password: 'password123' }));
+                  }}
+                  className={`py-1.5 px-2 rounded-lg font-semibold border text-center transition-all ${
+                    data.login === 'rizky.pratama'
+                      ? 'border-[#006B61] bg-[#006B61] text-white shadow-sm'
+                      : 'border-[#CBD5E1] bg-white text-[#10264F] hover:bg-slate-50'
+                  }`}
+                >
+                  👤 Warga
+                </button>
+              </div>
+            </div>
+
             {/* Form */}
             <form onSubmit={submit} className="space-y-4">
               {/* Field: Username / Email */}

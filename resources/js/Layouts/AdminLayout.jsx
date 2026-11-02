@@ -8,6 +8,7 @@ import {
     FileText,
     ShieldCheck,
     UserCog,
+    Coins,
     LogOut,
     ChevronRight,
 } from 'lucide-react';
@@ -169,6 +170,23 @@ export default function AdminLayout({
                                     <span>Audit Trail</span>
                                 </a>
                             )}
+
+                            {/* Kas & Keuangan RT (Bendahara) */}
+                            <Link
+                                href={route('bendahara.dashboard')}
+                                className={menuClass(
+                                    route().current('bendahara.*')
+                                )}
+                            >
+                                <span className="flex items-center gap-3">
+                                    <Coins className={iconClass} />
+                                    Kas RT (Bendahara)
+                                </span>
+
+                                {route().current('bendahara.*') && (
+                                    <ChevronRight className="h-3.5 w-3.5 text-[#89F5E7]" />
+                                )}
+                            </Link>
 
                             {/* Pengguna & Role */}
                             {isAdmin && (
