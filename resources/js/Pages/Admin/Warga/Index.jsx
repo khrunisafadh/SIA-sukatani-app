@@ -9,13 +9,34 @@ import {
   EyeOff, 
   Filter, 
   CheckCircle2, 
-  Lock
+  Lock,
+  Edit,
+  Trash2,
+  ExternalLink,
+  AlertTriangle
 } from 'lucide-react';
 
 export default function WargaIndex({ wargas, filters, totalWarga, totalTetap, totalKontrak, auth, flash }) {
   const [search, setSearch] = useState(filters?.search || '');
   const [statusHunian, setStatusHunian] = useState(filters?.status_hunian || 'Semua');
   const [showNikIds, setShowNikIds] = useState([]);
+  const [deleteModal, setDeleteModal] = useState({ open: false, id: null, nama: '' });
+  const [deleting, setDeleting] = useState(false);
+
+  const confirmDelete = (id, nama) => {
+    setDeleteModal({ open: true, id, nama });
+  };
+
+  const handleDelete = () => {
+    if (!deleteModal.id) return;
+    setDeleting(true);
+    router.delete(route('admin.warga.destroy', deleteModal.id), {
+      onFinish: () => {
+        setDeleting(false);
+        setDeleteModal({ open: false, id: null, nama: '' });
+      },
+    });
+  };
 
   const toggleShowNik = (id) => {
     if (showNikIds.includes(id)) {
@@ -211,13 +232,32 @@ export default function WargaIndex({ wargas, filters, totalWarga, totalTetap, to
 
                       {/* Aksi */}
                       <td className="py-4 px-6 text-center">
-                        <button
-                          type="button"
-                          onClick={() => toggleShowNik(warga.id)}
-                          className="text-xs font-semibold text-[#0E8F84] hover:underline cursor-pointer"
-                        >
-                          Detail
-                        </button>
+                        <div className="flex items-center justify-center gap-1.5">
+                          <Link
+                            href={route('admin.warga.show', warga.id)}
+                            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-[#E6F6F4] hover:bg-[#d1f0ec] text-[#006B61] text-xs font-bold transition cursor-pointer"
+                            title="Buka Halaman Detail Warga"
+                          >
+                            <span>Detail</span>
+                          </Link>
+
+                          <Link
+                            href={route('admin.warga.edit', warga.id)}
+                            className="p-1.5 rounded-lg border border-[#CBD5E1] bg-white hover:bg-slate-50 text-[#475569] hover:text-[#006B61] transition cursor-pointer"
+                            title="Edit Data Warga"
+                          >
+                            <Edit className="w-3.5 h-3.5" />
+                          </Link>
+
+                          <button
+                            type="button"
+                            onClick={() => confirmDelete(warga.id, warga.nama_lengkap)}
+                            className="p-1.5 rounded-lg border border-rose-200 bg-rose-50 hover:bg-rose-100 text-rose-600 transition cursor-pointer"
+                            title="Hapus Data Warga"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   );
@@ -238,6 +278,46 @@ export default function WargaIndex({ wargas, filters, totalWarga, totalTetap, to
           <Pagination meta={wargas} links={wargas?.links} />
         </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {deleteModal.open && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs animate-in fade-in duration-150">
+          <div className="w-full max-w-[440px] bg-white rounded-2xl shadow-2xl border border-rose-100 p-6 space-y-4">
+            <div className="flex items-start gap-3.5">
+              <div className="w-10 h-10 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center shrink-0">
+                <AlertTriangle className="w-5 h-5 text-rose-600" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-base font-bold text-[#10264F] font-heading">
+                  Hapus Data Warga?
+                </h3>
+                <p className="text-xs text-[#68748A] leading-relaxed">
+                  Apakah Anda yakin ingin menghapus data warga{' '}
+                  <strong className="text-[#10264F]">{deleteModal.nama}</strong>? Data yang dihapus tidak dapat dipulihkan secara langsung.
+                </p>
+              </div>
+            </div>
+
+            <div className="pt-2 flex items-center justify-end gap-2.5">
+              <button
+                type="button"
+                onClick={() => setDeleteModal({ open: false, id: null, nama: '' })}
+                className="px-4 py-2 rounded-xl border border-[#CBD5E1] text-xs font-semibold text-[#475569] hover:bg-slate-50 transition cursor-pointer"
+              >
+                Batal
+              </button>
+              <button
+                type="button"
+                disabled={deleting}
+                onClick={handleDelete}
+                className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition shadow-xs disabled:opacity-50 cursor-pointer"
+              >
+                {deleting ? 'Menghapus...' : 'Ya, Hapus Data Warga'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </AdminLayout>
   );
 }
