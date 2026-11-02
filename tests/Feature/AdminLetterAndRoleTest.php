@@ -158,78 +158,64 @@ class AdminLetterAndRoleTest extends TestCase
         );
     }
 
-    public function test_only_admin_can_access_create_letter_form(): void
+    public function test_admin_cannot_access_create_letter_form_as_it_is_warga_only(): void
     {
-        $responseAdmin = $this->actingAs($this->admin)->get(route('admin.surat.create'));
-        $responseAdmin->assertOk();
-        $responseAdmin->assertInertia(fn ($page) => $page
-            ->component('Admin/Surat/Create')
-            ->has('wargaOptions')
-            ->has('jenisOptions')
-        );
+        $responseAdmin = $this->actingAs($this->admin)->get('/admin/pengajuan-surat/buat');
+        $this->assertTrue(in_array($responseAdmin->status(), [403, 404], true));
 
-        $responseSekretaris = $this->actingAs($this->sekretaris)->get(route('admin.surat.create'));
-        $responseSekretaris->assertForbidden();
+        $responseSekretaris = $this->actingAs($this->sekretaris)->get('/admin/pengajuan-surat/buat');
+        $this->assertTrue(in_array($responseSekretaris->status(), [403, 404], true));
     }
 
-    public function test_admin_creates_letter_on_behalf_of_warga_with_pdf_generation(): void
+    public function test_admin_cannot_create_letter_via_old_endpoint_and_ketua_rt_verifies_warga_submission(): void
     {
-        $payload = [
+        $response = $this->actingAs($this->admin)->post('/admin/pengajuan-surat', [
             'pemohon_id' => $this->warga->id,
-            'jenis_surat' => LetterType::PENGANTAR,
-            'keperluan' => 'Pengurusan Surat Nikah di KUA',
-            'keterangan' => 'Keluarga baru pindah ke RT 01',
-        ];
+            'jenis_surat' => LetterType::TEMPAT_TINGGAL,
+            'keperluan' => 'Pengurusan Surat',
+        ]);
+        $this->assertTrue(in_array($response->status(), [403, 404, 405], true));
 
-        $response = $this->actingAs($this->admin)->post(route('admin.surat.store'), $payload);
-
-        $this->assertDatabaseHas('pengajuan_surat', [
+        // Pengajuan oleh Warga, verifikasi oleh Ketua RT
+        $letter = PengajuanSurat::create([
+            'nomor' => 'SRT-2026-001',
             'pemohon_id' => $this->warga->id,
-            'created_by' => $this->admin->id,
-            'jenis_surat' => LetterType::PENGANTAR,
-            'status' => LetterStatus::TERBIT,
+            'created_by' => $this->warga->id,
+            'jenis_surat' => LetterType::TEMPAT_TINGGAL,
             'keperluan' => 'Pengurusan Surat Nikah di KUA',
+            'data_surat' => [
+                'nama' => 'Rudi Hermawan',
+                'nik' => '3276010000000001',
+                'alamat' => 'RT 01',
+                'alasan_keperluan' => 'Pengurusan Surat Nikah di KUA',
+            ],
+            'status' => LetterStatus::DIAJUKAN,
         ]);
 
-        $letter = PengajuanSurat::query()->where('pemohon_id', $this->warga->id)->first();
-        $this->assertNotNull($letter);
+        $resVerify = $this->actingAs($this->admin)->post(route('admin.surat.verify', $letter));
+        $resVerify->assertRedirect(route('admin.surat.show', $letter));
+
+        $letter->refresh();
+        $this->assertEquals(LetterStatus::TERBIT, $letter->status);
+        $this->assertNotNull($letter->nomor_surat);
         $this->assertNotNull($letter->pdf_path);
         Storage::disk('local')->assertExists($letter->pdf_path);
 
         $this->assertDatabaseHas('pengajuan_surat_histories', [
             'pengajuan_surat_id' => $letter->id,
-            'status' => LetterStatus::DIAJUKAN,
-            'actor_id' => $this->admin->id,
-        ]);
-
-        $this->assertDatabaseHas('pengajuan_surat_histories', [
-            'pengajuan_surat_id' => $letter->id,
             'status' => LetterStatus::TERBIT,
             'actor_id' => $this->admin->id,
         ]);
-
-        $response->assertRedirect(route('admin.surat.show', $letter));
-        $response->assertSessionHas('success');
     }
 
     public function test_create_letter_validation_fails_for_missing_fields_or_non_warga_applicant(): void
     {
-        $response = $this->actingAs($this->admin)->post(route('admin.surat.store'), [
-            'pemohon_id' => '',
+        $response = $this->actingAs($this->warga)->post(route('portal.surat.store'), [
             'jenis_surat' => '',
-            'keperluan' => '',
+            'nama' => '',
         ]);
 
-        $response->assertSessionHasErrors(['pemohon_id', 'jenis_surat', 'keperluan']);
-
-        // Test choosing a non-warga (e.g. another admin or bendahara)
-        $responseNonWarga = $this->actingAs($this->admin)->post(route('admin.surat.store'), [
-            'pemohon_id' => $this->bendahara->id,
-            'jenis_surat' => LetterType::PENGANTAR,
-            'keperluan' => 'Pengurusan KTP',
-        ]);
-
-        $responseNonWarga->assertSessionHasErrors(['pemohon_id']);
+        $response->assertSessionHasErrors(['jenis_surat', 'nama']);
     }
 
     public function test_pdf_preview_and_download_return_binary_pdf_response_when_terbit(): void
@@ -296,9 +282,18 @@ class AdminLetterAndRoleTest extends TestCase
             'issued_at' => now(),
         ]);
 
+        // RT confirms -> status becomes selesai_rt
         $response = $this->actingAs($this->sekretaris)->post(route('admin.surat.confirm', $letter));
         $response->assertRedirect(route('admin.surat.show', $letter));
         $response->assertSessionHas('success');
+
+        $letter->refresh();
+        $this->assertEquals(LetterStatus::SELESAI_RT, $letter->status);
+        $this->assertNotNull($letter->rt_confirmed_at);
+
+        // RW confirms -> status becomes selesai
+        $resRw = $this->actingAs($this->sekretaris)->post(route('admin.surat.confirm-rw', $letter));
+        $resRw->assertRedirect(route('admin.surat.show', $letter));
 
         $letter->refresh();
         $this->assertEquals(LetterStatus::SELESAI, $letter->status);

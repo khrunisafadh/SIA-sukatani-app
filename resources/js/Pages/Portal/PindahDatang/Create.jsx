@@ -1,10 +1,11 @@
 import WargaLayout from '@/Layouts/WargaLayout';
-import { Head, router, usePage } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import {
     AlertTriangle,
     ArrowRight,
     CalendarDays,
     CheckCircle2,
+    Clock3,
     CloudUpload,
     Eye,
     FileImage,
@@ -52,29 +53,25 @@ function formatLongDate(value) {
     });
 }
 
-export default function PindahDatangCreate() {
+export default function PindahDatangCreate({ units = [], defaultWarga = null }) {
     const { auth } = usePage().props;
     const fileInputRef = useRef(null);
 
     const [jenis, setJenis] = useState('datang');
     const [form, setForm] = useState({
-        nama: auth.user.name || '',
-        nik: '',
-        kk: '',
+        nama: defaultWarga?.nama || auth?.user?.name || '',
+        nik: defaultWarga?.nik || '',
+        kk: defaultWarga?.no_kk || '',
         tanggal: '',
-        alamatAsal: '',
-        unit: '',
+        alamatAsal: defaultWarga?.alamat_ktp || '',
+        unit: defaultWarga?.unit || '',
         statusTinggal: 'Kontrak / Sewa Tahunan',
     });
-    const [files, setFiles] = useState([]);;
+    const [files, setFiles] = useState([]);
     const [errors, setErrors] = useState({});
     const [showConfirm, setShowConfirm] = useState(false);
     const [agreed, setAgreed] = useState(true);
-
-    const ticketId = useMemo(() => {
-        const stamp = form.tanggal?.replaceAll('-', '') ?? '20250616';
-        return `#MUT-${stamp.slice(0, 4)}-0689`;
-    }, [form.tanggal]);
+    const [submitting, setSubmitting] = useState(false);
 
     const updateField = (key, value) => {
         setForm((current) => ({ ...current, [key]: value }));
@@ -83,14 +80,16 @@ export default function PindahDatangCreate() {
 
     const validate = () => {
         const next = {};
-        if (!form.nama.trim()) next.nama = 'Nama lengkap wajib diisi.';
-        if (!/^\d{16}$/.test(form.nik)) next.nik = 'NIK harus 16 digit.';
-        if (!/^\d{16}$/.test(form.kk)) next.kk = 'Nomor KK harus 16 digit.';
+        if (!form.nama || !form.nama.trim()) next.nama = 'Nama lengkap wajib diisi.';
+        const cleanNik = (form.nik || '').replace(/\s+/g, '');
+        const cleanKk = (form.kk || '').replace(/\s+/g, '');
+        if (!/^\d{16}$/.test(cleanNik)) next.nik = 'NIK harus 16 digit angka.';
+        if (!/^\d{16}$/.test(cleanKk)) next.kk = 'Nomor KK harus 16 digit angka.';
         if (!form.tanggal) next.tanggal = 'Tanggal rencana wajib diisi.';
-        if (!form.alamatAsal.trim()) next.alamatAsal = 'Alamat asal wajib diisi.';
-        if (!form.unit) next.unit = 'Pilih unit rumah.';
+        if (!form.alamatAsal || !form.alamatAsal.trim()) next.alamatAsal = 'Alamat asal wajib diisi.';
+        if (!form.unit || !form.unit.trim()) next.unit = 'Pilih atau isi unit rumah.';
         if (!form.statusTinggal) next.statusTinggal = 'Pilih status tempat tinggal.';
-        if (files.length < 2) next.files = 'Unggah KTP Pemohon dan Kartu Keluarga.';
+        if (files.length < 1) next.files = 'Unggah berkas dokumen persyaratan (minimal KTP & Kartu Keluarga).';
         setErrors(next);
         return Object.keys(next).length === 0;
     };
@@ -105,32 +104,71 @@ export default function PindahDatangCreate() {
     };
 
     const submitReport = () => {
-        if (!agreed) {
+        if (!agreed || submitting) {
             return;
         }
 
+        setSubmitting(true);
+
         const payload = {
             jenis,
-            ...form,
-            files,
-            ticket: ticketId,
-            submittedAt: new Date().toISOString(),
+            nama: form.nama,
+            nik: (form.nik || '').replace(/\s+/g, ''),
+            kk: (form.kk || '').replace(/\s+/g, ''),
+            tanggal: form.tanggal,
+            alamatAsal: form.alamatAsal,
+            unit: form.unit,
+            statusTinggal: form.statusTinggal,
+            files: files.map((f) => f.raw).filter(Boolean),
         };
-        window.sessionStorage.setItem('sia.pindahDatang.latest', JSON.stringify(payload));
-        router.visit(route('portal.pindah-datang.tracking'));
+
+        router.post(route('portal.pindah-datang.store'), payload, {
+            forceFormData: true,
+            onError: (backendErrors) => {
+                setSubmitting(false);
+                setShowConfirm(false);
+                setErrors(backendErrors);
+            },
+            onFinish: () => {
+                setSubmitting(false);
+            },
+        });
     };
 
     const onPickFiles = (event) => {
-        const picked = Array.from(event.target.files || []).map((file) => ({
-            id: `${file.name}-${file.lastModified}`,
-            name: file.name,
-            sizeLabel: formatBytes(file.size),
-            kind: file.type.includes('pdf') ? 'Dokumen PDF' : 'Berkas Pendukung',
-            type: file.type.includes('pdf') ? 'pdf' : 'image',
-        }));
-        setFiles((current) => [...current, ...picked]);
+        const rawFiles = Array.from(event.target.files || []);
+        const validFiles = [];
+        let sizeError = null;
+
+        for (const file of rawFiles) {
+            if (file.size > 10 * 1024 * 1024) {
+                sizeError = `Berkas "${file.name}" melebihi batas maksimal 10 MB.`;
+                continue;
+            }
+            validFiles.push({
+                id: `${file.name}-${file.lastModified}-${Math.random()}`,
+                name: file.name,
+                sizeLabel: formatBytes(file.size),
+                kind: file.type.includes('pdf') ? 'Dokumen PDF' : 'Berkas Pendukung',
+                type: file.type.includes('pdf') ? 'pdf' : 'image',
+                raw: file,
+            });
+        }
+
+        if (sizeError) {
+            setErrors((current) => ({ ...current, files: sizeError }));
+        } else {
+            setErrors((current) => {
+                const next = { ...current };
+                delete next.files;
+                return next;
+            });
+        }
+
+        if (validFiles.length > 0) {
+            setFiles((current) => [...current, ...validFiles]);
+        }
         event.target.value = '';
-        setErrors((current) => ({ ...current, files: undefined }));
     };
 
     return (
@@ -149,14 +187,13 @@ export default function PindahDatangCreate() {
                         Catat perpindahan warga secara daring untuk verifikasi tertib administrasi RT 01/08.
                     </p>
                 </div>
-                <button
-                    type="button"
-                    onClick={() => window.location.reload()}
-                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#2F6BFF] px-4 py-2.5 text-[13px] font-semibold text-white shadow-sm hover:bg-[#2459B4]"
+                <Link
+                    href={route('portal.pindah-datang.tracking')}
+                    className="inline-flex items-center justify-center gap-2 rounded-xl border border-[#CBD5E1] bg-white px-4 py-2.5 text-[13px] font-semibold text-[#1A253C] hover:bg-slate-50 transition shadow-sm cursor-pointer"
                 >
-                    <Plus className="h-4 w-4" />
-                    Buat Laporan Baru
-                </button>
+                    <Clock3 className="h-4 w-4 text-[#0F685D]" />
+                    <span>Pantau Status Laporan</span>
+                </Link>
             </div>
 
             <div className="mb-5 flex gap-3 rounded-2xl border border-[#F3D7A3] bg-[#FFF6E5] px-4 py-3">
@@ -183,6 +220,20 @@ export default function PindahDatangCreate() {
                             Langkah 1 dari 2
                         </span>
                     </div>
+
+                    {Object.keys(errors).length > 0 && (
+                        <div className="mt-4 rounded-xl border border-[#FECDD3] bg-[#FFF1F2] p-4 text-xs text-[#9F1239]">
+                            <div className="flex items-center gap-2 font-bold mb-1">
+                                <AlertTriangle className="h-4 w-4 text-[#E11D48]" />
+                                <span>Mohon periksa data yang belum sesuai:</span>
+                            </div>
+                            <ul className="list-disc list-inside space-y-0.5 text-[11px]">
+                                {Object.entries(errors).map(([field, msg]) => (
+                                    <li key={field}>{msg}</li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
 
                     <div className="mt-5">
                         <label className="text-[12px] font-semibold">
@@ -293,12 +344,19 @@ export default function PindahDatangCreate() {
                                 Unit Rumah di RT 01/08 <span className="text-[#E24B4A]">*</span>
                             </label>
                             <input
-    type="text"
-    value={form.unit}
-    onChange={(event) => updateField('unit', event.target.value)}
-    placeholder="Masukkan blok dan nomor rumah"
-    className="mt-2 w-full rounded-xl border-0 bg-[#F4F7FB] px-4 py-3 text-[13px] ring-1 ring-[#E6EAF2] focus:ring-2 focus:ring-[#2F6BFF]"
-/>
+                                type="text"
+                                list="unit-list"
+                                value={form.unit}
+                                onChange={(event) => updateField('unit', event.target.value)}
+                                placeholder="Contoh: Blok B3 No. 12"
+                                className="mt-2 w-full rounded-xl border-0 bg-[#F4F7FB] px-4 py-3 text-[13px] ring-1 ring-[#E6EAF2] focus:ring-2 focus:ring-[#2F6BFF]"
+                            />
+                            <datalist id="unit-list">
+                                {units.map((u) => (
+                                    <option key={u.id} value={u.nama_unit} />
+                                ))}
+                            </datalist>
+                            {errors.unit && <p className="mt-1 text-[11px] text-[#E24B4A]">{errors.unit}</p>}
                         </div>
                         <div>
                             <label className="text-[12px] font-semibold">
@@ -486,7 +544,7 @@ export default function PindahDatangCreate() {
                                     <UserRound className="h-3.5 w-3.5" />
                                     {jenis === 'datang' ? 'Warga Datang (Domisili Baru RT 01/08)' : 'Warga Pindah (Keluar RT 01/08)'}
                                 </span>
-                                <span className="text-[11px] text-[#68748A]">ID Pelaporan: {ticketId}</span>
+                                <span className="text-[11px] text-[#68748A]">Nomor Tiket: Otomatis Diterbitkan Sistem</span>
                             </div>
 
                             <div className="mt-4 rounded-2xl border border-[#E6EAF2] bg-[#F7F9FC] p-4">
@@ -577,12 +635,21 @@ export default function PindahDatangCreate() {
                                 </button>
                                 <button
                                     type="button"
-                                    disabled={!agreed}
+                                    disabled={!agreed || submitting}
                                     onClick={submitReport}
                                     className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#2F6BFF] px-4 py-2.5 text-[13px] font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
                                 >
-                                    Ya, Kirim Laporan Sekarang
-                                    <ArrowRight className="h-4 w-4" />
+                                    {submitting ? (
+                                        <>
+                                            <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                                            Mengirim Laporan...
+                                        </>
+                                    ) : (
+                                        <>
+                                            Ya, Kirim Laporan Sekarang
+                                            <ArrowRight className="h-4 w-4" />
+                                        </>
+                                    )}
                                 </button>
                             </div>
                         </div>

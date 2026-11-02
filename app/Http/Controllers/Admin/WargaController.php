@@ -143,4 +143,96 @@ class WargaController extends Controller
 
         return redirect()->route('admin.warga.index')->with('success', "Data warga {$warga->nama_lengkap} (NIK: {$warga->nik}) berhasil disimpan langsung ke database!");
     }
+
+    /**
+     * Menampilkan detail lengkap data warga
+     */
+    public function show(Warga $warga): Response
+    {
+        return Inertia::render('Admin/Warga/Show', [
+            'warga' => $warga,
+        ]);
+    }
+
+    /**
+     * Menampilkan form edit data warga
+     */
+    public function edit(Warga $warga): Response
+    {
+        return Inertia::render('Admin/Warga/Edit', [
+            'warga' => $warga,
+        ]);
+    }
+
+    /**
+     * Menyimpan pembaruan data warga
+     */
+    public function update(Request $request, Warga $warga): RedirectResponse
+    {
+        $validated = $request->validate([
+            'nik' => ['required', 'string', 'size:16', 'unique:warga,nik,' . $warga->id],
+            'no_kk' => ['required', 'string', 'size:16'],
+            'nama_lengkap' => ['required', 'string', 'max:255'],
+            'gender' => ['required', 'in:L,P'],
+            'tempat_lahir' => ['required', 'string', 'max:100'],
+            'tgl_lahir' => ['required', 'date'],
+            'agama' => ['required', 'string'],
+            'goldar' => ['nullable', 'string'],
+            'shdk' => ['required', 'string'],
+            'nama_jalan' => ['required', 'string', 'max:255'],
+            'nomor_rumah' => ['required', 'string', 'max:50'],
+            'detail_alamat' => ['nullable', 'string', 'max:500'],
+            'status_domisili' => ['required', 'string'],
+            'status_administrasi' => ['required', 'string'],
+            'no_wa' => ['nullable', 'string', 'max:20'],
+            'pekerjaan' => ['nullable', 'string', 'max:100'],
+            'foto_ktp' => ['nullable', 'file', 'mimes:jpeg,png,jpg,pdf', 'max:5120'],
+            'foto_kk' => ['nullable', 'file', 'mimes:jpeg,png,jpg,pdf', 'max:5120'],
+        ], [
+            'nik.required' => 'Nomor Induk Kependudukan (NIK) wajib diisi.',
+            'nik.size' => 'NIK harus berjumlah tepat 16 digit.',
+            'nik.unique' => 'NIK ini sudah terdaftar untuk warga lain.',
+            'no_kk.required' => 'Nomor Kartu Keluarga wajib diisi.',
+            'no_kk.size' => 'Nomor KK harus berjumlah tepat 16 digit.',
+            'nama_lengkap.required' => 'Nama lengkap wajib diisi sesuai KTP.',
+            'nama_jalan.required' => 'Nama jalan / gang wajib diisi.',
+            'nomor_rumah.required' => 'Nomor rumah wajib diisi.',
+        ]);
+
+        if ($request->hasFile('foto_ktp')) {
+            if ($warga->foto_ktp) {
+                Storage::disk('public')->delete($warga->foto_ktp);
+            }
+            $validated['foto_ktp'] = $request->file('foto_ktp')->store('dokumen_warga/ktp', 'public');
+        }
+
+        if ($request->hasFile('foto_kk')) {
+            if ($warga->foto_kk) {
+                Storage::disk('public')->delete($warga->foto_kk);
+            }
+            $validated['foto_kk'] = $request->file('foto_kk')->store('dokumen_warga/kk', 'public');
+        }
+
+        $jalan = $validated['nama_jalan'];
+        $nomor = $validated['nomor_rumah'];
+        $detail = !empty($validated['detail_alamat']) ? " ({$validated['detail_alamat']})" : '';
+
+        $validated['blok_rumah'] = $jalan;
+        $validated['alamat_lengkap'] = "{$jalan} {$nomor}{$detail}, RT 01 / RW 08, Kelurahan Sukatani, Tapos, Depok";
+
+        $warga->update($validated);
+
+        return redirect()->route('admin.warga.show', $warga->id)->with('success', "Data warga {$warga->nama_lengkap} berhasil diperbarui!");
+    }
+
+    /**
+     * Menghapus data warga
+     */
+    public function destroy(Warga $warga): RedirectResponse
+    {
+        $nama = $warga->nama_lengkap;
+        $warga->delete();
+
+        return redirect()->route('admin.warga.index')->with('success', "Data warga {$nama} berhasil dihapus dari sistem.");
+    }
 }

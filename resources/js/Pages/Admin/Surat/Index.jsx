@@ -87,26 +87,17 @@ export default function SuratIndex({ letters, filters, summary, jenisOptions, st
                 { label: 'Layanan Administrasi', href: route('admin.dashboard') },
                 { label: 'Pengajuan Surat' },
             ]}
-            actions={
-                canCreate ? (
-                    <Link
-                        href={route('admin.surat.create')}
-                        className="btn-admin-primary"
-                    >
-                        <Plus className="h-4 w-4" />
-                        <span>Buat Pengajuan</span>
-                    </Link>
-                ) : null
-            }
+            actions={null}
         >
             <Head title="Pengajuan Surat - SIA Sukatani" />
 
-            <div className="mb-6 grid grid-cols-2 gap-4 md:grid-cols-4">
+            <div className="mb-6 grid grid-cols-2 gap-4 md:grid-cols-5">
                 {[
                     ['Total', summary.total],
                     ['Diajukan', summary.diajukan],
                     ['Terbit', summary.terbit],
-                    ['Selesai', summary.selesai],
+                    ['Selesai RT', summary.selesai_rt || 0],
+                    ['Selesai Akhir', summary.selesai],
                 ].map(([label, value]) => (
                     <div key={label} className="card-admin p-4">
                         <p className="text-xs text-[#718096] font-medium">{label}</p>
