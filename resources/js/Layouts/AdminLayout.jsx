@@ -108,9 +108,9 @@ export default function AdminLayout({
 
                             {/* Pindah / Datang */}
                             <Link
-                                href={route('admin.pindah-datang.index')}
+                                href={route('admin.mutasi.index')}
                                 className={menuClass(
-                                    route().current('admin.pindah-datang.*')
+                                    route().current('admin.mutasi.*')
                                 )}
                             >
                                 <span className="flex items-center gap-3">
@@ -118,7 +118,7 @@ export default function AdminLayout({
                                     Pindah / Datang
                                 </span>
 
-                                {route().current('admin.pindah-datang.*') && (
+                                {route().current('admin.mutasi.*') && (
                                     <ChevronRight className="h-3.5 w-3.5 text-[#89F5E7]" />
                                 )}
                             </Link>
@@ -144,22 +144,24 @@ export default function AdminLayout({
                                 </Link>
                             )}
 
-                            {/* Audit Trail */}
-                            <Link
-                                href={route('admin.audit-trail.index')}
-                                className={menuClass(
-                                    route().current('admin.audit-trail.*')
-                                )}
-                            >
-                                <span className="flex items-center gap-3">
-                                    <ShieldCheck className={iconClass} />
-                                    Audit Trail
-                                </span>
+                            {/* Audit Trail (Khusus Ketua RT) */}
+                            {isAdmin && (
+                                <Link
+                                    href={route('admin.audit-trail.index')}
+                                    className={menuClass(
+                                        route().current('admin.audit-trail.*')
+                                    )}
+                                >
+                                    <span className="flex items-center gap-3">
+                                        <ShieldCheck className={iconClass} />
+                                        Audit Trail
+                                    </span>
 
-                                {route().current('admin.audit-trail.*') && (
-                                    <ChevronRight className="h-3.5 w-3.5 text-[#89F5E7]" />
-                                )}
-                            </Link>
+                                    {route().current('admin.audit-trail.*') && (
+                                        <ChevronRight className="h-3.5 w-3.5 text-[#89F5E7]" />
+                                    )}
+                                </Link>
+                            )}
 
                             {/* Pengguna & Role */}
                             {isAdmin && (

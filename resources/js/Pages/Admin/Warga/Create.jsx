@@ -197,7 +197,7 @@ export default function WargaCreate({ auth }) {
 
                 {/* Pindah / Datang */}
                 <Link
-                  href={route('admin.pindah-datang.index')}
+                  href={route('admin.mutasi.index')}
                   className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[#D0EBE7] hover:bg-[#206760] hover:text-white text-xs font-medium transition-colors"
                 >
                   <ArrowLeftRight className="w-4 h-4 text-[#A7D7D0]" />
