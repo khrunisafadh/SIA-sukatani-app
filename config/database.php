@@ -60,7 +60,16 @@ return [
             'strict' => true,
             'engine' => null,
             'options' => extension_loaded('pdo_mysql') ? array_filter([
-                Mysql::ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+                PDO::MYSQL_ATTR_SSL_CA => (function () {
+                    $ca = env('MYSQL_ATTR_SSL_CA');
+                    if (is_string($ca) && $ca !== '' && $ca !== 'true' && $ca !== '1' && file_exists($ca)) {
+                        return $ca;
+                    }
+                    if ($ca === true || $ca === 'true' || $ca === '1' || $ca === 1) {
+                        return ini_get('openssl.cafile') ?: (ini_get('curl.cainfo') ?: (file_exists('/etc/ssl/certs/ca-certificates.crt') ? '/etc/ssl/certs/ca-certificates.crt' : true));
+                    }
+                    return null;
+                })(),
             ]) : [],
         ],
 
@@ -80,7 +89,16 @@ return [
             'strict' => true,
             'engine' => null,
             'options' => extension_loaded('pdo_mysql') ? array_filter([
-                Mysql::ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+                PDO::MYSQL_ATTR_SSL_CA => (function () {
+                    $ca = env('MYSQL_ATTR_SSL_CA');
+                    if (is_string($ca) && $ca !== '' && $ca !== 'true' && $ca !== '1' && file_exists($ca)) {
+                        return $ca;
+                    }
+                    if ($ca === true || $ca === 'true' || $ca === '1' || $ca === 1) {
+                        return ini_get('openssl.cafile') ?: (ini_get('curl.cainfo') ?: (file_exists('/etc/ssl/certs/ca-certificates.crt') ? '/etc/ssl/certs/ca-certificates.crt' : true));
+                    }
+                    return null;
+                })(),
             ]) : [],
         ],
 
