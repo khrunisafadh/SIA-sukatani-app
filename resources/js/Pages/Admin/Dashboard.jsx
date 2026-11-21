@@ -212,7 +212,7 @@ export default function AdminDashboard({ auth, stats: propStats, recentLetters: 
 
                 {/* Pindah / Datang */}
                 <Link
-                  href={route('admin.pindah-datang.index')}
+                  href={route('admin.mutasi.index')}
                   className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[#D0EBE7] hover:bg-[#206760] hover:text-white text-xs font-medium transition-colors"
                 >
                   <ArrowLeftRight className="w-4 h-4 text-[#A7D7D0]" />
@@ -236,13 +236,15 @@ export default function AdminDashboard({ auth, stats: propStats, recentLetters: 
                 </Link>
 
                 {/* Audit Trail */}
-                <a
-                  href="#audit-trail"
-                  className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[#D0EBE7] hover:bg-[#206760] hover:text-white text-xs font-medium transition-colors"
-                >
-                  <ShieldCheck className="w-4 h-4 text-[#A7D7D0]" />
-                  <span>Audit Trail</span>
-                </a>
+                {auth?.user?.role === 'ketua_rt' && (
+                  <Link
+                    href={route('admin.audit-trail.index')}
+                    className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[#D0EBE7] hover:bg-[#206760] hover:text-white text-xs font-medium transition-colors"
+                  >
+                    <ShieldCheck className="w-4 h-4 text-[#A7D7D0]" />
+                    <span>Audit Trail</span>
+                  </Link>
+                )}
 
                 {/* Pengguna & Role */}
                 <Link
@@ -410,7 +412,7 @@ export default function AdminDashboard({ auth, stats: propStats, recentLetters: 
 
               {/* Modul Mutasi */}
               <Link
-                href={route('admin.pindah-datang.index')}
+                href={route('admin.mutasi.index')}
                 className="p-5 rounded-2xl bg-white border border-[#E4E9F0] shadow-sm space-y-3 hover:border-[#97620D]/40 hover:shadow-md transition block group"
               >
                 <div className="w-10 h-10 rounded-xl bg-[#FFF2D9] flex items-center justify-center text-[#97620D]">
