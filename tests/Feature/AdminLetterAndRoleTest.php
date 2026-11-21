@@ -809,7 +809,8 @@ class AdminLetterAndRoleTest extends TestCase
 
     public function test_audit_logger_gracefully_handles_absence_and_presence_of_audit_logs_table(): void
     {
-        // 1. Table does not exist (default in this branch)
+        // 1. Table does not exist (tested by dropping table)
+        Schema::dropIfExists('audit_logs');
         $this->assertFalse(Schema::hasTable('audit_logs'));
 
         \App\Support\AuditLogger::record($this->admin, 'test.action', User::class, $this->admin->id, [

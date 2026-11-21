@@ -166,5 +166,8 @@ class DatabaseSeeder extends Seeder
 
         // Jalankan TransaksiKasSeeder untuk transparansi kas RT & modul bendahara
         $this->call(TransaksiKasSeeder::class);
+
+        // Jalankan AuditLogSeeder untuk modul audit trail & transparansi aktivitas sistem
+        $this->call(AuditLogSeeder::class);
     }
 }

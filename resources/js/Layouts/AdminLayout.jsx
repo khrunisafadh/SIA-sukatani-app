@@ -166,8 +166,8 @@ export default function AdminLayout({
                                 </Link>
                             )}
 
-                            {/* Audit Trail */}
-                            {route().has('admin.audit-trail.index') ? (
+                            {/* Audit Trail (Khusus Ketua RT) */}
+                            {isAdmin && (
                                 <Link
                                     href={route('admin.audit-trail.index')}
                                     className={menuClass(
@@ -183,14 +183,6 @@ export default function AdminLayout({
                                         <ChevronRight className="h-3.5 w-3.5 text-[#89F5E7]" />
                                     )}
                                 </Link>
-                            ) : (
-                                <a
-                                    href="#audit-trail"
-                                    className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[#D0EBE7] hover:bg-[#206760] hover:text-white text-xs font-medium transition-colors"
-                                >
-                                    <ShieldCheck className={iconClass} />
-                                    <span>Audit Trail</span>
-                                </a>
                             )}
 
                             {/* Pengguna & Role */}

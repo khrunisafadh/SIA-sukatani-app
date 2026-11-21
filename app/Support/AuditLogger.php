@@ -34,7 +34,7 @@ class AuditLogger
         }
 
         try {
-            DB::table('audit_logs')->insert([
+            $payload = [
                 'user_id' => $actor?->id,
                 'action' => $action,
                 'subject_type' => $subjectType,
@@ -42,7 +42,17 @@ class AuditLogger
                 'meta' => json_encode($meta),
                 'created_at' => now(),
                 'updated_at' => now(),
-            ]);
+            ];
+
+            if (Schema::hasColumn('audit_logs', 'ip_address')) {
+                $payload['ip_address'] = request()->ip() ?? '127.0.0.1';
+            }
+
+            if (Schema::hasColumn('audit_logs', 'user_agent')) {
+                $payload['user_agent'] = request()->userAgent() ?? 'System';
+            }
+
+            DB::table('audit_logs')->insert($payload);
         } catch (Throwable $e) {
             Log::warning("AuditLogger failed to persist to audit_logs: {$e->getMessage()}", [
                 'action' => $action,

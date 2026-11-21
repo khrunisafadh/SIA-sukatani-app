@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Admin\AuditTrailController;
 use App\Http\Controllers\Admin\MutasiAdminController;
 use App\Http\Controllers\Admin\SuratAdminController;
 use App\Http\Controllers\Admin\UserRoleController;
@@ -145,6 +146,12 @@ Route::middleware(['auth', 'role:ketua_rt'])->prefix('admin')->name('admin.')->g
     Route::post('pengguna', [UserRoleController::class, 'store'])->name('users.store');
     Route::patch('pengguna/{user}/role', [UserRoleController::class, 'updateRole'])->name('users.update-role');
     Route::post('pengguna/{user}/reset-akses', [UserRoleController::class, 'resetAccess'])->name('users.reset-access');
+
+    // Audit Trail (Khusus Ketua RT)
+    Route::get('audit-trail', [AuditTrailController::class, 'index'])->name('audit-trail.index');
+    Route::get('audit-trail/export/csv', [AuditTrailController::class, 'exportCsv'])->name('audit-trail.export.csv');
+    Route::get('audit-trail/export/pdf', [AuditTrailController::class, 'exportPdf'])->name('audit-trail.export.pdf');
+    Route::get('audit-trail/{id}', [AuditTrailController::class, 'show'])->name('audit-trail.show');
 });
 
 /*
